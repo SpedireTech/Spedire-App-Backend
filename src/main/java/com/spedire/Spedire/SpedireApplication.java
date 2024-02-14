@@ -1,4 +1,4 @@
-package com.example.spedire;
+package com.spedire.Spedire;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

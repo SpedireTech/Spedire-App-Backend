@@ -1,4 +1,4 @@
-package com.example.spedire;
+package com.spedire.Spedire;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
