@@ -2,7 +2,7 @@ package com.spedire.Spedire.service;
 
 import com.spedire.Spedire.dtos.responses.VerifyPhoneNumberResponse;
 import com.spedire.Spedire.exceptions.SpedireException;
-import com.spedire.Spedire.models.User;
+import com.spedire.Spedire.repositories.models.User;
 import com.spedire.Spedire.services.user.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

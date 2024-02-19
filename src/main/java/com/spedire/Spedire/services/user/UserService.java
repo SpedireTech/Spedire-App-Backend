@@ -1,7 +1,7 @@
 package com.spedire.Spedire.services.user;
 
 import com.spedire.Spedire.dtos.responses.VerifyPhoneNumberResponse;
-import com.spedire.Spedire.models.User;
+import com.spedire.Spedire.repositories.models.User;
 
 public interface UserService {
 

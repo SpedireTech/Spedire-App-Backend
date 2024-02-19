@@ -30,7 +30,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         UsernamePasswordAuthenticationFilter authenticationFilter = new SpedireAuthenticationFilter(authenticationManager,
-                objectMapper, null, null, jwtUtil, userService, null);
+                objectMapper, null, null, jwtUtil,  null);
         SpedireAuthorizationFilter authorizationFilter = new SpedireAuthorizationFilter(jwtUtil);
 
         return httpSecurity
@@ -41,12 +41,10 @@ public class SecurityConfig {
                 .exceptionHandling(exceptionHandler -> exceptionHandler.authenticationEntryPoint(customAuthenticationFailureHandler::onAuthenticationFailure))
                 .addFilterAt(authenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("/api/v1/cooperative/register")
+                        .requestMatchers("/api/v1/user/verifyPhoneNumberFirst")
                         .permitAll()
                         .anyRequest()
-                        .authenticated()
-                )
-                .build();
+                        .authenticated()).build();
     }
 
 }

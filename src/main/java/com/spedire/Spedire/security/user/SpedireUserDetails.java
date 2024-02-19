@@ -1,7 +1,7 @@
 package com.spedire.Spedire.security.user;
 
 import com.spedire.Spedire.enums.Role;
-import com.spedire.Spedire.models.User;
+import com.spedire.Spedire.repositories.models.User;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

@@ -33,7 +33,6 @@ public class SpedireAuthenticationFilter extends UsernamePasswordAuthenticationF
     private String password;
     private final JwtUtil jwtUtil;
     private final UserService userService;
-    private String id;
 
 
     @Override
@@ -44,10 +43,7 @@ public class SpedireAuthenticationFilter extends UsernamePasswordAuthenticationF
             password = loginRequest.getPassword();
             Authentication authentication = new UsernamePasswordAuthenticationToken(email, password);
             Authentication authenticationResult = authenticationManager.authenticate(authentication);
-            String idForContext = extractIdFromEmail(email);
-            id = idForContext;
-            Authentication authenticationForContext = new UsernamePasswordAuthenticationToken(idForContext, password);
-            SecurityContextHolder.getContext().setAuthentication(authenticationForContext);
+            SecurityContextHolder.getContext().setAuthentication(authenticationResult);
             return authenticationResult;
         } catch (IOException exception) {
             throw new BadCredentialsException(BADCREDENTIALSEXCEPTION);
@@ -55,22 +51,14 @@ public class SpedireAuthenticationFilter extends UsernamePasswordAuthenticationF
     }
 
     @SneakyThrows
-    private String extractIdFromEmail(String email){
-        String id = null;
-        id = userService.findMemberByMail(email).getId();
-        return  id;
-    }
-
-    @SneakyThrows
     @Override
     protected void successfulAuthentication(HttpServletRequest request,
                                             HttpServletResponse response,
                                             FilterChain chain,
-                                            Authentication authResult) throws IOException {
-        String accessToken = jwtUtil.generateAccessToken(id);
+                                            Authentication authResult)  {
+        String accessToken = jwtUtil.generateAccessToken(email);
         Map<String, Object> responseData = new HashMap<>();
         responseData.put("access_token", accessToken);
-        //  String email = (String) authResult.getPrincipal();
         response.setContentType(APPLICATION_JSON_VALUE);
         response.getOutputStream().write(objectMapper.writeValueAsBytes(
                 responseData));

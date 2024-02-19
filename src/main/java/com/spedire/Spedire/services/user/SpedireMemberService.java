@@ -2,12 +2,11 @@ package com.spedire.Spedire.services.user;
 
 import com.spedire.Spedire.dtos.responses.VerifyPhoneNumberResponse;
 import com.spedire.Spedire.enums.Role;
-import com.spedire.Spedire.models.User;
+import com.spedire.Spedire.repositories.models.User;
 import com.spedire.Spedire.repositories.UserRepository;
 import com.spedire.Spedire.services.otp.OTPService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

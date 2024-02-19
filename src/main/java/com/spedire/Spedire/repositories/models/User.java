@@ -1,4 +1,4 @@
-package com.spedire.Spedire.models;
+package com.spedire.Spedire.repositories.models;
 
 
 import com.spedire.Spedire.enums.Role;
