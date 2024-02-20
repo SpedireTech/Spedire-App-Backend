@@ -40,6 +40,7 @@ public class SpedireAuthorizationFilter extends OncePerRequestFilter {
             authorizeRequest(request, response, filterChain);
         }
     }
+
     @SneakyThrows
     private void authorizeRequest(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)  {
         authorize(request);
@@ -63,12 +64,11 @@ public class SpedireAuthorizationFilter extends OncePerRequestFilter {
     private void authorizeToken(String token) throws SpedireException {
         Map<String, Claim> map = jwtUtil.extractClaimsFromToken(token);
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();
-       // Claim roles = map.get("Roles");
-        Claim id = map.get("id");
-        System.out.println("this is the ID " + id);
+        Claim roles = map.get("roles");
+        Claim email = map.get("email");
 
-      //  addClaimToUserAuthorities(authorities, roles);
-        Authentication authentication = new UsernamePasswordAuthenticationToken(id, null, authorities);
+        addClaimToUserAuthorities(authorities, roles);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(email, null, authorities);
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
@@ -76,7 +76,7 @@ public class SpedireAuthorizationFilter extends OncePerRequestFilter {
         for (int i = 0; i < claim.asMap().size(); i++) {
             String role = (String) claim.asMap().get("role" + (i + 1));
             if (role != null) {
-                authorities.add(new SimpleGrantedAuthority(role.toString()));
+                authorities.add(new SimpleGrantedAuthority(role));
             }
         }
     }

@@ -38,6 +38,7 @@ public class SpedireAuthenticationProvider implements AuthenticationProvider {
         return authenticationResult;
     }
 
+
     private Authentication authenticateUser(String principal, String password) {
         Authentication authenticationResult;
         UserDetails userDetails = userDetailsService.loadUserByUsername(principal);
@@ -51,23 +52,6 @@ public class SpedireAuthenticationProvider implements AuthenticationProvider {
         return null;
     }
 
-//    private Authentication authenticateIfAuthIsCooperative(String principal, String password) {
-//        Authentication authenticationResult;
-//        CooperativeDetailsService cooperativedetails = new CooperativeDetailsService(cooperativeService);
-//        UserDetails details = cooperativedetails.loadUserByUsername(principal);
-//        if (!(details == null)) {
-//            String cooperativeId = details.getUsername();
-//            System.out.println("this si coope ID " + cooperativeId );
-//            String cooperativePassword = details.getPassword();
-//            if (!cooperativeId.isEmpty()) {
-//                if (passwordEncoder.matches(password, cooperativePassword)) {
-//                    authenticationResult = new UsernamePasswordAuthenticationToken(cooperativeId, cooperativePassword);
-//                    return authenticationResult;
-//                }
-//            }
-//        }
-//        return null;
-//    }
 
     @Override
     public boolean supports(Class<?> authentication) {

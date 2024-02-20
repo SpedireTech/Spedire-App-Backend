@@ -20,8 +20,6 @@ public class SpedireUserDetails implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<SimpleGrantedAuthority> authorities= new ArrayList<>();
-        System.out.println("Member::>> "+ user.toString());
-        System.out.println("Roles::>> "+ user.getRoles());
         for(Role role: user.getRoles()){
             authorities.add(new SimpleGrantedAuthority(role.name()));
         }
