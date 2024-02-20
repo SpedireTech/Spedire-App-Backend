@@ -1,7 +1,7 @@
 package com.spedire.Spedire.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.spedire.Spedire.exceptions.CustomAuthenticationFailureHandler;
+//import com.spedire.Spedire.exceptions.CustomAuthenticationFailureHandler;
 import com.spedire.Spedire.security.filter.SpedireAuthenticationFilter;
 import com.spedire.Spedire.security.filter.SpedireAuthorizationFilter;
 import com.spedire.Spedire.services.user.UserService;
@@ -21,7 +21,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final AuthenticationManager authenticationManager;
-    private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
+//    private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
     private final UserService userService;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final JwtUtil jwtUtil;
@@ -41,7 +41,7 @@ public class SecurityConfig {
 //                .exceptionHandling(exceptionHandler -> exceptionHandler.authenticationEntryPoint(customAuthenticationFailureHandler::onAuthenticationFailure))
                 .addFilterAt(authenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("/api/v1/user/verifyPhoneNumberFirst/**")
+                        .requestMatchers("/api/v1/user/verifyPhoneNumberFirst/**", "/api/v1/user/test")
                         .permitAll()
                         .anyRequest()
                         .authenticated()).build();
