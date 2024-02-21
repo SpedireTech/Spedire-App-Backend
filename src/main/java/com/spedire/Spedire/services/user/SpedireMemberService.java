@@ -2,9 +2,9 @@ package com.spedire.Spedire.services.user;
 
 import com.spedire.Spedire.dtos.responses.VerifyPhoneNumberResponse;
 import com.spedire.Spedire.enums.Role;
-import com.spedire.Spedire.repositories.models.User;
+import com.spedire.Spedire.models.User;
 import com.spedire.Spedire.repositories.UserRepository;
-import com.spedire.Spedire.services.otp.OTPService;
+import com.spedire.Spedire.services.sms.SMSService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,7 +18,7 @@ import static com.spedire.Spedire.services.user.UserServiceUtils.verifyPhoneNumb
 public class SpedireMemberService implements UserService{
 
     private final UserRepository userRepository;
-    private final OTPService otpService;
+    private final SMSService otpService;
 
     @Override
     @Transactional

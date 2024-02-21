@@ -1,7 +1,7 @@
 package com.spedire.Spedire.security.user;
 
 import com.spedire.Spedire.exceptions.SpedireException;
-import com.spedire.Spedire.repositories.models.User;
+import com.spedire.Spedire.models.User;
 import com.spedire.Spedire.repositories.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;

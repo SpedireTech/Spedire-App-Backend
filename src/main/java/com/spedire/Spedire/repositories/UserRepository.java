@@ -1,6 +1,6 @@
 package com.spedire.Spedire.repositories;
 
-import com.spedire.Spedire.repositories.models.User;
+import com.spedire.Spedire.models.User;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.Optional;
