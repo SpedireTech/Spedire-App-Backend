@@ -12,6 +12,8 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
+
+import java.util.Arrays;
 import java.util.Map;
 
 import static com.spedire.Spedire.security.SecurityUtils.JWT_SECRET;
@@ -25,36 +27,23 @@ public class JwtUtil {
     @Value(JWT_SECRET)
     private String secret;
 
-    public Map<String, Claim> extractClaimsFromToken(String token) throws SpedireException {
-        DecodedJWT decodedJwt = validateToken(token);
+    public Map<String, Claim> extractClaimsFromToken(String token)  {
+        DecodedJWT decodedJwt = verifyToken(token);
         return decodedJwt.getClaims();
     }
 
-    public DecodedJWT validateToken(String token){
-        log.info("This is the token " + token);
-        return JWT.require(Algorithm.HMAC512(secret.getBytes()))
-                .build().verify(token);
-    }
-
     public DecodedJWT verifyToken(String token) {
-        System.out.println("Token 2"+ token);
         Algorithm algorithm = Algorithm.HMAC512(secret.getBytes());
         JWTVerifier verifier = JWT.require(algorithm).build();
         return verifier.verify(token);
     }
 
-    public String generateAccessToken(String id) {
-        System.out.println();
 
-        return JWT
-                .create()
-                .withIssuedAt(Instant.now())
-                .withExpiresAt(
-                        Instant.now()
-                                .plusSeconds(86000L)
-                )
-                .withClaim("id", id)
+    public String generateAccessToken(String email) {
+        return JWT.create().withIssuedAt(Instant.now()).withExpiresAt(Instant.now().plusSeconds(86000L))
+                .withClaim("email", email)
                 .sign(Algorithm.HMAC512(secret.getBytes()));
     }
+
 
 }

@@ -1,6 +1,9 @@
 package com.spedire.Spedire.configurations;
 
+import com.spedire.Spedire.repositories.UserRepository;
 import com.spedire.Spedire.security.JwtUtil;
+import com.spedire.Spedire.services.email.JavaMailService;
+import com.spedire.Spedire.services.user.UserServiceUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -31,4 +34,11 @@ public class BeanConfig {
     public JwtUtil jwtUtil() {
         return new JwtUtil(secret);
     }
+
+    @Bean
+    public UserServiceUtils userServiceUtils(PasswordEncoder passwordEncoder,
+                                             UserRepository userRepository, JavaMailService javaMailService) {
+        return new UserServiceUtils(secret, passwordEncoder, userRepository, javaMailService);
+    }
 }
+

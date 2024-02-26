@@ -2,6 +2,9 @@ package com.spedire.Spedire.services.sms;
 
 public interface SMSService {
 
-    String sendOTPToPhoneNumber(String phoneNumber);
+    String sendVerificationSMS(String phoneNumber);
+
+    boolean checkVerificationCode(String phoneNumber, String verificationCode);
+
 
 }

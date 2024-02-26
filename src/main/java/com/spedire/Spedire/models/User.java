@@ -7,6 +7,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,9 +33,11 @@ public class User {
     @Indexed(unique = true)
     private String email;
 
+    private boolean otpVerificationStatus;
 
     private List<Role> roles = new ArrayList<>();
 
+    private LocalDateTime createdAt;
     public User(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
