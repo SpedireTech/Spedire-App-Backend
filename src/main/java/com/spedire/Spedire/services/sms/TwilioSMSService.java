@@ -20,22 +20,13 @@ public class TwilioSMSService implements SMSService {
 
     private UserServiceUtils utils;
 
-    @Value(TWILIO_ACCOUNT_SID)
-    private String accountSid;
-
-    @Value(TWILIO_AUTH_TOKEN)
-    private String authToken;
-
-    @Value(VERIFY_SERVICE_SID)
-    private String serviceSid;
-
+    private SMSUtils smsUtils;
     private static final Logger logger = LoggerFactory.getLogger(TwilioSMSService.class);
-
 
 
     @PostConstruct
     private void initializeTwilio() {
-        Twilio.init(accountSid, authToken);
+        Twilio.init(smsUtils.TWILIO_ACCOUNT_SID, smsUtils.TWILIO_AUTH_TOKEN);
     }
 
     @Override
@@ -44,7 +35,7 @@ public class TwilioSMSService implements SMSService {
         System.out.println(removeFirstDigit);
         try {
             Verification verification = Verification.creator(
-                            serviceSid,
+                            smsUtils.VERIFY_SERVICE_SID,
                             PHONE_NUMBER_PREFIX+removeFirstDigit,
                             "sms").create();
             logger.info("Verification Status: {}", verification.getStatus());

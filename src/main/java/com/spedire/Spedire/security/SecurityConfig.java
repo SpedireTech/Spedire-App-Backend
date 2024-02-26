@@ -2,6 +2,7 @@ package com.spedire.Spedire.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 //import com.spedire.Spedire.exceptions.CustomAuthenticationFailureHandler;
+import com.spedire.Spedire.enums.Role;
 import com.spedire.Spedire.security.filter.SpedireAuthenticationFilter;
 import com.spedire.Spedire.security.filter.SpedireAuthorizationFilter;
 import com.spedire.Spedire.services.user.UserService;
@@ -41,8 +42,8 @@ public class SecurityConfig {
 //                .exceptionHandling(exceptionHandler -> exceptionHandler.authenticationEntryPoint(customAuthenticationFailureHandler::onAuthenticationFailure))
                 .addFilterAt(authenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("/api/v1/user/verifyPhoneNumberFirst/**", "/api/v1/user/test")
-                        .permitAll()
+                        .requestMatchers("/api/v1/user/savePhoneNumber/**").permitAll()
+                        .requestMatchers("/api/v1/user/complete-registration", "/api/v1/sms/verify-otp").hasAuthority(Role.NEW_USER.getName())
                         .anyRequest()
                         .authenticated()).build();
     }

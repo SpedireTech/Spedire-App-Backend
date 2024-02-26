@@ -1,6 +1,7 @@
 package com.spedire.Spedire.controllers;
 
 import com.spedire.Spedire.dtos.requests.CompleteRegistrationRequest;
+import com.spedire.Spedire.dtos.requests.VerifyOtpRequest;
 import com.spedire.Spedire.dtos.responses.ApiResponse;
 import com.spedire.Spedire.dtos.responses.CompleteRegistrationResponse;
 import com.spedire.Spedire.services.sms.SMSService;
@@ -17,10 +18,10 @@ public class SMSController {
     private final SMSService smsService;
 
     @PostMapping("verify-otp")
-    public ResponseEntity<ApiResponse<?>> verifyOtp(String phoneNumber, String verificationCode) {
+    public ResponseEntity<ApiResponse<?>> verifyOtp(@RequestBody VerifyOtpRequest request) {
         boolean response = false;
         try {
-            response = smsService.checkVerificationCode(phoneNumber, verificationCode);
+            response = smsService.checkVerificationCode(request.getPhoneNumber(), request.getVerificationCode());
             return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().message("Verification Successful").success(response).build());
         } catch (IllegalArgumentException exception) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().message("Verification Failed").success(response).build());

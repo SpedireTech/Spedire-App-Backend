@@ -1,19 +1,22 @@
 package com.spedire.Spedire.services.sms;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
 @Component
 public class SMSUtils {
 
-    public static final String TWILIO_ACCOUNT_SID = "${twilio.accountSid}";
+    @Value("${twilio.accountSid}")
+    public String TWILIO_ACCOUNT_SID;
 
-    public static final String TWILIO_AUTH_TOKEN = "${twilio.authToken}";
+    @Value("${twilio.authToken}")
+    public String TWILIO_AUTH_TOKEN;
 
-//    public static final String TWILIO_NUMBER = "${twilio.number}";
-    public static final String VERIFY_SERVICE_SID = "${twilio.verifySid}";
+    @Value("${twilio.verifySid}")
+    public String VERIFY_SERVICE_SID;
 
-    public static final String PHONE_NUMBER_PREFIX="+234";
+    public static final String PHONE_NUMBER_PREFIX = "+234";
 
 
 }

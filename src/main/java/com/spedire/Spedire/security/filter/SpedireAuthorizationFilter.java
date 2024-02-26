@@ -47,7 +47,7 @@ public class SpedireAuthorizationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private void authorize(HttpServletRequest request) throws SpedireException {
+    private void authorize(HttpServletRequest request)  {
         String authorization = request.getHeader(AUTHORIZATION);
         String tokenPrefix = "Bearer ";
         boolean isValidAuthorizationHeader = false;
@@ -61,7 +61,7 @@ public class SpedireAuthorizationFilter extends OncePerRequestFilter {
         }
     }
 
-    private void authorizeToken(String token) throws SpedireException {
+    private void authorizeToken(String token) {
         Map<String, Claim> map = jwtUtil.extractClaimsFromToken(token);
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();
         Claim roles = map.get("roles");

@@ -30,7 +30,7 @@ public class UserController {
     }
 
 
-    @PostMapping("complete-registration/{phoneNumber}")
+    @PostMapping("complete-registration")
     public ResponseEntity<ApiResponse<?>> completeRegistration(@RequestBody CompleteRegistrationRequest request, @RequestHeader("Authorization") String token)  {
         CompleteRegistrationResponse response = new CompleteRegistrationResponse();
         try {
