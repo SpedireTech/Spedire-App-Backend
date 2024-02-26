@@ -1,13 +1,12 @@
 package com.spedire.Spedire.dtos.responses;
 
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 @ToString
 @Builder
+@Getter
+@Setter
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class ApiResponse<T> {

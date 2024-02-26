@@ -18,10 +18,10 @@ public class SMSController {
     private final SMSService smsService;
 
     @PostMapping("verify-otp")
-    public ResponseEntity<ApiResponse<?>> verifyOtp(@RequestBody VerifyOtpRequest request) {
+    public ResponseEntity<ApiResponse<?>> verifyOtp(@RequestBody VerifyOtpRequest request, @RequestHeader("Authorization") String token) {
         boolean response = false;
         try {
-            response = smsService.checkVerificationCode(request.getPhoneNumber(), request.getVerificationCode());
+            response = smsService.checkVerificationCode(request.getVerificationCode(), token);
             return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().message("Verification Successful").success(response).build());
         } catch (IllegalArgumentException exception) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().message("Verification Failed").success(response).build());

@@ -73,10 +73,12 @@ public class SpedireAuthorizationFilter extends OncePerRequestFilter {
     }
 
     private void addClaimToUserAuthorities(List<SimpleGrantedAuthority> authorities, Claim claim) {
-        for (int i = 0; i < claim.asMap().size(); i++) {
-            String role = (String) claim.asMap().get("role" + (i + 1));
-            if (role != null) {
-                authorities.add(new SimpleGrantedAuthority(role));
+        if (claim != null) {
+            for (int i = 0; i < claim.asMap().size(); i++) {
+                String role = (String) claim.asMap().get("role" + (i + 1));
+                if (role != null) {
+                    authorities.add(new SimpleGrantedAuthority(role));
+                }
             }
         }
     }

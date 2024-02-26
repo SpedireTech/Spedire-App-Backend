@@ -42,8 +42,7 @@ public class SecurityConfig {
 //                .exceptionHandling(exceptionHandler -> exceptionHandler.authenticationEntryPoint(customAuthenticationFailureHandler::onAuthenticationFailure))
                 .addFilterAt(authenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("/api/v1/user/savePhoneNumber/**").permitAll()
-                        .requestMatchers("/api/v1/user/complete-registration", "/api/v1/sms/verify-otp").hasAuthority(Role.NEW_USER.getName())
+                        .requestMatchers("/api/v1/user/savePhoneNumber", "/api/v1/user/complete-registration", "/api/v1/sms/verify-otp").permitAll()
                         .anyRequest()
                         .authenticated()).build();
     }

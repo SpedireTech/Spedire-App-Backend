@@ -36,9 +36,9 @@ public class BeanConfig {
     }
 
     @Bean
-    public UserServiceUtils userServiceUtils(PasswordEncoder passwordEncoder,
+    public UserServiceUtils userServiceUtils(PasswordEncoder passwordEncoder, JwtUtil jwtUtil,
                                              UserRepository userRepository, JavaMailService javaMailService) {
-        return new UserServiceUtils(secret, passwordEncoder, userRepository, javaMailService);
+        return new UserServiceUtils(secret, jwtUtil, passwordEncoder, userRepository, javaMailService);
     }
 }
 

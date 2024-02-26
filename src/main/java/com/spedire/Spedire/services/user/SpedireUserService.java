@@ -35,11 +35,17 @@ public class SpedireUserService implements UserService{
     @Override
     @Transactional
     public VerifyPhoneNumberResponse savePhoneNumber(String phoneNumber) {
+        System.out.println(phoneNumber);
         verifyPhoneNumberIsValid(phoneNumber);
+        System.out.println(1);
         validatePhoneNumberDoesntExist(phoneNumber, userRepository);
+        System.out.println(2);
         User user = new User(phoneNumber);
+        System.out.println(3);
         user.getRoles().add(Role.NEW_USER);
+        System.out.println(4);
         String message = smsService.sendVerificationSMS(phoneNumber);
+        System.out.println(5);
         user.setOtpVerificationStatus(false);
         if (message.equals("OTP Sent")) {
             User storedUser = userRepository.save(user);
@@ -56,10 +62,7 @@ public class SpedireUserService implements UserService{
     @Override
     @Transactional
     public CompleteRegistrationResponse completeRegistration(CompleteRegistrationRequest request, String token) {
-        String splitToken = token.split(" ")[1];
-        System.out.println(splitToken);
-        DecodedJWT decodedJWT = jwtUtil.verifyToken(splitToken);
-        String phoneNumber = decodedJWT.getClaim("phoneNumber").asString();
+        String phoneNumber = utils.decodeToken(token);
         utils.checkIfUserHasVerifiedOtp(phoneNumber);
         Optional<User> foundUser = userRepository.findByPhoneNumber(phoneNumber);
         if (foundUser.isEmpty()) {

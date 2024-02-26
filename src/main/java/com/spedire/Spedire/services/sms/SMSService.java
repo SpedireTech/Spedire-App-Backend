@@ -4,7 +4,7 @@ public interface SMSService {
 
     String sendVerificationSMS(String phoneNumber);
 
-    boolean checkVerificationCode(String phoneNumber, String verificationCode);
+    boolean checkVerificationCode(String verificationCode, String token);
 
 
 }

@@ -1,5 +1,6 @@
 package com.spedire.Spedire.services.sms;
 
+import com.spedire.Spedire.security.JwtUtil;
 import com.spedire.Spedire.services.user.UserServiceUtils;
 import com.twilio.exception.ApiException;
 import com.twilio.rest.verify.v2.service.Verification;
@@ -19,6 +20,8 @@ import static com.spedire.Spedire.services.sms.SMSUtils.*;
 public class TwilioSMSService implements SMSService {
 
     private UserServiceUtils utils;
+
+    private JwtUtil jwtUtil;
 
     private SMSUtils smsUtils;
     private static final Logger logger = LoggerFactory.getLogger(TwilioSMSService.class);
@@ -48,7 +51,8 @@ public class TwilioSMSService implements SMSService {
 
 
     @Override
-    public boolean checkVerificationCode(String phoneNumber, String verificationCode) {
+    public boolean checkVerificationCode(String verificationCode, String token) {
+        String phoneNumber = utils.decodeToken(token);
         String removeFirstDigit = phoneNumber.substring(1, 11);
         try {
             VerificationCheck verificationCheck = VerificationCheck.creator(
