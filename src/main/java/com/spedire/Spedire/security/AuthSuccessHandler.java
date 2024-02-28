@@ -37,6 +37,7 @@ public class AuthSuccessHandler implements AuthenticationSuccessHandler {
         OAuth2User userDetails = (OAuth2User) authentication.getPrincipal();
         String email = (String) userDetails.getAttributes().get("email");
         var optionalUser = userRepository.findByEmail(email);
+
         if (optionalUser.isEmpty()) response.sendRedirect("http://localhost:3000/verifynumber?token="+email);
         else {
             User user = optionalUser.get();
