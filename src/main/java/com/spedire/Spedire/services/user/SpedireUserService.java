@@ -34,27 +34,15 @@ public class SpedireUserService implements UserService{
 
     @Override
     @Transactional
-    public VerifyPhoneNumberResponse savePhoneNumber(String phoneNumber) {
-        System.out.println(phoneNumber);
+    public VerifyPhoneNumberResponse savePhoneNumber(String phoneNumber,  String googleToken) {
         verifyPhoneNumberIsValid(phoneNumber);
-        System.out.println(1);
         validatePhoneNumberDoesntExist(phoneNumber, userRepository);
-        System.out.println(2);
         User user = new User(phoneNumber);
-        System.out.println(3);
-        user.getRoles().add(Role.NEW_USER);
-        System.out.println(4);
+        User filledUser = utils.extractUserInformationFromToken(user, googleToken);
         String message = smsService.sendVerificationSMS(phoneNumber);
-        System.out.println(5);
-        user.setOtpVerificationStatus(false);
-        if (message.equals("OTP Sent")) {
-            User storedUser = userRepository.save(user);
-            String token = utils.fetchToken(storedUser.getPhoneNumber());
-            return VerifyPhoneNumberResponse.builder().message(message).token(token).build();
-        } else {
-            return VerifyPhoneNumberResponse.builder().message(message).build();
-        }
+        return utils.getVerifyPhoneNumberResponse(filledUser, message);
     }
+
 
 
 

@@ -21,10 +21,10 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping(path = "savePhoneNumber", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse<?>> savePhoneNumber(@RequestBody SavePhoneNumberRequest request)  {
+    public ResponseEntity<ApiResponse<?>> savePhoneNumber(@RequestBody SavePhoneNumberRequest request, String token)  {
         VerifyPhoneNumberResponse response = new VerifyPhoneNumberResponse();
         try {
-           response = userService.savePhoneNumber(request.getPhoneNumber());
+           response = userService.savePhoneNumber(request.getPhoneNumber(), token);
            return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().message(response.getMessage()).data(response.getToken()).success(true).build());
        } catch (IllegalArgumentException exception) {
            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().message(response.getMessage()).success(false).build());

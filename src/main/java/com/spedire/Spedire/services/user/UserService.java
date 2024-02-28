@@ -6,7 +6,7 @@ import com.spedire.Spedire.dtos.responses.VerifyPhoneNumberResponse;
 
 public interface UserService {
 
-    VerifyPhoneNumberResponse savePhoneNumber(String phoneNumber);
+    VerifyPhoneNumberResponse savePhoneNumber(String phoneNumber, String token);
 
     CompleteRegistrationResponse completeRegistration(CompleteRegistrationRequest request, String token);
 

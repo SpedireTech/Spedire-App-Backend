@@ -18,7 +18,8 @@ public class SendMailTest {
 
     @Test
     public void sendMailTest() throws MessagingException {
-        boolean status =javaMailService.sendMail("zainabalayande01@gmail.com", "Welcome to My Space", getEmailTemplate());
+        boolean status =javaMailService.sendMail("zainabalayande01@gmail.com", "Welcome to My Space",
+                getEmailTemplate());
         assertTrue(status);
     }
 

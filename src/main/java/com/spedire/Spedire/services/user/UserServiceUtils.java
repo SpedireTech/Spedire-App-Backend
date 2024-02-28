@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.spedire.Spedire.dtos.requests.CompleteRegistrationRequest;
+import com.spedire.Spedire.dtos.responses.VerifyPhoneNumberResponse;
 import com.spedire.Spedire.enums.Role;
 import com.spedire.Spedire.exceptions.SpedireException;
 import com.spedire.Spedire.models.User;
@@ -90,6 +91,29 @@ public class UserServiceUtils {
         }
     }
 
+    public User extractUserInformationFromToken(User user, String token) {
+        DecodedJWT decodedJWT = jwtUtil.verifyToken(token);
+        String firstName = decodedJWT.getClaim("firstName").asString();
+        String lastName = decodedJWT.getClaim("lastName").asString();
+        String email = decodedJWT.getClaim("email").asString();
+        String profilePicture = decodedJWT.getClaim("profilePicture").asString();
+        user.getRoles().add(Role.NEW_USER);
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        user.setEmail(email);
+        user.setProfileImage(profilePicture);
+        return user;
+    }
+
+    public VerifyPhoneNumberResponse getVerifyPhoneNumberResponse(User filledUser, String message) {
+        if (message.equals("OTP Sent")) {
+            User storedUser = userRepository.save(filledUser);
+            String token = fetchToken(storedUser.getPhoneNumber());
+            return VerifyPhoneNumberResponse.builder().message(message).token(token).build();
+        } else {
+            return VerifyPhoneNumberResponse.builder().message(message).build();
+        }
+    }
 
     public User buildRegistrationRequest(CompleteRegistrationRequest registrationRequest, User foundUser)  {
         foundUser.getRoles().add(SENDER);
