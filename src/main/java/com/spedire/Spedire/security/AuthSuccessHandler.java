@@ -1,5 +1,7 @@
 package com.spedire.Spedire.security;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 
 import com.spedire.Spedire.enums.Role;
@@ -21,6 +23,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.time.Instant;
 
 
 @AllArgsConstructor
@@ -36,8 +39,18 @@ public class AuthSuccessHandler implements AuthenticationSuccessHandler {
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         OAuth2User userDetails = (OAuth2User) authentication.getPrincipal();
         String email = (String) userDetails.getAttributes().get("email");
+        String firstName = (String) userDetails.getAttributes().get("given_name");
+        String lastName = (String) userDetails.getAttributes().get("family_name");
+        String picture = (String)userDetails.getAttributes().get("picture");
+
+
+      String token =  JWT.create().withIssuedAt(Instant.now()).withExpiresAt(Instant.now().plusSeconds(86000L))
+                .withClaim("email", email).withClaim("given_name", firstName).withClaim("family_name", lastName).withClaim("picture", picture)
+                .sign(Algorithm.HMAC512(jwtUtils.getSecret().getBytes()));
+
+
         var optionalUser = userRepository.findByEmail(email);
-        if (optionalUser.isEmpty()) response.sendRedirect("http://localhost:3001/verifynumber?token="+email);
+        if (optionalUser.isEmpty()) response.sendRedirect("http://localhost:3001/verifynumber?token="+token);
         else {
             User user = optionalUser.get();
             String accessToken = jwtUtils.generateAccessToken("");
