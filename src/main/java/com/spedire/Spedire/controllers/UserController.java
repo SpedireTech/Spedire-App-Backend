@@ -21,7 +21,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping(path = "savePhoneNumber", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse<?>> savePhoneNumber(@RequestBody SavePhoneNumberRequest request, String token)  {
+    public ResponseEntity<ApiResponse<?>> savePhoneNumber(@RequestBody SavePhoneNumberRequest request, @RequestHeader("Authorization") String token)  {
         VerifyPhoneNumberResponse response = new VerifyPhoneNumberResponse();
         try {
            response = userService.savePhoneNumber(request.getPhoneNumber(), token);

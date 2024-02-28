@@ -93,10 +93,10 @@ public class UserServiceUtils {
 
     public User extractUserInformationFromToken(User user, String token) {
         DecodedJWT decodedJWT = jwtUtil.verifyToken(token);
-        String firstName = decodedJWT.getClaim("firstName").asString();
-        String lastName = decodedJWT.getClaim("lastName").asString();
+        String firstName = decodedJWT.getClaim("given_name").asString();
+        String lastName = decodedJWT.getClaim("family_name").asString();
         String email = decodedJWT.getClaim("email").asString();
-        String profilePicture = decodedJWT.getClaim("profilePicture").asString();
+        String profilePicture = decodedJWT.getClaim("picture").asString();
         user.getRoles().add(Role.NEW_USER);
         user.setFirstName(firstName);
         user.setLastName(lastName);

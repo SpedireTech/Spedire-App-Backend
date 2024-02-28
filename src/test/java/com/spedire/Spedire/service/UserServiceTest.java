@@ -4,6 +4,7 @@ import com.spedire.Spedire.dtos.requests.CompleteRegistrationRequest;
 import com.spedire.Spedire.dtos.responses.VerifyPhoneNumberResponse;
 import com.spedire.Spedire.exceptions.SpedireException;
 import com.spedire.Spedire.models.User;
+import com.spedire.Spedire.repositories.UserRepository;
 import com.spedire.Spedire.services.user.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -22,6 +23,9 @@ public class UserServiceTest {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private UserRepository userRepository;
 
     String token = "";
 
@@ -67,6 +71,12 @@ public class UserServiceTest {
                 .email("alayandezainab64@gmail.com").password("Abimbola64").image("No Image").build();
         var response = userService.completeRegistration(request, "Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MDg5NDA4MTIsImV4cCI6MTcwOTAyNjgxMiwicGhvbmVOdW1iZXIiOiIwODAzMDY2OTUwOCJ9.a070X-TKxhKjVq-r7LVPmMa3PPQwCteMP0QGYNKNJAZtae4OM2hllTm-VGtkOdK2yAWW-h9wKzEpd_35umhIzA");
         System.out.println(response);
+    }
+
+    @Test
+    public void deleteUserTest() {
+        userRepository.deleteByPhoneNumber("08030669508");
+        System.out.println("User deleted from the DB");
     }
 
 
