@@ -28,7 +28,7 @@ public class UserServiceTest {
     @Test
     public void savePhoneNumberTest() {
         User user = new User("08030669508");
-        VerifyPhoneNumberResponse response = userService.savePhoneNumber(user.getPhoneNumber());
+        VerifyPhoneNumberResponse response = userService.savePhoneNumber(user.getPhoneNumber(), "");
         token = response.getToken();
         log.info("Response -> {} " , response);
         assertThat(response.getMessage()).isEqualTo("OTP Sent");
@@ -38,7 +38,7 @@ public class UserServiceTest {
     public void inValidPhoneNumberThrowsExceptionTest() {
         User user = new User("06023677114");
         SpedireException exception = assertThrows(SpedireException.class, () -> {
-            userService.savePhoneNumber(user.getPhoneNumber());
+            userService.savePhoneNumber(user.getPhoneNumber(), "");
         });
         assertEquals("Invalid phone number", exception.getMessage());
     }
@@ -47,7 +47,7 @@ public class UserServiceTest {
     public void phoneNumberExistThrowExceptionTest() {
         User user = new User("08030669508");
         MissingFormatArgumentException exception = assertThrows(MissingFormatArgumentException.class, () -> {
-            userService.savePhoneNumber(user.getPhoneNumber());
+            userService.savePhoneNumber(user.getPhoneNumber(), "");
         });
 //        assertEquals("User with %s exist".formatted(user.getPhoneNumber()), exception.getMessage());
         assertEquals("Format specifier '%s'", exception.getMessage());

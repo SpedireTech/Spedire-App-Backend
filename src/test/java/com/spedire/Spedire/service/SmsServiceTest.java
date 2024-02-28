@@ -20,7 +20,7 @@ public class SmsServiceTest {
 
     @Test
     public void sendSMSToPhoneNumber() {
-        var response = smsService.sendVerificationSMS("08030669508");
+        var response = smsService.sendVerificationSMS("08105029925");
         assertThat(response).isEqualTo("OTP Sent");
     }
 
