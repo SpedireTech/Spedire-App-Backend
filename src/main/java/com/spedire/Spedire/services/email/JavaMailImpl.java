@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -14,18 +15,15 @@ import java.io.File;
 import static com.spedire.Spedire.services.email.EmailUtils.APP_EMAIL;
 
 
-@Service
+@Component
 @Slf4j
 public class JavaMailImpl implements JavaMailService {
 
     @Autowired
     private JavaMailSender emailSender;
 
-
-   public boolean sendMail(String to, String subject, String text) throws MessagingException {
-       log.info("Getting into send mail method");
+   public boolean sendMail(String to, String subject, String text)  {
         try{
-            log.info("Getting into try block");
             MimeMessage mimeMessage = emailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
             helper.setFrom("spediretech@gmail.com");

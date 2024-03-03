@@ -50,14 +50,21 @@
     </div>
     <div class="main">
         <div class="content">
-            <h2>Welcome to Spedire</h2>
-            <p>
-                Hello {name},
-                <br>
-                We send you Warm Greetings from Spedire,
-            </p>
+            <h2>Hello {name},</h2>
+            <h3>Reset your Spedire account password</h3>
+            <h3>We received a request to reset your Spedire account password. To proceed, please follow the steps below:</h3>
+            <h3>Click button below to reset your password and follow the on-screen instructions to create a new password for your account.</h3>
 
+            <button>{link}</button>
 
+            <p>Link is valid for 2 hours, after which you will need to request another password reset.</p>
+
+            <p>If you didn't initiate this action or if you think you received this email by mistake, please contact support@spedireaccounts.com</p>
+
+            <p>Regards</p>
+            <p>Spedire Team</p> <br><br>
+
+            <p>©  Powered by PolyThread</p>
         </div>
     </div>
 </div>

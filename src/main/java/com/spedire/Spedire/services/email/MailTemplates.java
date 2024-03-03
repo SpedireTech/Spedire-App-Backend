@@ -8,18 +8,37 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.stream.Collectors;
 
-import static com.spedire.Spedire.services.email.EmailUtils.MAIL_TEMPLATE_LOCATION;
+import static com.spedire.Spedire.services.email.EmailUtils.*;
 
 public class MailTemplates {
 
 
     @SneakyThrows
-    public static String getEmailTemplate()  {
+    public static String getWelcomeMailTemplate(String name)  {
         try(BufferedReader bufferedReader =
-                    new BufferedReader(new FileReader(MAIL_TEMPLATE_LOCATION))) {
-            return bufferedReader.lines().collect(Collectors.joining());
+                    new BufferedReader(new FileReader(WELCOME_MAIL_TEMPLATE_LOCATION))) {
+            String template = bufferedReader.lines().collect(Collectors.joining());
+            template = template.replace("{name}", name);
+            return template;
         } catch (IOException exception) {
             throw new SpedireException("Failed to send mail");
         }
     }
+
+    @SneakyThrows
+    public static String getForgotPasswordMailTemplate(String name, String token)  {
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(FORGOT_PASSWORD_MAIL_TEMPLATE_LOCATION))) {
+            String template = bufferedReader.lines().collect(Collectors.joining());
+
+            template = template.replace("{name}", name);
+            template = template.replace("{link}", "<a href='" + token + "'>Reset Password</a>");
+
+            return template;
+        } catch (IOException exception) {
+            throw new SpedireException("Failed to send mail");
+        }
+    }
+
+
+
 }

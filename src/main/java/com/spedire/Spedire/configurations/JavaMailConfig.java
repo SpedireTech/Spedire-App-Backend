@@ -28,8 +28,12 @@ public class JavaMailConfig {
         Properties properties = mailSender.getJavaMailProperties();
         properties.put("mail.transport.protocol", "smtp");
         properties.put("mail.smtp.auth", "true");
+        properties.put("mail.smtp.starttls.enable", "true");
+        properties.put("mail.smtp.starttls.required", "true");
         properties.put("mail.smtp.ssl.enable", "true");
-        properties.put("mail.debug", "true");
+        properties.put("mail.socketFactory.port", "587");
+        properties.put("mail.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+        properties.put("mail.socketFactory.fallback", "false");
         return mailSender;
     }
 }
