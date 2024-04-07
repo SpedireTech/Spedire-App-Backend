@@ -26,7 +26,6 @@ public class SMSController {
         } catch (IllegalArgumentException exception) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().message("Verification Failed").success(response).build());
         }
-
     }
 
 }

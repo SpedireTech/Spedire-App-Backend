@@ -3,6 +3,7 @@ package com.spedire.Spedire.services.user;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.spedire.Spedire.dtos.requests.ChangePasswordRequest;
 import com.spedire.Spedire.dtos.requests.CompleteRegistrationRequest;
 import com.spedire.Spedire.dtos.responses.VerifyPhoneNumberResponse;
 import com.spedire.Spedire.enums.Role;
@@ -15,19 +16,15 @@ import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.spedire.Spedire.enums.Role.SENDER;
 import static com.spedire.Spedire.security.SecurityUtils.JWT_SECRET;
-import static com.spedire.Spedire.services.email.MailTemplates.getEmailTemplate;
 
 
 @AllArgsConstructor
@@ -68,17 +65,15 @@ public class UserServiceUtils {
 
     @SneakyThrows
     public static void validatePhoneNumberDoesntExist(String phoneNumber, UserRepository userRepository) {
-        System.out.println("a");
         if (userRepository.existsByPhoneNumber(phoneNumber)) {
-            System.out.println("b");
             throw new SpedireException(String.format("User with %s exist" + phoneNumber));
         }
-        System.out.println("c");
     }
 
     public String decodeToken(String token) {
-        String splitToken = token.split(" ")[1];
-        DecodedJWT decodedJWT = jwtUtil.verifyToken(splitToken);
+//        String splitToken = token.split(" ")[1];
+        System.out.println("The toks ==> " + token);
+        DecodedJWT decodedJWT = jwtUtil.verifyToken(token);
         return decodedJWT.getClaim("phoneNumber").asString();
     }
 
@@ -92,11 +87,12 @@ public class UserServiceUtils {
     }
 
     public User extractUserInformationFromToken(User user, String token) {
-        DecodedJWT decodedJWT = jwtUtil.verifyToken(token);
-        String firstName = decodedJWT.getClaim("firstName").asString();
-        String lastName = decodedJWT.getClaim("lastName").asString();
+        String splitToken = token.split(" ")[1];
+        DecodedJWT decodedJWT = jwtUtil.verifyToken(splitToken);
+        String firstName = decodedJWT.getClaim("given_name").asString();
+        String lastName = decodedJWT.getClaim("family_name").asString();
         String email = decodedJWT.getClaim("email").asString();
-        String profilePicture = decodedJWT.getClaim("profilePicture").asString();
+        String profilePicture = decodedJWT.getClaim("picture").asString();
         user.getRoles().add(Role.NEW_USER);
         user.setFirstName(firstName);
         user.setLastName(lastName);
@@ -133,8 +129,16 @@ public class UserServiceUtils {
     }
 
     @SneakyThrows
-    public String sendEmail(String recipientEmail) {
-       boolean status = javaMailService.sendMail(recipientEmail, "Welcome to Spedire", getEmailTemplate());
+    public static void validatePasswordMatch(ChangePasswordRequest request) {
+        String newPassword = request.getNewPassword();
+        String confirmPassword = request.getConfirmPassword();
+        if (!newPassword.equals(confirmPassword)) throw new SpedireException("Password Mismatch");
+
+    }
+
+    @SneakyThrows
+    public String sendEmail(String recipientEmail, String subject, String template) {
+       boolean status = javaMailService.sendMail(recipientEmail, subject, template);
        if (status) {
            return "Mail delivered successfully";
        } else return "Mail delivery failed";
@@ -151,11 +155,26 @@ public class UserServiceUtils {
 
     @SneakyThrows
     public void checkIfUserHasVerifiedOtp(String phoneNumber) {
+        System.out.println("Phone number => " + phoneNumber);
         Optional<User> user = userRepository.findByPhoneNumber(phoneNumber);
         if (user.isPresent() && !user.get().isOtpVerificationStatus()) {
             throw new SpedireException("User yet to verify Otp");
         }
     }
 
+    public String generateResetLink(String emailAddress) {
+        String token = JWT.create().withIssuedAt(Instant.now()).withExpiresAt(Instant.now().plusSeconds(86000L))
+                .withClaim("email", emailAddress)
+                .sign(Algorithm.HMAC512(secret.getBytes()));
+        return "http://localhost:3000/resetPassword?token=" + token;
+    }
+
+
+    public static String extractTokenFromAuthorizationHeader(String authorizationHeader) {
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            return authorizationHeader.substring(7);
+        }
+        return null;
+    }
 
 }
