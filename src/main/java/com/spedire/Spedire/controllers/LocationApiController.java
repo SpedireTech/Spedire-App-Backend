@@ -20,7 +20,7 @@ public class LocationApiController {
 
     @PostMapping("/getC")
     public String getC() throws URISyntaxException, IOException, InterruptedException {
-        return locationApis.getLocationCoordinates().toString();
+        return locationApis.getNearbyPlaces();
     }
 
 

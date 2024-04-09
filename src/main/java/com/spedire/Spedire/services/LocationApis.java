@@ -21,18 +21,30 @@ public class LocationApis {
         return response;
     }
 
-    public JSONObject getLocationCoordinates() throws URISyntaxException, IOException, InterruptedException {
-        log.info("do this legwork");
+    public static JSONObject getLocationCoordinates() throws URISyntaxException, IOException, InterruptedException {
         String baseUrl = "https://www.googleapis.com/geolocation/v1/geolocate?key=AIzaSyAGHpgeiFAzUQqrosmbd2G531zmD9zgiI8";
         HttpRequest request = HttpRequest.newBuilder().POST(HttpRequest.BodyPublishers.noBody()
                 ).
             uri(new URI(baseUrl)).build();
         var res = sendRequest(request);
-        log.info(res.body() + " this is res");
         JSONObject object = new JSONObject(res.body());
-        log.info(object.getJSONObject("location") + "this is location");
         return object.getJSONObject("location");
     }
+
+    public  String getNearbyPlaces() throws URISyntaxException, IOException, InterruptedException {
+
+        JSONObject object = getLocationCoordinates();
+        log.info(object + " this is object");
+        double longitude = Double.parseDouble(String.valueOf(object.getDouble("lng")));
+        double lat = Double.parseDouble(String.valueOf(object.getDouble("lat")));
+        String url = "https://maps.googleapis.com/maps/api/geocode/json?latlng="+lat+","+longitude+"&key=AIzaSyAGHpgeiFAzUQqrosmbd2G531zmD9zgiI8";
+        HttpRequest request = HttpRequest.newBuilder().GET().uri(new URI(url)).build();
+        var res = sendRequest(request);
+        return res.body();
+
+    }
+
+
 
 
 
