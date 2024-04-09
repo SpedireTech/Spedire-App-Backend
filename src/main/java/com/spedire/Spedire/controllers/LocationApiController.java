@@ -18,8 +18,8 @@ public class LocationApiController {
 
     private final LocationApis locationApis;
 
-    @PostMapping("/getC")
-    public String getC() throws URISyntaxException, IOException, InterruptedException {
+    @PostMapping("/nearbyPlaces")
+    public String getNearbyPlaces() throws URISyntaxException, IOException, InterruptedException {
         return locationApis.getNearbyPlaces();
     }
 
