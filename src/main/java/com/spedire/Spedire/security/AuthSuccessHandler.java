@@ -48,6 +48,7 @@ public class AuthSuccessHandler implements AuthenticationSuccessHandler {
         String lastName = (String) userDetails.getAttributes().get("family_name");
         String picture = (String)userDetails.getAttributes().get("picture");
 
+
         var optionalUser = userRepository.findByEmail(email);
 
         if (optionalUser.isEmpty()) {
@@ -59,6 +60,8 @@ public class AuthSuccessHandler implements AuthenticationSuccessHandler {
             response.sendRedirect("http://localhost:3000/loginRedirect?token="+accessToken);
         }
     }
+
+
 
 //    @Override
 //    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {

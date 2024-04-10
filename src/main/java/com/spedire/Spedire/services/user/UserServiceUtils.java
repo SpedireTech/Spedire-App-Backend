@@ -14,6 +14,7 @@ import com.spedire.Spedire.security.JwtUtil;
 import com.spedire.Spedire.services.email.JavaMailService;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -28,6 +29,7 @@ import static com.spedire.Spedire.security.SecurityUtils.JWT_SECRET;
 
 
 @AllArgsConstructor
+@Slf4j
 public class UserServiceUtils {
 
     @Value(JWT_SECRET)
@@ -50,7 +52,6 @@ public class UserServiceUtils {
     private static final Pattern pattern = Pattern.compile(PHONE_NUMBER_REGEX);
 
 
-    @SneakyThrows
     public static void verifyPhoneNumberIsValid(String phoneNumber) {
         System.out.println(phoneNumber);
         if (phoneNumber == null) {
@@ -63,16 +64,16 @@ public class UserServiceUtils {
     }
 
 
-    @SneakyThrows
     public static void validatePhoneNumberDoesntExist(String phoneNumber, UserRepository userRepository) {
         if (userRepository.existsByPhoneNumber(phoneNumber)) {
-            throw new SpedireException(String.format("User with %s exist" + phoneNumber));
+            throw new SpedireException(String.format("User with phone number %s already exists", phoneNumber));
         }
     }
 
+
     public String decodeToken(String token) {
 //        String splitToken = token.split(" ")[1];
-        System.out.println("The toks ==> " + token);
+        log.info("Token : {} " , token);
         DecodedJWT decodedJWT = jwtUtil.verifyToken(token);
         return decodedJWT.getClaim("phoneNumber").asString();
     }
@@ -132,7 +133,7 @@ public class UserServiceUtils {
     public static void validatePasswordMatch(ChangePasswordRequest request) {
         String newPassword = request.getNewPassword();
         String confirmPassword = request.getConfirmPassword();
-        if (!newPassword.equals(confirmPassword)) throw new SpedireException("Password Mismatch");
+        if (!newPassword.equals(confirmPassword)) throw new IllegalArgumentException("Password Mismatch");
 
     }
 
@@ -155,7 +156,7 @@ public class UserServiceUtils {
 
     @SneakyThrows
     public void checkIfUserHasVerifiedOtp(String phoneNumber) {
-        System.out.println("Phone number => " + phoneNumber);
+        log.info("Phone number : {} " , phoneNumber);
         Optional<User> user = userRepository.findByPhoneNumber(phoneNumber);
         if (user.isPresent() && !user.get().isOtpVerificationStatus()) {
             throw new SpedireException("User yet to verify Otp");

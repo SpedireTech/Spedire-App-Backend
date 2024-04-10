@@ -66,7 +66,6 @@ public class SpedireAuthorizationFilter extends OncePerRequestFilter {
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();
         Claim roles = map.get("roles");
         Claim email = map.get("email");
-
         addClaimToUserAuthorities(authorities, roles);
         Authentication authentication = new UsernamePasswordAuthenticationToken(email, null, authorities);
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -82,4 +81,6 @@ public class SpedireAuthorizationFilter extends OncePerRequestFilter {
             }
         }
     }
+
+    
 }
