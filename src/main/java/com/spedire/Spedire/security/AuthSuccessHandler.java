@@ -53,7 +53,6 @@ public class AuthSuccessHandler implements AuthenticationSuccessHandler {
 
         if (optionalUser.isEmpty()) {
             CompleteRegistrationRequest registrationRequest = CompleteRegistrationRequest.builder().fullName(firstName + " " + lastName).image(picture).email(email).build();
-            System.out.println("reg request -- " + registrationRequest);
             String token = jwtUtils.fetchToken(registrationRequest);
             response.sendRedirect("http://localhost:5173/verify-number?token=" + token + "&oauth=true");
         } else {

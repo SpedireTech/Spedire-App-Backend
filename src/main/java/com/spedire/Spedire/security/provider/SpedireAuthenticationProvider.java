@@ -55,7 +55,6 @@ public class SpedireAuthenticationProvider implements AuthenticationProvider {
 
     @Override
     public boolean supports(Class<?> authentication) {
-        if (authentication.equals(UsernamePasswordAuthenticationToken.class)) return true;
-        return false;
+        return authentication.equals(UsernamePasswordAuthenticationToken.class);
     }
 }

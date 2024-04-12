@@ -38,7 +38,6 @@ public class SpedireAuthenticationFilter extends UsernamePasswordAuthenticationF
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) {
         try {
-            System.out.println("Hello Auth");
             LoginRequest loginRequest = objectMapper.readValue(request.getInputStream(), LoginRequest.class);
             email = loginRequest.getEmail();
             password = loginRequest.getPassword();
