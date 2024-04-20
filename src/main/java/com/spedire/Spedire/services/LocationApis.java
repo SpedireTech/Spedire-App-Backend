@@ -32,9 +32,7 @@ public class LocationApis {
     }
 
     public  String getNearbyPlaces() throws URISyntaxException, IOException, InterruptedException {
-
         JSONObject object = getLocationCoordinates();
-        log.info(object + " this is object");
         double longitude = Double.parseDouble(String.valueOf(object.getDouble("lng")));
         double lat = Double.parseDouble(String.valueOf(object.getDouble("lat")));
         String url = "https://maps.googleapis.com/maps/api/geocode/json?latlng="+lat+","+longitude+"&key=AIzaSyAGHpgeiFAzUQqrosmbd2G531zmD9zgiI8";
