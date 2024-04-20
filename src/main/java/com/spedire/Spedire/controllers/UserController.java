@@ -21,6 +21,12 @@ public class UserController {
 
     private final UserService userService;
 
+
+    @GetMapping("test")
+    public String test()  {
+        return "This is a simple test";
+    }
+
     @PostMapping("verifyPhoneNumber")
     public ResponseEntity<ApiResponse<?>> verifyPhoneNumber(@RequestBody SavePhoneNumberRequest request)  {
         VerifyPhoneNumberResponse response;
