@@ -46,8 +46,7 @@ public class SecurityConfig {
                 .addFilterBefore(authorizationFilter, SpedireAuthenticationFilter.class)
 //                .exceptionHandling(exceptionHandler -> exceptionHandler.authenticationEntryPoint(customAuthenticationFailureHandler::onAuthenticationFailure))
                 .addFilterAt(authenticationFilter, UsernamePasswordAuthenticationFilter.class).oauth2Login(c -> c.successHandler(authSuccessHandler))
-                .authorizeHttpRequests(request -> request
-                        .requestMatchers("/api/v1/user/verifyPhoneNumber", "/api/v1/user/complete-registration", "/api/v1/sms/verify-otp", "/api/v1/user/forgotPassword", "/api/v1/user/resetPassword", "/api/v1/location/nearbyPlaces").permitAll()
+                .authorizeHttpRequests(request -> request.requestMatchers("/api/v1/user/verifyPhoneNumber", "/api/v1/user/complete-registration", "/api/v1/sms/verify-otp", "/api/v1/user/forgotPassword", "/api/v1/user/resetPassword", "/api/v1/location/nearbyPlaces").permitAll()
                         .anyRequest()
                         .authenticated()).build();
     }

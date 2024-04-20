@@ -55,11 +55,8 @@ public class SpedireUserService implements UserService{
     @Override
     @Transactional
     public CompleteRegistrationResponse completeRegistration(CompleteRegistrationRequest request, HttpServletRequest httpServletRequest) {
-        System.out.println("HttpServletRequest => " + httpServletRequest.toString());
         String authorizationHeader = httpServletRequest.getHeader(HttpHeaders.AUTHORIZATION);
-        System.out.println("authorizationHeader => " + authorizationHeader);
         String extractedToken = extractTokenFromAuthorizationHeader(authorizationHeader);
-        System.out.println("extractedToken -> " + extractedToken);
         String phoneNumber = utils.decodeToken(extractedToken);
         utils.checkIfUserHasVerifiedOtp(phoneNumber);
         Optional<User> foundUser = userRepository.findByPhoneNumber(phoneNumber);
@@ -71,7 +68,8 @@ public class SpedireUserService implements UserService{
         String response = utils.sendEmail(savedUser.getEmail(), "Welcome to Spedire", getWelcomeMailTemplate(savedUser.getFirstName()));
 
         if (savedUser.getId() != null && "Mail delivered successfully".equals(response)) {
-            return CompleteRegistrationResponse.builder().message("USER_REGISTRATION_SUCCESSFUL").success(true).build();
+            var theResponse = CompleteRegistrationResponse.RegistrationResponse.builder().firstName(savedUser.getFirstName()).lastName(savedUser.getLastName()).image(savedUser.getProfileImage()).build();
+            return CompleteRegistrationResponse.builder().message("USER_REGISTRATION_SUCCESSFUL").success(true).data(theResponse).build();
         } else {
             return CompleteRegistrationResponse.builder().message("Failed to deliver email").success(false).build();
         }
@@ -84,7 +82,7 @@ public class SpedireUserService implements UserService{
         Optional<User> user = userRepository.findByEmail(emailAddress);
         if (user.isPresent()) {
             String link = utils.generateResetLink(emailAddress);
-            System.out.println("The link here ==> " + link);
+            log.info("Password Reset link : {} " + link);
             String name = user.get().getFirstName() + user.get().getLastName();
             String message = utils.sendEmail(emailAddress, "Password Reset", getForgotPasswordMailTemplate(name, link));
             if ("Mail delivered successfully".equals(message)) return ForgotPasswordResponse.builder().status(true).message(String.format("Reset instructions sent to %s", emailAddress)).build();

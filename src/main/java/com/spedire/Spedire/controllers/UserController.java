@@ -23,50 +23,48 @@ public class UserController {
 
     @PostMapping("verifyPhoneNumber")
     public ResponseEntity<ApiResponse<?>> verifyPhoneNumber(@RequestBody SavePhoneNumberRequest request)  {
-        System.out.println("Inside Controller");
-        VerifyPhoneNumberResponse response = new VerifyPhoneNumberResponse();
+        VerifyPhoneNumberResponse response;
         try {
-           response = userService.verifyPhoneNumber(request.getPhoneNumber());
-           return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().message(response.getMessage()).data(response.getToken()).success(true).build());
-       } catch (IllegalArgumentException exception) {
-           return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().message(response.getMessage()).success(false).build());
-       }
+            response = userService.verifyPhoneNumber(request.getPhoneNumber());
+            return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().message(response.getMessage()).data(response.getToken()).success(true).build());
+        } catch (SpedireException exception) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().message(exception.getMessage()).success(false).build());
+        }
     }
 
 
-//    @PostMapping("complete-registration")
-//    public ResponseEntity<ApiResponse<?>> completeRegistration(@RequestBody CompleteRegistrationRequest request, @RequestHeader("Authorization") String token)  {
-//        CompleteRegistrationResponse response = new CompleteRegistrationResponse();
-//        try {
-//            response = userService.completeRegistration(request, token);
-//            return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().message(response.getMessage()).success(true).build());
-//        } catch (IllegalArgumentException exception) {
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().message(response.getMessage()).success(false).build());
-//        }
-//    }
-
-
-    @PostMapping("complete-registration")
+    @PostMapping("completeRegistration")
     public ResponseEntity<ApiResponse<?>> completeRegistration(@RequestBody CompleteRegistrationRequest request, HttpServletRequest httpServletRequest) {
         try {
             CompleteRegistrationResponse response = userService.completeRegistration(request, httpServletRequest);
-            return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().message(response.getMessage()).success(true).build());
-        } catch (IllegalArgumentException exception) {
+            return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().message(response.getMessage()).success(response.isSuccess()).data(response.getData()).build());
+        } catch (SpedireException exception) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().message(exception.getMessage()).success(false).build());
         }
     }
 
 
     @PostMapping("forgotPassword")
-    public ResponseEntity<?> forgotPassword (@RequestBody ForgotPasswordRequest request) throws SpedireException {
-        ForgotPasswordResponse response = userService.forgotPassword(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    public ResponseEntity<?> forgotPassword (@RequestBody ForgotPasswordRequest request)  {
+        ForgotPasswordResponse response;
+        try {
+            response = userService.forgotPassword(request);
+            return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().message(response.getMessage()).success(response.isStatus()).build());
+        } catch (SpedireException exception) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().message(exception.getMessage()).success(false).build());
+        }
     }
 
     @PostMapping("resetPassword")
-    public ResponseEntity<?> resetPassword (@RequestBody ChangePasswordRequest request) throws SpedireException {
-        ChangePasswordResponse response = userService.resetPassword(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    public ResponseEntity<?> resetPassword (@RequestBody ChangePasswordRequest request) {
+        ChangePasswordResponse response;
+        try {
+            response = userService.resetPassword(request);
+            return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().message(response.getMessage()).success(response.isStatus()).build());
+        } catch (SpedireException exception) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().message(exception.getMessage()).success(false).build());
+        }
+
     }
 
 
