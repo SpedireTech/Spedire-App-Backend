@@ -73,6 +73,12 @@ public class UserController {
 
     }
 
+    @PostMapping("testing")
+
+    public String testing(){
+        return "Spedire server is working";
+    }
+
 
 
 
