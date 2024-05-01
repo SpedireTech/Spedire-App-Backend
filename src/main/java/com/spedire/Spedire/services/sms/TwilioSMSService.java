@@ -54,7 +54,7 @@ public class TwilioSMSService implements SMSService {
 
     @Override
     public boolean checkVerificationCode(String verificationCode, String token) {
-        String phoneNumber = utils.decodeToken(token);
+        String phoneNumber = utils.decodePhoneNumber(token);
         String removeFirstDigit = phoneNumber.substring(1, 11);
         try {
             VerificationCheck verificationCheck = VerificationCheck.creator(
@@ -70,6 +70,11 @@ public class TwilioSMSService implements SMSService {
             logger.error("Error checking verification code: {}", exception.getMessage());
             return false;
         }
+    }
+
+    @Override
+    public String sendSMSWithTermii(String phoneNumber) {
+        return null;
     }
 
 

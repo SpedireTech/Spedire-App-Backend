@@ -1,7 +1,6 @@
 package com.spedire.Spedire.dtos.responses;
 
 import lombok.*;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 @Setter
 @Getter
@@ -11,7 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @AllArgsConstructor
 public class VerifyPhoneNumberResponse {
 
-    private String message;
+    private String otp;
     private String token;
 
 }

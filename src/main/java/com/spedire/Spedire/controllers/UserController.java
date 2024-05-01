@@ -1,9 +1,6 @@
 package com.spedire.Spedire.controllers;
 
-import com.spedire.Spedire.dtos.requests.ChangePasswordRequest;
-import com.spedire.Spedire.dtos.requests.CompleteRegistrationRequest;
-import com.spedire.Spedire.dtos.requests.ForgotPasswordRequest;
-import com.spedire.Spedire.dtos.requests.SavePhoneNumberRequest;
+import com.spedire.Spedire.dtos.requests.*;
 import com.spedire.Spedire.dtos.responses.*;
 import com.spedire.Spedire.exceptions.SpedireException;
 import com.spedire.Spedire.services.user.UserService;
@@ -27,27 +24,54 @@ public class UserController {
         return "This is a simple test";
     }
 
+    @PostMapping("/sign-up")
+    public ResponseEntity<?> register(@RequestBody RegistrationRequest registrationRequest) {
+        RegistrationResponse response = userService.createUser(registrationRequest);
+        String token = response.getToken();
+        return ResponseEntity.ok(new RegistrationResponse(token));
+    }
+
     @PostMapping("verifyPhoneNumber")
-    public ResponseEntity<ApiResponse<?>> verifyPhoneNumber(@RequestBody SavePhoneNumberRequest request)  {
+    public ResponseEntity<ApiResponse<?>> verifyPhoneNumber(HttpServletRequest httpServletRequest, @RequestBody VerifyPhoneNumberRequest request)  {
         VerifyPhoneNumberResponse response;
         try {
-            response = userService.verifyPhoneNumber(request.getPhoneNumber());
-            return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().message(response.getMessage()).data(response.getToken()).success(true).build());
-        } catch (SpedireException exception) {
+            response = userService.verifyPhoneNumber(httpServletRequest, request.isRoute(), request.getPhoneNumber());
+            return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().message("Proceed to enter generated OTP").data(response).success(true).build());
+           } catch (SpedireException exception) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().message(exception.getMessage()).success(false).build());
         }
     }
 
 
-    @PostMapping("completeRegistration")
-    public ResponseEntity<ApiResponse<?>> completeRegistration(@RequestBody CompleteRegistrationRequest request, HttpServletRequest httpServletRequest) {
+    @PostMapping("profile")
+    public ResponseEntity<ApiResponse<?>> fetchUserProfile(@RequestHeader("Authorization") String token)  {
+        UserProfileResponse response;
         try {
-            CompleteRegistrationResponse response = userService.completeRegistration(request, httpServletRequest);
-            return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().message(response.getMessage()).success(response.isSuccess()).data(response.getData()).build());
+            response = userService.fetchUserProfile(token);
+            return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().message("User Profile").data(response).success(true).build());
         } catch (SpedireException exception) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().message(exception.getMessage()).success(false).build());
         }
     }
+
+
+//    @PostMapping("verifyPhoneNumber")
+//    public ResponseEntity<ApiResponse<?>> verifyPhoneNumber(HttpServletRequest httpServletRequest, boolean route, String phoneNumber)  {
+//        VerifyPhoneNumberResponse response;
+//        try {
+//            response = userService.verifyPhoneNumber(httpServletRequest, route, phoneNumber);
+//            if (response.getOtp().equals("Kindly verify phone number")) {
+//                return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(ApiResponse.builder().message(response.getOtp()).data(response.getToken()).success(false).build());
+//            } else if (response.getOtp().equals("Error Sending OTP")) {
+//                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ApiResponse.builder().message(response.getOtp()).data(response.getToken()).success(false).build());
+//            } else {
+//                return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().message(response.getOtp()).data(response.getToken()).success(true).build());
+//            }
+//           } catch (SpedireException exception) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().message(exception.getMessage()).success(false).build());
+//        }
+//    }
+
 
 
     @PostMapping("forgotPassword")

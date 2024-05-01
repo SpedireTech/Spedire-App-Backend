@@ -8,6 +8,7 @@ import com.spedire.Spedire.security.filter.SpedireAuthenticationFilter;
 import com.spedire.Spedire.security.filter.SpedireAuthorizationFilter;
 import com.spedire.Spedire.services.user.UserService;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,6 +18,8 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import static com.spedire.Spedire.security.SecurityUtils.JWT_SECRET;
 
 @Configuration
 @AllArgsConstructor
@@ -37,7 +40,7 @@ public class SecurityConfig {
         SpedireAuthorizationFilter authorizationFilter = new SpedireAuthorizationFilter(jwtUtil);
 
 
-        AuthSuccessHandler authSuccessHandler = new AuthSuccessHandler(userRepository, userService, jwtUtil);
+        AuthSuccessHandler authSuccessHandler = new AuthSuccessHandler(userRepository, jwtUtil);
 
         return httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
@@ -46,7 +49,8 @@ public class SecurityConfig {
                 .addFilterBefore(authorizationFilter, SpedireAuthenticationFilter.class)
 //                .exceptionHandling(exceptionHandler -> exceptionHandler.authenticationEntryPoint(customAuthenticationFailureHandler::onAuthenticationFailure))
                 .addFilterAt(authenticationFilter, UsernamePasswordAuthenticationFilter.class).oauth2Login(c -> c.successHandler(authSuccessHandler))
-                .authorizeHttpRequests(request -> request.requestMatchers("/api/v1/user/verifyPhoneNumber", "/api/v1/user/testing", "/api/v1/user/complete-registration", "/api/v1/sms/verify-otp", "/api/v1/user/forgotPassword", "/api/v1/user/resetPassword", "/api/v1/location/nearbyPlaces").permitAll()
+                .authorizeHttpRequests(request -> request.requestMatchers("/api/v1/user/sign-up", "/api/v1/user/verifyPhoneNumber", "/api/v1/user/testing", "/api/v1/user/complete-registration",
+                                "/api/v1/sms/verify-otp", "/api/v1/user/profile", "/api/v1/otp/verifyOtp", "/api/v1/user/forgotPassword", "/api/v1/user/resetPassword", "/api/v1/location/nearbyPlaces").permitAll()
                         .anyRequest()
                         .authenticated()).build();
     }

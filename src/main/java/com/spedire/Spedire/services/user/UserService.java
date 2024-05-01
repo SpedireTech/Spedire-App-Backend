@@ -3,22 +3,25 @@ package com.spedire.Spedire.services.user;
 import com.spedire.Spedire.dtos.requests.ChangePasswordRequest;
 import com.spedire.Spedire.dtos.requests.CompleteRegistrationRequest;
 import com.spedire.Spedire.dtos.requests.ForgotPasswordRequest;
-import com.spedire.Spedire.dtos.responses.ChangePasswordResponse;
-import com.spedire.Spedire.dtos.responses.CompleteRegistrationResponse;
-import com.spedire.Spedire.dtos.responses.ForgotPasswordResponse;
-import com.spedire.Spedire.dtos.responses.VerifyPhoneNumberResponse;
+import com.spedire.Spedire.dtos.requests.RegistrationRequest;
+import com.spedire.Spedire.dtos.responses.*;
 import com.spedire.Spedire.exceptions.SpedireException;
+import com.spedire.Spedire.models.User;
 import jakarta.servlet.http.HttpServletRequest;
 
 public interface UserService {
 
-    VerifyPhoneNumberResponse verifyPhoneNumber(String phoneNumber);
+    RegistrationResponse createUser(RegistrationRequest request);
 
-    CompleteRegistrationResponse completeRegistration(CompleteRegistrationRequest request, HttpServletRequest httpServletRequest);
+    VerifyPhoneNumberResponse verifyPhoneNumber(HttpServletRequest request, boolean route, String phoneNumber);
+
+    UserProfileResponse fetchUserProfile(String token);
+//    void completeRegistration(String token);
 
     ForgotPasswordResponse forgotPassword(ForgotPasswordRequest forgotPasswordRequest) throws SpedireException;
 
     ChangePasswordResponse resetPassword(ChangePasswordRequest passwordResetRequest) throws SpedireException;
 
+    void saveUser(String token);
 
 }

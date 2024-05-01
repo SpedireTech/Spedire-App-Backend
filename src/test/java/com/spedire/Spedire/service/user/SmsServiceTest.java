@@ -1,4 +1,4 @@
-package com.spedire.Spedire.service;
+package com.spedire.Spedire.service.user;
 
 
 import com.spedire.Spedire.services.sms.SMSService;

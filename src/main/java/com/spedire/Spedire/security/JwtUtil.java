@@ -1,5 +1,6 @@
 package com.spedire.Spedire.security;
 
+import com.spedire.Spedire.dtos.requests.CompleteRegistrationRequest;
 import com.spedire.Spedire.exceptions.SpedireException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -42,6 +43,14 @@ public class JwtUtil {
     public String generateAccessToken(String email) {
         return JWT.create().withIssuedAt(Instant.now()).withExpiresAt(Instant.now().plusSeconds(86000L))
                 .withClaim("email", email)
+                .sign(Algorithm.HMAC512(secret.getBytes()));
+    }
+
+    public String fetchToken(CompleteRegistrationRequest registrationRequest) {
+        return JWT.create().withIssuedAt(Instant.now()).withExpiresAt(Instant.now().plusSeconds(86000L))
+                .withClaim("email", registrationRequest.getEmail())
+                .withClaim("fullName", registrationRequest.getFullName())
+                .withClaim("image", registrationRequest.getImage())
                 .sign(Algorithm.HMAC512(secret.getBytes()));
     }
 

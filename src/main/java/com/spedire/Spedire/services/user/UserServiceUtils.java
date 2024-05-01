@@ -6,7 +6,6 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.spedire.Spedire.dtos.requests.ChangePasswordRequest;
 import com.spedire.Spedire.dtos.requests.CompleteRegistrationRequest;
 import com.spedire.Spedire.dtos.responses.VerifyPhoneNumberResponse;
-import com.spedire.Spedire.enums.Role;
 import com.spedire.Spedire.exceptions.SpedireException;
 import com.spedire.Spedire.models.User;
 import com.spedire.Spedire.repositories.UserRepository;
@@ -71,11 +70,18 @@ public class UserServiceUtils {
     }
 
 
-    public String decodeToken(String token) {
+    public String decodePhoneNumber(String token) {
 //        String splitToken = token.split(" ")[1];
         log.info("Token : {} " , token);
         DecodedJWT decodedJWT = jwtUtil.verifyToken(token);
         return decodedJWT.getClaim("phoneNumber").asString();
+    }
+
+
+    public DecodedJWT decodeToken(String token) {
+//        String splitToken = token.split(" ")[1];
+        log.info("Token : {} " , token);
+        return jwtUtil.verifyToken(token);
     }
 
 
@@ -87,40 +93,59 @@ public class UserServiceUtils {
         }
     }
 
-    public User extractUserInformationFromToken(User user, String token) {
+    public DecodedJWT extractTokenDetails(String token) {
         String splitToken = token.split(" ")[1];
-        DecodedJWT decodedJWT = jwtUtil.verifyToken(splitToken);
-        String firstName = decodedJWT.getClaim("given_name").asString();
-        String lastName = decodedJWT.getClaim("family_name").asString();
+        return jwtUtil.verifyToken(splitToken);
+    }
+
+    public String generateFreshTokenWhereOAuthIsTrue(DecodedJWT decodedJWT, String phoneNumber) {
+        String fullName = decodedJWT.getClaim("fullName").asString();
         String email = decodedJWT.getClaim("email").asString();
-        String profilePicture = decodedJWT.getClaim("picture").asString();
-        user.getRoles().add(Role.NEW_USER);
-        user.setFirstName(firstName);
-        user.setLastName(lastName);
-        user.setEmail(email);
-        user.setProfileImage(profilePicture);
+        String profilePicture = decodedJWT.getClaim("image").asString();
+
+        return JWT.create().withIssuedAt(Instant.now()).withExpiresAt(Instant.now().plusSeconds(86000L))
+                .withClaim("phoneNumber", phoneNumber)
+                .withClaim("email", email)
+                .withClaim("fullName", fullName)
+                .withClaim("image", profilePicture)
+                .sign(Algorithm.HMAC512(secret.getBytes()));
+    }
+
+    public String generateFreshTokenWhereOAuthIsFalse(DecodedJWT decodedJWT, String phoneNumber) {
+        String fullName = decodedJWT.getClaim("fullName").asString();
+        String email = decodedJWT.getClaim("email").asString();
+        String password = decodedJWT.getClaim("password").asString();
+
+        return JWT.create().withIssuedAt(Instant.now()).withExpiresAt(Instant.now().plusSeconds(86000L))
+                .withClaim("phoneNumber", phoneNumber)
+                .withClaim("email", email)
+                .withClaim("fullName", fullName)
+                .withClaim("password", password)
+                .sign(Algorithm.HMAC512(secret.getBytes()));
+
+    }
+
+    public VerifyPhoneNumberResponse getVerifyPhoneNumberResponse(String token, String otp) {
+        return VerifyPhoneNumberResponse.builder().otp(otp).token(token).build();
+//        if (message.equals("OTP Sent")) {
+//            User storedUser = userRepository.save(filledUser);
+//            String token = fetchToken(storedUser.getPhoneNumber());
+//            return VerifyPhoneNumberResponse.builder().message(message).token(token).build();
+//        } else {
+//            return VerifyPhoneNumberResponse.builder().message(message).build();
+//        }
+    }
+
+    public User buildRegistrationRequest(CompleteRegistrationRequest registrationRequest)  {
+        User user = new User();
+        user.getRoles().add(SENDER);
+//        user.setFirstName(registrationRequest.getFirstName());
+//        user.setLastName(registrationRequest.getLastName());
+        user.setEmail(registrationRequest.getEmail());
+        user.setPassword(passwordEncoder.encode(registrationRequest.getPassword()));
+        user.setProfileImage(registrationRequest.getImage());
+        user.setCreatedAt(LocalDateTime.now());
         return user;
-    }
-
-    public VerifyPhoneNumberResponse getVerifyPhoneNumberResponse(User filledUser, String message) {
-        if (message.equals("OTP Sent")) {
-            User storedUser = userRepository.save(filledUser);
-            String token = fetchToken(storedUser.getPhoneNumber());
-            return VerifyPhoneNumberResponse.builder().message(message).token(token).build();
-        } else {
-            return VerifyPhoneNumberResponse.builder().message(message).build();
-        }
-    }
-
-    public User buildRegistrationRequest(CompleteRegistrationRequest registrationRequest, User foundUser)  {
-        foundUser.getRoles().add(SENDER);
-        foundUser.setFirstName(registrationRequest.getFirstName());
-        foundUser.setLastName(registrationRequest.getLastName());
-        foundUser.setEmail(registrationRequest.getEmail());
-        foundUser.setPassword(passwordEncoder.encode(registrationRequest.getPassword()));
-        foundUser.setProfileImage(registrationRequest.getImage());
-        foundUser.setCreatedAt(LocalDateTime.now());
-        return foundUser;
     }
 
     public String fetchToken(String phoneNumber) {
@@ -167,7 +192,7 @@ public class UserServiceUtils {
         String token = JWT.create().withIssuedAt(Instant.now()).withExpiresAt(Instant.now().plusSeconds(86000L))
                 .withClaim("email", emailAddress)
                 .sign(Algorithm.HMAC512(secret.getBytes()));
-        return "http://localhost:3000/resetPassword?token=" + token;
+        return "http://localhost:5173/resetPassword?token=" + token;
     }
 
 

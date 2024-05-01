@@ -10,8 +10,7 @@ import lombok.*;
 public class OtpResponse {
 
     private String otpNumber;
+//    private String data;
 
-    private String message;
-    private boolean success;
 
 }

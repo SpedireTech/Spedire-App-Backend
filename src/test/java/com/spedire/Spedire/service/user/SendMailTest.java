@@ -1,9 +1,8 @@
-package com.spedire.Spedire.service;
+package com.spedire.Spedire.service.user;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.spedire.Spedire.services.email.JavaMailService;
-import com.spedire.Spedire.services.user.UserServiceUtils;
 import jakarta.mail.MessagingException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

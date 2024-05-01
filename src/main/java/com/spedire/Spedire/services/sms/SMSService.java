@@ -6,5 +6,6 @@ public interface SMSService {
 
     boolean checkVerificationCode(String verificationCode, String token);
 
+    String sendSMSWithTermii(String phoneNumber);
 
 }
