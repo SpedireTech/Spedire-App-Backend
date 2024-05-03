@@ -3,6 +3,7 @@ package com.spedire.Spedire.services.order;
 import com.spedire.Spedire.dtos.requests.CreateOrderRequest;
 import com.spedire.Spedire.dtos.responses.CreateOrderResponse;
 import com.spedire.Spedire.models.Order;
+import com.spedire.Spedire.repositories.OrderRepository;
 import com.spedire.Spedire.repositories.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,7 +19,7 @@ import java.util.Date;
 @Service
 public class SpedireOrderService implements OrderService{
 
-    private final UserRepository userRepository;
+    private final OrderRepository orderRepository;
     @Override
     public CreateOrderResponse createOrder(CreateOrderRequest createOrderRequest) {
         Order order = new Order();
@@ -44,6 +45,7 @@ public class SpedireOrderService implements OrderService{
         order.setSenderPhoneNumber(createOrderRequest.getSenderPhoneNumber());
 
 
+        orderRepository.save(order);
         return CreateOrderResponse.builder().status(true).message("Order has been successfully create").build();
     }
 
