@@ -111,16 +111,12 @@ public class UserServiceUtils {
                 .sign(Algorithm.HMAC512(secret.getBytes()));
     }
 
-    public String generateFreshTokenWhereOAuthIsFalse(DecodedJWT decodedJWT, String phoneNumber) {
-        String fullName = decodedJWT.getClaim("fullName").asString();
-        String email = decodedJWT.getClaim("email").asString();
-        String password = decodedJWT.getClaim("password").asString();
-
+    public String generateFreshTokenWhereOAuthIsFalse(String phoneNumber) {
         return JWT.create().withIssuedAt(Instant.now()).withExpiresAt(Instant.now().plusSeconds(86000L))
                 .withClaim("phoneNumber", phoneNumber)
-                .withClaim("email", email)
-                .withClaim("fullName", fullName)
-                .withClaim("password", password)
+//                .withClaim("email", email)
+//                .withClaim("fullName", fullName)
+//                .withClaim("password", password)
                 .sign(Algorithm.HMAC512(secret.getBytes()));
 
     }

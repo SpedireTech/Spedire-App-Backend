@@ -66,11 +66,9 @@ public class SpedireAuthenticationFilter extends UsernamePasswordAuthenticationF
                 responseData));
     }
 
-
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
       response.getOutputStream().write("Login Error, please try again".getBytes());
     }
-
 
 
 }

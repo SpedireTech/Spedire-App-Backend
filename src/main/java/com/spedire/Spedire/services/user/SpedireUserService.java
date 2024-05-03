@@ -64,18 +64,24 @@ public class SpedireUserService implements UserService{
 
     @Override
     public RegistrationResponse createUser(RegistrationRequest registrationRequest) {
-        User user = new User();
-        user.setEmail(registrationRequest.getEmail());
-        user.setFullName(registrationRequest.getFullName());
-        user.setPassword(registrationRequest.getPassword());
+        verifyPhoneNumberIsValid(registrationRequest.getPhoneNumber());
+        validatePhoneNumberDoesntExist(registrationRequest.getPhoneNumber(), userRepository);
+        validateEmailAddress(registrationRequest.getEmail());
+//        User user = new User();
+//        user.setEmail(registrationRequest.getEmail());
+//        user.setFullName(registrationRequest.getFullName());
+//        user.setPassword(registrationRequest.getPassword());
+//        user.setPhoneNumber(registrationRequest.getPhoneNumber());
+
         String token = JWT.create()
                 .withIssuedAt(Instant.now())
-                .withClaim("password", user.getPassword())
-                .withClaim("email", user.getEmail())
-                .withClaim("fullName", user.getFullName())
+                .withClaim("password", registrationRequest.getPassword())
+                .withClaim("email", registrationRequest.getEmail())
+                .withClaim("fullName", registrationRequest.getFullName())
+                .withClaim("phoneNumber", registrationRequest.getPhoneNumber())
                 .sign(Algorithm.HMAC512(secret.getBytes()));
-        System.out.println("service token == " + token);
-        return RegistrationResponse.builder().token(token).build();
+        VerifyPhoneNumberResponse response = verifyPhoneNumber(null, false, registrationRequest.getPhoneNumber());
+        return RegistrationResponse.builder().token(token).otp(response.getOtp()).build();
     }
 
     @Override
@@ -90,11 +96,11 @@ public class SpedireUserService implements UserService{
             OtpResponse otp = otpService.generateOtp(phoneNumber);
             return utils.getVerifyPhoneNumberResponse(token, otp.getOtpNumber());
         } else {
-            String authorizationHeader = request.getHeader("Authorization");
-            DecodedJWT decodedJWT = utils.extractTokenDetails(authorizationHeader);
-            String token = utils.generateFreshTokenWhereOAuthIsFalse(decodedJWT, phoneNumber);
+//            String authorizationHeader = request.getHeader("Authorization");
+//            DecodedJWT decodedJWT = utils.extractTokenDetails(authorizationHeader);
+//            String token = utils.generateFreshTokenWhereOAuthIsFalse(phoneNumber);
             OtpResponse otp = otpService.generateOtp(phoneNumber);
-            return utils.getVerifyPhoneNumberResponse(token, otp.getOtpNumber());
+            return utils.getVerifyPhoneNumberResponse("", otp.getOtpNumber());
         }
     }
 
@@ -117,7 +123,7 @@ public class SpedireUserService implements UserService{
         if (user.isPresent()) {
             String link = utils.generateResetLink(emailAddress);
             log.info("Password Reset link : {} " + link);
-            String name = user.get().getFirstName() + user.get().getLastName();
+            String name = user.get().getFullName();
             String message = utils.sendEmail(emailAddress, "Password Reset", getForgotPasswordMailTemplate(name, link));
             if ("Mail delivered successfully".equals(message)) return ForgotPasswordResponse.builder().status(true).message(String.format("Reset instructions sent to %s", emailAddress)).build();
         }
