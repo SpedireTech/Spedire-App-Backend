@@ -65,7 +65,13 @@ public class UserServiceUtils {
 
     public static void validatePhoneNumberDoesntExist(String phoneNumber, UserRepository userRepository) {
         if (userRepository.existsByPhoneNumber(phoneNumber)) {
-            throw new SpedireException(String.format("User with phone number %s already exists", phoneNumber));
+            throw new SpedireException(String.format("User with %s already exists", phoneNumber));
+        }
+    }
+
+    public static void validateEmailDoesntExist(String email, UserRepository userRepository) {
+        if (userRepository.existsByEmail(email)) {
+            throw new SpedireException(String.format("User with %s already exists", email));
         }
     }
 

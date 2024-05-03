@@ -16,6 +16,7 @@ import com.spedire.Spedire.security.JwtUtil;
 import com.spedire.Spedire.services.email.JavaMailService;
 import com.spedire.Spedire.services.otp.OtpService;
 import com.spedire.Spedire.services.sms.SMSService;
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -66,6 +67,7 @@ public class SpedireUserService implements UserService{
     public RegistrationResponse createUser(RegistrationRequest registrationRequest) {
         verifyPhoneNumberIsValid(registrationRequest.getPhoneNumber());
         validatePhoneNumberDoesntExist(registrationRequest.getPhoneNumber(), userRepository);
+        validateEmailDoesntExist(registrationRequest.getEmail(), userRepository);
         validateEmailAddress(registrationRequest.getEmail());
 //        User user = new User();
 //        user.setEmail(registrationRequest.getEmail());
@@ -131,7 +133,6 @@ public class SpedireUserService implements UserService{
     }
 
     @Override
-    @SneakyThrows
     public ChangePasswordResponse resetPassword(ChangePasswordRequest passwordResetRequest)  {
         String token = passwordResetRequest.getToken();
         String newPassword = passwordResetRequest.getNewPassword();
@@ -146,9 +147,9 @@ public class SpedireUserService implements UserService{
         return ChangePasswordResponse.builder().status(true).message("Your password has been reset").build();
     }
 
-    @SneakyThrows
+
     @Override
-    public void saveUser(String token) {
+    public void saveUser(String token) throws MessagingException {
         String splitToken = token.split(" ")[1];
         DecodedJWT decodedJWT = jwtUtil.verifyToken(splitToken);
         String email = decodedJWT.getClaim("email").asString();

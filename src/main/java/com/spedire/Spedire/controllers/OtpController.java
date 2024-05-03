@@ -8,6 +8,7 @@ import com.spedire.Spedire.dtos.responses.VerifyPhoneNumberResponse;
 import com.spedire.Spedire.exceptions.SpedireException;
 import com.spedire.Spedire.services.otp.OtpService;
 import com.spedire.Spedire.services.user.UserService;
+import jakarta.mail.MessagingException;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,7 +44,7 @@ public class OtpController {
             } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().message("Invalid Otp or Phone number").success(response).build());
             }
-           } catch (SpedireException exception) {
+           } catch (SpedireException | MessagingException exception) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().message(exception.getMessage()).success(false).build());
         }
     }

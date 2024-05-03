@@ -7,6 +7,7 @@ import com.spedire.Spedire.dtos.requests.RegistrationRequest;
 import com.spedire.Spedire.dtos.responses.*;
 import com.spedire.Spedire.exceptions.SpedireException;
 import com.spedire.Spedire.models.User;
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 
 public interface UserService {
@@ -22,6 +23,6 @@ public interface UserService {
 
     ChangePasswordResponse resetPassword(ChangePasswordRequest passwordResetRequest) throws SpedireException;
 
-    void saveUser(String token);
+    void saveUser(String token) throws MessagingException;
 
 }

@@ -9,6 +9,7 @@ import com.spedire.Spedire.models.Otp;
 import com.spedire.Spedire.repositories.OtpRepository;
 import com.spedire.Spedire.security.JwtUtil;
 import com.spedire.Spedire.services.user.UserService;
+import jakarta.mail.MessagingException;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -77,7 +78,7 @@ public class SpedireOtpService implements OtpService{
     }
 
     @Override
-    public boolean verifyOtp(String otp, String token, UserService userService) {
+    public boolean verifyOtp(String otp, String token, UserService userService) throws MessagingException {
         String phoneNumber = decodeToken(token);
         var otpList = findAllOtp();
         for (Otp code: otpList) {
