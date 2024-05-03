@@ -167,9 +167,19 @@ public class SpedireUserService implements UserService{
         String phoneNumber = decodedJWT.getClaim("phoneNumber").asString();
         String password = decodedJWT.getClaim("password").asString();
         String fullName = decodedJWT.getClaim("fullName").asString();
-        User user = User.builder().fullName(fullName).password(password).phoneNumber(phoneNumber).email(email)
-                .profileImage(image).otpVerificationStatus(true).createdAt(LocalDateTime.now()).build();
-        User savedUser = userRepository.save(user);
+
+        User savedUser;
+
+        if (password == null) {
+            User user = User.builder().fullName(fullName).phoneNumber(phoneNumber).email(email)
+                    .profileImage(image).otpVerificationStatus(true).createdAt(LocalDateTime.now()).build();
+            savedUser = userRepository.save(user);
+        } else {
+            User user = User.builder().fullName(fullName).password(passwordEncoder.encode(password)).phoneNumber(phoneNumber).email(email)
+                    .profileImage(image).otpVerificationStatus(true).createdAt(LocalDateTime.now()).build();
+            savedUser = userRepository.save(user);
+        }
+
         javaMailService.sendMail(savedUser.getEmail(), "Welcome to Spedire", getWelcomeMailTemplate(savedUser.getFullName()));
     }
 
