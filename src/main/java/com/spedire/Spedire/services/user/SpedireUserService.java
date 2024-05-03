@@ -105,26 +105,9 @@ public class SpedireUserService implements UserService{
         String email = decodedJWT.getClaim("email").asString();
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new SpedireException("Invalid email address"));
-        return UserProfileResponse.builder().profileImage(user.getEmail()).phoneNumber(user.getPhoneNumber()).fullName(user.getFullName()).build();
+        return UserProfileResponse.builder().email(user.getEmail()).phoneNumber(user.getPhoneNumber()).fullName(user.getFullName()).build();
     }
 
-
-//    @SneakyThrows
-//    @Override
-//    @Transactional
-//    public void completeRegistration(String token) {
-//        DecodedJWT decodeToken = utils.decodeToken(token);
-//        String phoneNumber = decodeToken.getClaim("phoneNumber").asString();
-//        String email = decodeToken.getClaim("email").asString();
-//        String image = decodeToken.getClaim("image").asString();
-//        String fullName = decodeToken.getClaim("fullName").asString();
-//        String password = decodeToken.getClaim("password").asString();
-//        CompleteRegistrationRequest request = CompleteRegistrationRequest.builder().image(image).fullName(fullName).email(email).password(password).phoneNumber(phoneNumber).build();
-//        utils.checkIfUserHasVerifiedOtp(phoneNumber);
-//        validateEmailAddress(email);
-//        User savedUser = userRepository.save(utils.buildRegistrationRequest(request));
-//        utils.sendEmail(savedUser.getEmail(), "Welcome to Spedire", getWelcomeMailTemplate(savedUser.getFirstName()));
-//    }
 
     @Override
     public ForgotPasswordResponse forgotPassword(ForgotPasswordRequest forgotPasswordRequest) {
@@ -169,7 +152,6 @@ public class SpedireUserService implements UserService{
         String fullName = decodedJWT.getClaim("fullName").asString();
 
         User savedUser;
-
         if (password == null) {
             User user = User.builder().fullName(fullName).phoneNumber(phoneNumber).email(email)
                     .profileImage(image).otpVerificationStatus(true).createdAt(LocalDateTime.now()).build();

@@ -19,11 +19,6 @@ public class UserController {
     private final UserService userService;
 
 
-    @GetMapping("test")
-    public String test()  {
-        return "This is a simple test";
-    }
-
     @PostMapping("/sign-up")
     public ResponseEntity<?> register(@RequestBody RegistrationRequest registrationRequest) {
         RegistrationResponse response = userService.createUser(registrationRequest);

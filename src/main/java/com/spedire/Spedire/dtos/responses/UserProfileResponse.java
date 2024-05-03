@@ -1,14 +1,15 @@
 package com.spedire.Spedire.dtos.responses;
 import lombok.*;
 
+@Setter
+@Getter
+@ToString
 @Builder
 @RequiredArgsConstructor
 @AllArgsConstructor
-@Setter
 public class UserProfileResponse {
 
     private String fullName;
-    private String password;
 
     private String phoneNumber;
     private String profileImage;
