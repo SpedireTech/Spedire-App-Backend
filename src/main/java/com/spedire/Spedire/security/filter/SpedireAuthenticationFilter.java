@@ -6,6 +6,7 @@ import com.spedire.Spedire.exceptions.SpedireException;
 import com.spedire.Spedire.security.JwtUtil;
 import com.spedire.Spedire.services.user.UserService;
 import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
@@ -14,6 +15,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -64,8 +66,9 @@ public class SpedireAuthenticationFilter extends UsernamePasswordAuthenticationF
                 responseData));
     }
 
-
-
+    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
+      response.getOutputStream().write("Login Error, please try again".getBytes());
+    }
 
 
 }
