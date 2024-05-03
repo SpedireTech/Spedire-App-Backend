@@ -22,20 +22,19 @@ public class UserController {
     @PostMapping("/sign-up")
     public ResponseEntity<?> register(@RequestBody RegistrationRequest registrationRequest) {
         RegistrationResponse response = userService.createUser(registrationRequest);
-        String token = response.getToken();
-        return ResponseEntity.ok(new RegistrationResponse(token));
+        return ResponseEntity.ok(new RegistrationResponse(response.getToken(), response.getOtp()));
     }
 
-    @PostMapping("verifyPhoneNumber")
-    public ResponseEntity<ApiResponse<?>> verifyPhoneNumber(HttpServletRequest httpServletRequest, @RequestBody VerifyPhoneNumberRequest request)  {
-        VerifyPhoneNumberResponse response;
-        try {
-            response = userService.verifyPhoneNumber(httpServletRequest, request.isRoute(), request.getPhoneNumber());
-            return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().message("Proceed to enter generated OTP").data(response).success(true).build());
-           } catch (SpedireException exception) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().message(exception.getMessage()).success(false).build());
-        }
-    }
+//    @PostMapping("verifyPhoneNumber")
+//    public ResponseEntity<ApiResponse<?>> verifyPhoneNumber(HttpServletRequest httpServletRequest, @RequestBody VerifyPhoneNumberRequest request)  {
+//        VerifyPhoneNumberResponse response;
+//        try {
+//            response = userService.verifyPhoneNumber(httpServletRequest, request.isRoute(), request.getPhoneNumber());
+//            return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().message("Proceed to enter generated OTP").data(response).success(true).build());
+//           } catch (SpedireException exception) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().message(exception.getMessage()).success(false).build());
+//        }
+//    }
 
 
     @PostMapping("profile")
