@@ -2,7 +2,7 @@ package com.spedire.Spedire.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spedire.Spedire.dtos.requests.LoginRequest;
-import com.spedire.Spedire.exceptions.SpedireException;
+import com.spedire.Spedire.dtos.responses.ApiResponse;
 import com.spedire.Spedire.security.JwtUtil;
 import com.spedire.Spedire.services.user.UserService;
 import jakarta.servlet.FilterChain;
@@ -66,8 +66,14 @@ public class SpedireAuthenticationFilter extends UsernamePasswordAuthenticationF
                 responseData));
     }
 
+    @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
-      response.getOutputStream().write("Login Error, please try again".getBytes());
+        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        ApiResponse<?> errorResponse = ApiResponse.builder().success(false).message("Login Error, please try again").build();
+        ObjectMapper mapper = new ObjectMapper();
+        String jsonResponse = mapper.writeValueAsString(errorResponse);
+        response.setContentType("application/json");
+        response.getOutputStream().write(jsonResponse.getBytes());
     }
 
 
