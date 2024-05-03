@@ -44,6 +44,7 @@ public class AuthSuccessHandler implements AuthenticationSuccessHandler {
     @Override
     public void onAuthenticationSuccess(HttpServletRequest httpServletRequest, HttpServletResponse response, Authentication authentication) throws IOException {
         OAuth2User userDetails = (OAuth2User) authentication.getPrincipal();
+        log.info("{} this one works too now ", String.valueOf(userDetails));
         String email = (String) userDetails.getAttributes().get("email");
         String firstName = (String) userDetails.getAttributes().get("given_name");
         String lastName = (String) userDetails.getAttributes().get("family_name");
