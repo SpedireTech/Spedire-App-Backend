@@ -117,7 +117,7 @@ public class SpedireUserService implements UserService{
         if (user.isPresent()) {
             String link = utils.generateResetLink(emailAddress);
             log.info("Password Reset link : {} " + link);
-            String name = user.get().getFirstName() + user.get().getLastName();
+            String name = user.get().getFullName();
             String message = utils.sendEmail(emailAddress, "Password Reset", getForgotPasswordMailTemplate(name, link));
             if ("Mail delivered successfully".equals(message)) return ForgotPasswordResponse.builder().status(true).message(String.format("Reset instructions sent to %s", emailAddress)).build();
         }
