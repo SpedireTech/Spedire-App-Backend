@@ -37,6 +37,7 @@ import java.util.UUID;
 import static com.spedire.Spedire.security.SecurityUtils.JWT_SECRET;
 import static com.spedire.Spedire.services.email.MailTemplates.*;
 import static com.spedire.Spedire.services.user.UserServiceUtils.*;
+import static org.apache.http.HttpHeaders.AUTHORIZATION;
 
 
 @Service
@@ -62,10 +63,7 @@ public class SpedireUserService implements UserService{
     private PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final JavaMailService javaMailService;
-//    private final SMSService smsService;
-
     private final UserServiceUtils utils;
-
     private final RedisInterface redisInterface;
 
 
@@ -85,7 +83,7 @@ public class SpedireUserService implements UserService{
         redisInterface.cacheUserData(user);
 
         String token = JWT.create().withIssuedAt(Instant.now()).withExpiresAt(Instant.now().plusSeconds(86000L))
-                .withClaim("email", user.getEmail()).sign(Algorithm.HMAC512(secret.getBytes()));
+                .withClaim(EMAIL, user.getEmail()).sign(Algorithm.HMAC512(secret.getBytes()));
         VerifyPhoneNumberResponse response = verifyPhoneNumber(null, false, registrationRequest.getPhoneNumber());
         return RegistrationResponse.builder().token(token).otp(response.getOtp()).build();
     }
@@ -98,15 +96,12 @@ public class SpedireUserService implements UserService{
         verifyPhoneNumberIsValid(phoneNumber);
         validatePhoneNumberDoesntExist(phoneNumber, userRepository);
         if (route) {
-            String authorizationHeader = request.getHeader("Authorization");
+            String authorizationHeader = request.getHeader(AUTHORIZATION);
             DecodedJWT decodedJWT = utils.extractTokenDetails(authorizationHeader);
-            String email = decodedJWT.getClaim("email").asString();
-            System.out.println(email);
+            String email = decodedJWT.getClaim(EMAIL).asString();
             User user = redisInterface.getUserData(email);
-            System.out.println(user);
             user.setPhoneNumber(phoneNumber);
             redisInterface.cacheUserData(user);
-            System.out.println("Cached user == " + redisInterface.getUserData(email));
             String token = utils.generateFreshTokenWhereOAuthIsTrue(email);
             OtpResponse otp = otpService.generateOtp(phoneNumber);
             return utils.getVerifyPhoneNumberResponse(token, otp.getOtpNumber());
@@ -120,9 +115,9 @@ public class SpedireUserService implements UserService{
     public UserProfileResponse fetchUserProfile(String token) {
         String splitToken = token.split(" ")[1];
         DecodedJWT decodedJWT = jwtUtil.verifyToken(splitToken);
-        String email = decodedJWT.getClaim("email").asString();
+        String email = decodedJWT.getClaim(EMAIL).asString();
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new SpedireException("Invalid email address"));
+                .orElseThrow(() -> new SpedireException(INVALID_EMAIL_ADDRESS));
         return UserProfileResponse.builder().email(user.getEmail()).phoneNumber(user.getPhoneNumber()).fullName(user.getFullName()).build();
     }
 
@@ -136,10 +131,10 @@ public class SpedireUserService implements UserService{
             String link = utils.generateResetLink(emailAddress);
             log.info("Password Reset link : {} " + link);
             String name = user.get().getFullName();
-            String message = utils.sendEmail(emailAddress, "Password Reset", getForgotPasswordMailTemplate(name, link));
-            if ("Mail delivered successfully".equals(message)) return ForgotPasswordResponse.builder().status(true).message(String.format("Reset instructions sent to %s", emailAddress)).build();
+            String message = utils.sendEmail(emailAddress, PASSWORD_RESET, getForgotPasswordMailTemplate(name, link));
+            if (MAIL_DELIVERED_SUCCESSFULLY.equals(message)) return ForgotPasswordResponse.builder().status(true).message(String.format(RESET_INSTRUCTIONS_SENT, emailAddress)).build();
         }
-        return ForgotPasswordResponse.builder().status(false).message("Email Address Not Found").build();
+        return ForgotPasswordResponse.builder().status(false).message(EMAIL_ADDRESS_NOT_FOUND).build();
     }
 
     @Override
@@ -148,13 +143,13 @@ public class SpedireUserService implements UserService{
         String newPassword = passwordResetRequest.getNewPassword();
         validatePasswordMatch(passwordResetRequest);
         DecodedJWT decodedJWT = jwtUtil.verifyToken(token);
-        Claim claim = decodedJWT.getClaim("email");
+        Claim claim = decodedJWT.getClaim(EMAIL);
         String email = claim.asString();
         User user = userRepository.findByEmail(email).orElseThrow(() ->
-                new SpedireException(String.format("%s not found", email)));
+                new SpedireException(String.format(NOT_FOUND, email)));
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
-        return ChangePasswordResponse.builder().status(true).message("Your password has been reset").build();
+        return ChangePasswordResponse.builder().status(true).message(YOUR_PASSWORD_HAS_BEEN_REST).build();
     }
 
 
@@ -162,27 +157,13 @@ public class SpedireUserService implements UserService{
     public void saveUser(String token) throws MessagingException {
         String splitToken = token.split(" ")[1];
         DecodedJWT decodedJWT = jwtUtil.verifyToken(splitToken);
-        String email = decodedJWT.getClaim("email").asString();
-//        String image = decodedJWT.getClaim("image").asString();
-//        String phoneNumber = decodedJWT.getClaim("phoneNumber").asString();
-//        String password = decodedJWT.getClaim("password").asString();
-//        String fullName = decodedJWT.getClaim("fullName").asString();
+        String email = decodedJWT.getClaim(EMAIL).asString();
         User cachedUser = redisInterface.getUserData(email);
         System.out.println(cachedUser.toString());
         User user = User.builder().fullName(cachedUser.getFullName()).password(cachedUser.getPassword())
-                .phoneNumber(cachedUser.getPhoneNumber()).email(cachedUser.getEmail()).otpVerificationStatus(true).createdAt(LocalDateTime.now()).build();
+                .phoneNumber(cachedUser.getPhoneNumber()).email(cachedUser.getEmail()).profileImage(cachedUser.getProfileImage()).otpVerificationStatus(true).createdAt(LocalDateTime.now()).build();
         User savedUser = userRepository.save(user);
-//        if (password == null) {
-//            User user = User.builder().fullName(fullName).phoneNumber(phoneNumber).email(email)
-//                    .profileImage(image).otpVerificationStatus(true).createdAt(LocalDateTime.now()).build();
-//            savedUser = userRepository.save(user);
-//        } else {
-//            User user = User.builder().fullName(fullName).password(passwordEncoder.encode(password)).phoneNumber(phoneNumber).email(email)
-//                    .profileImage(image).otpVerificationStatus(true).createdAt(LocalDateTime.now()).build();
-//            savedUser = userRepository.save(user);
-//        }
-
-        javaMailService.sendMail(savedUser.getEmail(), "Welcome to Spedire", getWelcomeMailTemplate(savedUser.getFullName()));
+        javaMailService.sendMail(savedUser.getEmail(), WELCOME_TO_SPEDIRE, getWelcomeMailTemplate(savedUser.getFullName()));
         redisInterface.deleteUserCache(email);
     }
 

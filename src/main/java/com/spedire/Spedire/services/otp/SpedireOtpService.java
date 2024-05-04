@@ -53,13 +53,13 @@ public class SpedireOtpService implements OtpService{
     private void handleOtpTimeout() {
         var allOtp = findAllOtp();
         for (Otp otp:allOtp) {
-            if((Duration.between(LocalTime.now(),otp.getTime()).toMinutes() % 60) > 5){
+            long minutesElapsed = Duration.between(otp.getTime(), LocalTime.now()).toMinutes();
+            if (minutesElapsed > 5) {
                 otpRepository.delete(otp);
             }
         }
     }
 
-    
     @Override
     public OtpResponse generateOtp(String phoneNumber) {
         String numbers = "0123456789";

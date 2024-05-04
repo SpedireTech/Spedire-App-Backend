@@ -60,11 +60,14 @@ public class SpedireAuthenticationFilter extends UsernamePasswordAuthenticationF
                                             Authentication authResult)  {
         String accessToken = jwtUtil.generateAccessToken(email);
         Map<String, Object> responseData = new HashMap<>();
+//        ApiResponse<?> successResponse = ApiResponse.builder().success(true).message("Login successful").data(accessToken).build();
         responseData.put("access_token", accessToken);
+//        responseData.put("", successResponse);
         response.setContentType(APPLICATION_JSON_VALUE);
         response.getOutputStream().write(objectMapper.writeValueAsBytes(
                 responseData));
     }
+
 
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
@@ -72,7 +75,7 @@ public class SpedireAuthenticationFilter extends UsernamePasswordAuthenticationF
         ApiResponse<?> errorResponse = ApiResponse.builder().success(false).message("Login Error, please try again").build();
         ObjectMapper mapper = new ObjectMapper();
         String jsonResponse = mapper.writeValueAsString(errorResponse);
-        response.setContentType("application/json");
+        response.setContentType(APPLICATION_JSON_VALUE);
         response.getOutputStream().write(jsonResponse.getBytes());
     }
 

@@ -49,6 +49,15 @@ public class UserServiceUtils {
     private static final String PHONE_NUMBER_REGEX = "^(080|091|070|081|090)\\d{8}$";
 
     private static final Pattern pattern = Pattern.compile(PHONE_NUMBER_REGEX);
+    public static final String WELCOME_TO_SPEDIRE = "Welcome to Spedire";
+    public static final String EMAIL = "email";
+    public static final String YOUR_PASSWORD_HAS_BEEN_REST = "Your password has been reset";
+    public static final String EMAIL_ADDRESS_NOT_FOUND = "Email Address Not Found";
+    public static final String NOT_FOUND = "%s not found";
+    public static final String PASSWORD_RESET = "Password Reset";
+    public static final String RESET_INSTRUCTIONS_SENT = "Reset instructions sent to %s";
+    public static final String MAIL_DELIVERED_SUCCESSFULLY = "Mail delivered successfully";
+    public static final String INVALID_EMAIL_ADDRESS = "Invalid email address";
 
 
     public static void verifyPhoneNumberIsValid(String phoneNumber) {
@@ -76,7 +85,6 @@ public class UserServiceUtils {
 
 
     public String decodePhoneNumber(String token) {
-//        String splitToken = token.split(" ")[1];
         log.info("Token : {} " , token);
         DecodedJWT decodedJWT = jwtUtil.verifyToken(token);
         return decodedJWT.getClaim("phoneNumber").asString();
@@ -112,9 +120,6 @@ public class UserServiceUtils {
     public String generateFreshTokenWhereOAuthIsFalse(String phoneNumber) {
         return JWT.create().withIssuedAt(Instant.now()).withExpiresAt(Instant.now().plusSeconds(86000L))
                 .withClaim("phoneNumber", phoneNumber)
-//                .withClaim("email", email)
-//                .withClaim("fullName", fullName)
-//                .withClaim("password", password)
                 .sign(Algorithm.HMAC512(secret.getBytes()));
 
     }

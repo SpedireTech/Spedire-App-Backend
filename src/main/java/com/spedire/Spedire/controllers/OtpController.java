@@ -14,6 +14,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import static com.spedire.Spedire.controllers.Utils.*;
+import static org.apache.http.HttpHeaders.AUTHORIZATION;
+
 @RestController
 @AllArgsConstructor
 @RequestMapping("api/v1/otp")
@@ -27,7 +30,7 @@ public class OtpController {
         OtpResponse response;
         try {
             response = otpService.generateOtp(request.getPhoneNumber());
-            return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().message("OTP Available").data(response).success(true).build());
+            return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().message(OTP_AVAILABLE).data(response).success(true).build());
         } catch (SpedireException exception) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().message(exception.getMessage()).success(false).build());
         }
@@ -35,14 +38,14 @@ public class OtpController {
 
 
     @PostMapping("verifyOtp")
-    public ResponseEntity<ApiResponse<?>> verifyOtp(@RequestBody VerifyOtpRequest request, @RequestHeader("Authorization") String token)  {
+    public ResponseEntity<ApiResponse<?>> verifyOtp(@RequestBody VerifyOtpRequest request, @RequestHeader(AUTHORIZATION) String token)  {
         boolean response;
         try {
             response = otpService.verifyOtp(request.getVerificationCode(), token, userService);
             if (response) {
-                return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().message("Registration completed").success(response).build());
+                return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().message(REGISTRATION_COMPLETED).success(response).build());
             } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().message("Invalid Otp or Phone number").success(response).build());
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().message(INVALID_OTP_OR_PHONE_NUMBER).success(response).build());
             }
            } catch (SpedireException | MessagingException exception) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().message(exception.getMessage()).success(false).build());

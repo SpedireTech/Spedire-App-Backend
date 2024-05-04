@@ -14,6 +14,9 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 
+import static com.spedire.Spedire.controllers.Utils.CLOSEST_LANDMARK;
+import static com.spedire.Spedire.controllers.Utils.NO_LANDMARK;
+
 @AllArgsConstructor
 @Slf4j
 @RequestMapping("/api/v1/location")
@@ -28,8 +31,8 @@ public class LocationApiController {
         List<String> response;
         try {
             response = locationApis.getNearbyPlaces();
-            if (!response.isEmpty()) return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().success(true).message("Closest Landmarks").data(response).build());
-            else return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().success(false).message("No Landmarks").build());
+            if (!response.isEmpty()) return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().success(true).message(CLOSEST_LANDMARK).data(response).build());
+            else return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().success(false).message(NO_LANDMARK).build());
         } catch (URISyntaxException exception) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().message(exception.getMessage()).success(false).build());
         }
