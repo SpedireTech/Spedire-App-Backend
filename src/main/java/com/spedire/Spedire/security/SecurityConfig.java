@@ -6,6 +6,7 @@ import com.spedire.Spedire.enums.Role;
 import com.spedire.Spedire.repositories.UserRepository;
 import com.spedire.Spedire.security.filter.SpedireAuthenticationFilter;
 import com.spedire.Spedire.security.filter.SpedireAuthorizationFilter;
+import com.spedire.Spedire.services.cache.RedisInterface;
 import com.spedire.Spedire.services.user.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,6 +32,7 @@ public class SecurityConfig {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
+    private final RedisInterface redisInterface;
 
 
     @Bean
@@ -40,7 +42,7 @@ public class SecurityConfig {
         SpedireAuthorizationFilter authorizationFilter = new SpedireAuthorizationFilter(jwtUtil);
 
 
-        AuthSuccessHandler authSuccessHandler = new AuthSuccessHandler(userRepository, jwtUtil);
+        AuthSuccessHandler authSuccessHandler = new AuthSuccessHandler(userRepository, jwtUtil, redisInterface);
 
         return httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)

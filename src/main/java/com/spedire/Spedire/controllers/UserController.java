@@ -24,7 +24,7 @@ public class UserController {
         RegistrationResponse response;
         try {
             response = userService.createUser(registrationRequest);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().message("Successful").data(response).success(true).build());
+            return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().message("Successful").data(response).success(true).build());
         } catch (SpedireException exception) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().message(exception.getMessage()).success(false).build());
         }

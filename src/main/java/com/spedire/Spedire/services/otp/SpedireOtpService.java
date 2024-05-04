@@ -79,13 +79,17 @@ public class SpedireOtpService implements OtpService{
 
     @Override
     public boolean verifyOtp(String otp, String token, UserService userService) throws MessagingException {
-        String phoneNumber = decodeToken(token);
+        String email = decodeToken(token);
         var otpList = findAllOtp();
         for (Otp code: otpList) {
-            if (Objects.equals(code.getCode(), otp) && code.getPhoneNumber().equals(phoneNumber)) {
+            if (Objects.equals(code.getCode(), otp)) {
                 userService.saveUser(token);
                 return true;
             }
+//            if (Objects.equals(code.getCode(), otp) && code.getPhoneNumber().equals(email)) {
+//                userService.saveUser(token);
+//                return true;
+//            }
         }
         return false;
     }
@@ -103,7 +107,8 @@ public class SpedireOtpService implements OtpService{
     public String decodeToken(String token) {
         String splitToken = token.split(" ")[1];
         DecodedJWT decodedJWT = jwtUtil.verifyToken(splitToken);
-        return decodedJWT.getClaim("phoneNumber").asString();
+//        return decodedJWT.getClaim("phoneNumber").asString();
+        return decodedJWT.getClaim("email").asString();
     }
 
 }

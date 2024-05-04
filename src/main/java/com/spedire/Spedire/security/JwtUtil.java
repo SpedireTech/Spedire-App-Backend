@@ -46,11 +46,9 @@ public class JwtUtil {
                 .sign(Algorithm.HMAC512(secret.getBytes()));
     }
 
-    public String fetchToken(CompleteRegistrationRequest registrationRequest) {
+    public String fetchToken(String email) {
         return JWT.create().withIssuedAt(Instant.now()).withExpiresAt(Instant.now().plusSeconds(86000L))
-                .withClaim("email", registrationRequest.getEmail())
-                .withClaim("fullName", registrationRequest.getFullName())
-                .withClaim("image", registrationRequest.getImage())
+                .withClaim("email", email)
                 .sign(Algorithm.HMAC512(secret.getBytes()));
     }
 

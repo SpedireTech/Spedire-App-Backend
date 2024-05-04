@@ -13,6 +13,7 @@ import com.spedire.Spedire.exceptions.SpedireException;
 import com.spedire.Spedire.models.User;
 import com.spedire.Spedire.repositories.UserRepository;
 import com.spedire.Spedire.security.JwtUtil;
+import com.spedire.Spedire.services.cache.RedisInterface;
 import com.spedire.Spedire.services.email.JavaMailService;
 import com.spedire.Spedire.services.otp.OtpService;
 import com.spedire.Spedire.services.sms.SMSService;
@@ -31,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 import static com.spedire.Spedire.security.SecurityUtils.JWT_SECRET;
 import static com.spedire.Spedire.services.email.MailTemplates.*;
@@ -42,13 +44,15 @@ import static com.spedire.Spedire.services.user.UserServiceUtils.*;
 public class SpedireUserService implements UserService{
 
     public SpedireUserService(UserRepository userRepository, OtpService otpService,
-                              PasswordEncoder passwordEncoder, JwtUtil jwtUtil, UserServiceUtils utils, JavaMailService javaMailService) {
+                              PasswordEncoder passwordEncoder, JwtUtil jwtUtil, UserServiceUtils utils,
+                              JavaMailService javaMailService, RedisInterface redisInterface) {
         this.userRepository = userRepository;
         this.otpService = otpService;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
         this.utils = utils;
         this.javaMailService = javaMailService;
+        this.redisInterface = redisInterface;
     }
 
     @Value(JWT_SECRET)
@@ -62,6 +66,8 @@ public class SpedireUserService implements UserService{
 
     private final UserServiceUtils utils;
 
+    private final RedisInterface redisInterface;
+
 
     @Override
     public RegistrationResponse createUser(RegistrationRequest registrationRequest) {
@@ -69,22 +75,22 @@ public class SpedireUserService implements UserService{
         validatePhoneNumberDoesntExist(registrationRequest.getPhoneNumber(), userRepository);
         validateEmailDoesntExist(registrationRequest.getEmail(), userRepository);
         validateEmailAddress(registrationRequest.getEmail());
-//        User user = new User();
-//        user.setEmail(registrationRequest.getEmail());
-//        user.setFullName(registrationRequest.getFullName());
-//        user.setPassword(registrationRequest.getPassword());
-//        user.setPhoneNumber(registrationRequest.getPhoneNumber());
 
-        String token = JWT.create()
-                .withIssuedAt(Instant.now())
-                .withClaim("password", registrationRequest.getPassword())
-                .withClaim("email", registrationRequest.getEmail())
-                .withClaim("fullName", registrationRequest.getFullName())
-                .withClaim("phoneNumber", registrationRequest.getPhoneNumber())
-                .sign(Algorithm.HMAC512(secret.getBytes()));
+        String encodedPassword = passwordEncoder.encode(registrationRequest.getPassword());
+        User user = new User();
+        user.setEmail(registrationRequest.getEmail());
+        user.setFullName(registrationRequest.getFullName());
+        user.setPassword(encodedPassword);
+        user.setPhoneNumber(registrationRequest.getPhoneNumber());
+        redisInterface.cacheUserData(user);
+
+        String token = JWT.create().withIssuedAt(Instant.now()).withExpiresAt(Instant.now().plusSeconds(86000L))
+                .withClaim("email", user.getEmail()).sign(Algorithm.HMAC512(secret.getBytes()));
         VerifyPhoneNumberResponse response = verifyPhoneNumber(null, false, registrationRequest.getPhoneNumber());
         return RegistrationResponse.builder().token(token).otp(response.getOtp()).build();
     }
+
+
 
     @Override
     @Transactional
@@ -94,13 +100,17 @@ public class SpedireUserService implements UserService{
         if (route) {
             String authorizationHeader = request.getHeader("Authorization");
             DecodedJWT decodedJWT = utils.extractTokenDetails(authorizationHeader);
-            String token = utils.generateFreshTokenWhereOAuthIsTrue(decodedJWT, phoneNumber);
+            String email = decodedJWT.getClaim("email").asString();
+            System.out.println(email);
+            User user = redisInterface.getUserData(email);
+            System.out.println(user);
+            user.setPhoneNumber(phoneNumber);
+            redisInterface.cacheUserData(user);
+            System.out.println("Cached user == " + redisInterface.getUserData(email));
+            String token = utils.generateFreshTokenWhereOAuthIsTrue(email);
             OtpResponse otp = otpService.generateOtp(phoneNumber);
             return utils.getVerifyPhoneNumberResponse(token, otp.getOtpNumber());
         } else {
-//            String authorizationHeader = request.getHeader("Authorization");
-//            DecodedJWT decodedJWT = utils.extractTokenDetails(authorizationHeader);
-//            String token = utils.generateFreshTokenWhereOAuthIsFalse(phoneNumber);
             OtpResponse otp = otpService.generateOtp(phoneNumber);
             return utils.getVerifyPhoneNumberResponse("", otp.getOtpNumber());
         }
@@ -153,23 +163,27 @@ public class SpedireUserService implements UserService{
         String splitToken = token.split(" ")[1];
         DecodedJWT decodedJWT = jwtUtil.verifyToken(splitToken);
         String email = decodedJWT.getClaim("email").asString();
-        String image = decodedJWT.getClaim("image").asString();
-        String phoneNumber = decodedJWT.getClaim("phoneNumber").asString();
-        String password = decodedJWT.getClaim("password").asString();
-        String fullName = decodedJWT.getClaim("fullName").asString();
-
-        User savedUser;
-        if (password == null) {
-            User user = User.builder().fullName(fullName).phoneNumber(phoneNumber).email(email)
-                    .profileImage(image).otpVerificationStatus(true).createdAt(LocalDateTime.now()).build();
-            savedUser = userRepository.save(user);
-        } else {
-            User user = User.builder().fullName(fullName).password(passwordEncoder.encode(password)).phoneNumber(phoneNumber).email(email)
-                    .profileImage(image).otpVerificationStatus(true).createdAt(LocalDateTime.now()).build();
-            savedUser = userRepository.save(user);
-        }
+//        String image = decodedJWT.getClaim("image").asString();
+//        String phoneNumber = decodedJWT.getClaim("phoneNumber").asString();
+//        String password = decodedJWT.getClaim("password").asString();
+//        String fullName = decodedJWT.getClaim("fullName").asString();
+        User cachedUser = redisInterface.getUserData(email);
+        System.out.println(cachedUser.toString());
+        User user = User.builder().fullName(cachedUser.getFullName()).password(cachedUser.getPassword())
+                .phoneNumber(cachedUser.getPhoneNumber()).email(cachedUser.getEmail()).otpVerificationStatus(true).createdAt(LocalDateTime.now()).build();
+        User savedUser = userRepository.save(user);
+//        if (password == null) {
+//            User user = User.builder().fullName(fullName).phoneNumber(phoneNumber).email(email)
+//                    .profileImage(image).otpVerificationStatus(true).createdAt(LocalDateTime.now()).build();
+//            savedUser = userRepository.save(user);
+//        } else {
+//            User user = User.builder().fullName(fullName).password(passwordEncoder.encode(password)).phoneNumber(phoneNumber).email(email)
+//                    .profileImage(image).otpVerificationStatus(true).createdAt(LocalDateTime.now()).build();
+//            savedUser = userRepository.save(user);
+//        }
 
         javaMailService.sendMail(savedUser.getEmail(), "Welcome to Spedire", getWelcomeMailTemplate(savedUser.getFullName()));
+        redisInterface.deleteUserCache(email);
     }
 
 }

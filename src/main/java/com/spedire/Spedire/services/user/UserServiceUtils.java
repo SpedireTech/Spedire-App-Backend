@@ -52,7 +52,6 @@ public class UserServiceUtils {
 
 
     public static void verifyPhoneNumberIsValid(String phoneNumber) {
-        System.out.println(phoneNumber);
         if (phoneNumber == null) {
             throw new SpedireException("Phone number can not be null");
         }
@@ -104,16 +103,9 @@ public class UserServiceUtils {
         return jwtUtil.verifyToken(splitToken);
     }
 
-    public String generateFreshTokenWhereOAuthIsTrue(DecodedJWT decodedJWT, String phoneNumber) {
-        String fullName = decodedJWT.getClaim("fullName").asString();
-        String email = decodedJWT.getClaim("email").asString();
-        String profilePicture = decodedJWT.getClaim("image").asString();
-
+    public String generateFreshTokenWhereOAuthIsTrue(String email) {
         return JWT.create().withIssuedAt(Instant.now()).withExpiresAt(Instant.now().plusSeconds(86000L))
-                .withClaim("phoneNumber", phoneNumber)
                 .withClaim("email", email)
-                .withClaim("fullName", fullName)
-                .withClaim("image", profilePicture)
                 .sign(Algorithm.HMAC512(secret.getBytes()));
     }
 
