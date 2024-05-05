@@ -9,4 +9,5 @@ public interface RedisInterface {
     public User getUserData(String email);
 
     public void deleteUserCache(String email);
+    public boolean isUserExist(String email);
 }

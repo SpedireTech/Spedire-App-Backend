@@ -31,6 +31,8 @@ public class RedisService implements RedisInterface{
             userData.put("phoneNumber", user.getPhoneNumber());
         }
 
+        System.out.println("user data == " + userData);
+
 
         if (!userData.isEmpty()) {
             redisTemplate.opsForHash().putAll(emailKey, userData);
@@ -73,5 +75,14 @@ public class RedisService implements RedisInterface{
     public void deleteUserCache(String email) {
         String emailKey = "user:" + email;
         redisTemplate.delete(emailKey);
+    }
+
+    @Override
+    public boolean isUserExist(String email) {
+        return Boolean.TRUE.equals(redisTemplate.hasKey(email));
+//        if (Boolean.TRUE.equals(exists)) {
+//            return true;
+//        }
+//        return false;
     }
 }

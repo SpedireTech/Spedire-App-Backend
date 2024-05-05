@@ -70,9 +70,12 @@ public class SpedireUserService implements UserService{
     @Override
     public RegistrationResponse createUser(RegistrationRequest registrationRequest) {
         verifyPhoneNumberIsValid(registrationRequest.getPhoneNumber());
-        validatePhoneNumberDoesntExist(registrationRequest.getPhoneNumber(), userRepository);
-        validateEmailDoesntExist(registrationRequest.getEmail(), userRepository);
         validateEmailAddress(registrationRequest.getEmail());
+        boolean exists = redisInterface.isUserExist(registrationRequest.getEmail());
+        System.out.println(exists);
+        if (exists) {
+            throw new SpedireException("already initiated signup request");
+        }
 
         String encodedPassword = passwordEncoder.encode(registrationRequest.getPassword());
         User user = new User();
@@ -80,6 +83,7 @@ public class SpedireUserService implements UserService{
         user.setFullName(registrationRequest.getFullName());
         user.setPassword(encodedPassword);
         user.setPhoneNumber(registrationRequest.getPhoneNumber());
+        System.out.println(user);
         redisInterface.cacheUserData(user);
 
         String token = JWT.create().withIssuedAt(Instant.now()).withExpiresAt(Instant.now().plusSeconds(86000L))
@@ -155,6 +159,7 @@ public class SpedireUserService implements UserService{
 
     @Override
     public void saveUser(String token) throws MessagingException {
+        System.out.println("hello");
         String splitToken = token.split(" ")[1];
         DecodedJWT decodedJWT = jwtUtil.verifyToken(splitToken);
         String email = decodedJWT.getClaim(EMAIL).asString();
