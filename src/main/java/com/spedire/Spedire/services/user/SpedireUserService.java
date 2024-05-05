@@ -71,31 +71,34 @@ public class SpedireUserService implements UserService{
 
     @Override
     public RegistrationResponse createUser(RegistrationRequest registrationRequest) {
-        verifyPhoneNumberIsValid(registrationRequest.getPhoneNumber());
-        validateEmailAddress(registrationRequest.getEmail());
-        validateEmailDoesntExist(registrationRequest.getEmail(), userRepository);
-        validatePhoneNumberDoesntExist(registrationRequest.getPhoneNumber(), userRepository);
-
+        validateRequest(registrationRequest);
         boolean exists = redisInterface.isUserExist(registrationRequest.getEmail());
         User cachedUser = redisInterface.getUserData(registrationRequest.getEmail());
         String token = utils.generateToken(registrationRequest.getEmail());
 
-        if (exists || cachedUser != null) {
-            return RegistrationResponse.builder().token(token).build();
-        }
+        if (exists || cachedUser != null) {return RegistrationResponse.builder().token(token).build();}
 
         String encodedPassword = passwordEncoder.encode(registrationRequest.getPassword());
+        cacheUserData(registrationRequest, encodedPassword);
+        VerifyPhoneNumberResponse response = verifyPhoneNumber(null, false, registrationRequest.getPhoneNumber());
+        return RegistrationResponse.builder().token(token).otp(response.getOtp()).build();
+    }
+
+    private void cacheUserData(RegistrationRequest registrationRequest, String encodedPassword) {
         User user = new User();
         user.setEmail(registrationRequest.getEmail());
         user.setFullName(registrationRequest.getFullName());
         user.setPassword(encodedPassword);
         user.setPhoneNumber(registrationRequest.getPhoneNumber());
         redisInterface.cacheUserData(user);
-
-       VerifyPhoneNumberResponse response = verifyPhoneNumber(null, false, registrationRequest.getPhoneNumber());
-        return RegistrationResponse.builder().token(token).otp(response.getOtp()).build();
     }
 
+    private void validateRequest(RegistrationRequest registrationRequest) {
+        verifyPhoneNumberIsValid(registrationRequest.getPhoneNumber());
+        validateEmailAddress(registrationRequest.getEmail());
+        validateEmailDoesntExist(registrationRequest.getEmail(), userRepository);
+        validatePhoneNumberDoesntExist(registrationRequest.getPhoneNumber(), userRepository);
+    }
 
 
     @Override
