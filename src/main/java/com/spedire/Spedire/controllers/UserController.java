@@ -27,7 +27,11 @@ public class UserController {
         RegistrationResponse response;
         try {
             response = userService.createUser(registrationRequest);
-            return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().message(SUCCESSFUL).data(response).success(true).build());
+            if ( response.getOtp() == null) {
+                return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(ApiResponse.builder().message(INCOMPLETE_REGISTRATION).data(response).success(false).build());
+            } else {
+                return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().message(SUCCESSFUL).data(response).success(true).build());
+            }
         } catch (SpedireException exception) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().message(exception.getMessage()).success(false).build());
         }

@@ -203,4 +203,9 @@ public class UserServiceUtils {
         return null;
     }
 
+    public String generateToken(String email) {
+       return JWT.create().withIssuedAt(Instant.now()).withExpiresAt(Instant.now().plusSeconds(86000L))
+                .withClaim(EMAIL, email).sign(Algorithm.HMAC512(secret.getBytes()));
+    }
+
 }

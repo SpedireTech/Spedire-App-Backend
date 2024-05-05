@@ -78,9 +78,10 @@ public class SpedireUserService implements UserService{
 
         boolean exists = redisInterface.isUserExist(registrationRequest.getEmail());
         User cachedUser = redisInterface.getUserData(registrationRequest.getEmail());
+        String token = utils.generateToken(registrationRequest.getEmail());
 
         if (exists || cachedUser != null) {
-            throw new SpedireException(INCOMPLETE_REGISTRATION);
+            return RegistrationResponse.builder().token(token).build();
         }
 
         String encodedPassword = passwordEncoder.encode(registrationRequest.getPassword());
@@ -91,9 +92,7 @@ public class SpedireUserService implements UserService{
         user.setPhoneNumber(registrationRequest.getPhoneNumber());
         redisInterface.cacheUserData(user);
 
-        String token = JWT.create().withIssuedAt(Instant.now()).withExpiresAt(Instant.now().plusSeconds(86000L))
-                .withClaim(EMAIL, user.getEmail()).sign(Algorithm.HMAC512(secret.getBytes()));
-        VerifyPhoneNumberResponse response = verifyPhoneNumber(null, false, registrationRequest.getPhoneNumber());
+       VerifyPhoneNumberResponse response = verifyPhoneNumber(null, false, registrationRequest.getPhoneNumber());
         return RegistrationResponse.builder().token(token).otp(response.getOtp()).build();
     }
 
