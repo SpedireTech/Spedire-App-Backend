@@ -58,6 +58,7 @@ public class UserServiceUtils {
     public static final String RESET_INSTRUCTIONS_SENT = "Reset instructions sent to %s";
     public static final String MAIL_DELIVERED_SUCCESSFULLY = "Mail delivered successfully";
     public static final String INVALID_EMAIL_ADDRESS = "Invalid email address";
+    public static final String INCOMPLETE_REGISTRATION = "Incomplete.registration, Kindly.verify.your.phone.number.to.continue";
 
 
     public static void verifyPhoneNumberIsValid(String phoneNumber) {

@@ -33,6 +33,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import static com.spedire.Spedire.security.SecurityUtils.JWT_SECRET;
 import static com.spedire.Spedire.services.email.MailTemplates.*;
@@ -67,14 +68,19 @@ public class SpedireUserService implements UserService{
     private final RedisInterface redisInterface;
 
 
+
     @Override
     public RegistrationResponse createUser(RegistrationRequest registrationRequest) {
         verifyPhoneNumberIsValid(registrationRequest.getPhoneNumber());
         validateEmailAddress(registrationRequest.getEmail());
+        validateEmailDoesntExist(registrationRequest.getEmail(), userRepository);
+        validatePhoneNumberDoesntExist(registrationRequest.getPhoneNumber(), userRepository);
+
         boolean exists = redisInterface.isUserExist(registrationRequest.getEmail());
-        System.out.println(exists);
-        if (exists) {
-            throw new SpedireException("already initiated signup request");
+        User cachedUser = redisInterface.getUserData(registrationRequest.getEmail());
+
+        if (exists || cachedUser != null) {
+            throw new SpedireException(INCOMPLETE_REGISTRATION);
         }
 
         String encodedPassword = passwordEncoder.encode(registrationRequest.getPassword());
@@ -83,7 +89,6 @@ public class SpedireUserService implements UserService{
         user.setFullName(registrationRequest.getFullName());
         user.setPassword(encodedPassword);
         user.setPhoneNumber(registrationRequest.getPhoneNumber());
-        System.out.println(user);
         redisInterface.cacheUserData(user);
 
         String token = JWT.create().withIssuedAt(Instant.now()).withExpiresAt(Instant.now().plusSeconds(86000L))
