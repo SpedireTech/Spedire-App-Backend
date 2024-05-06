@@ -56,8 +56,10 @@ public class UserServiceUtils {
     public static final String NOT_FOUND = "%s not found";
     public static final String PASSWORD_RESET = "Password Reset";
     public static final String RESET_INSTRUCTIONS_SENT = "Reset instructions sent to %s";
+    public static final String MAIL_DELIVERY_FAILED = "Mail delivery failed";
     public static final String MAIL_DELIVERED_SUCCESSFULLY = "Mail delivered successfully";
     public static final String INVALID_EMAIL_ADDRESS = "Invalid email address";
+    public static final String INCOMPLETE_REGISTRATION = "Incomplete registration, Verify your phone number to continue";
 
 
     public static void verifyPhoneNumberIsValid(String phoneNumber) {
@@ -191,7 +193,7 @@ public class UserServiceUtils {
         String token = JWT.create().withIssuedAt(Instant.now()).withExpiresAt(Instant.now().plusSeconds(86000L))
                 .withClaim("email", emailAddress)
                 .sign(Algorithm.HMAC512(secret.getBytes()));
-        return "http://localhost:5173/resetPassword?token=" + token;
+        return "http://localhost:3000/reset-password?token=" + token;
     }
 
 
@@ -200,6 +202,11 @@ public class UserServiceUtils {
             return authorizationHeader.substring(7);
         }
         return null;
+    }
+
+    public String generateToken(String email) {
+       return JWT.create().withIssuedAt(Instant.now()).withExpiresAt(Instant.now().plusSeconds(86000L))
+                .withClaim(EMAIL, email).sign(Algorithm.HMAC512(secret.getBytes()));
     }
 
 }

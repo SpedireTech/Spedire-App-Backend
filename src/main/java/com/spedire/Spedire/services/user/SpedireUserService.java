@@ -33,6 +33,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import static com.spedire.Spedire.security.SecurityUtils.JWT_SECRET;
 import static com.spedire.Spedire.services.email.MailTemplates.*;
@@ -67,27 +68,37 @@ public class SpedireUserService implements UserService{
     private final RedisInterface redisInterface;
 
 
+
     @Override
     public RegistrationResponse createUser(RegistrationRequest registrationRequest) {
-        verifyPhoneNumberIsValid(registrationRequest.getPhoneNumber());
-        validatePhoneNumberDoesntExist(registrationRequest.getPhoneNumber(), userRepository);
-        validateEmailDoesntExist(registrationRequest.getEmail(), userRepository);
-        validateEmailAddress(registrationRequest.getEmail());
+        validateRequest(registrationRequest);
+        boolean exists = redisInterface.isUserExist(registrationRequest.getEmail());
+        User cachedUser = redisInterface.getUserData(registrationRequest.getEmail());
+        String token = utils.generateToken(registrationRequest.getEmail());
+
+        if (exists || cachedUser != null) {return RegistrationResponse.builder().token(token).build();}
 
         String encodedPassword = passwordEncoder.encode(registrationRequest.getPassword());
+        cacheUserData(registrationRequest, encodedPassword);
+        VerifyPhoneNumberResponse response = verifyPhoneNumber(null, false, registrationRequest.getPhoneNumber());
+        return RegistrationResponse.builder().token(token).otp(response.getOtp()).build();
+    }
+
+    private void cacheUserData(RegistrationRequest registrationRequest, String encodedPassword) {
         User user = new User();
         user.setEmail(registrationRequest.getEmail());
         user.setFullName(registrationRequest.getFullName());
         user.setPassword(encodedPassword);
         user.setPhoneNumber(registrationRequest.getPhoneNumber());
         redisInterface.cacheUserData(user);
-
-        String token = JWT.create().withIssuedAt(Instant.now()).withExpiresAt(Instant.now().plusSeconds(86000L))
-                .withClaim(EMAIL, user.getEmail()).sign(Algorithm.HMAC512(secret.getBytes()));
-        VerifyPhoneNumberResponse response = verifyPhoneNumber(null, false, registrationRequest.getPhoneNumber());
-        return RegistrationResponse.builder().token(token).otp(response.getOtp()).build();
     }
 
+    private void validateRequest(RegistrationRequest registrationRequest) {
+        verifyPhoneNumberIsValid(registrationRequest.getPhoneNumber());
+        validateEmailAddress(registrationRequest.getEmail());
+        validateEmailDoesntExist(registrationRequest.getEmail(), userRepository);
+        validatePhoneNumberDoesntExist(registrationRequest.getPhoneNumber(), userRepository);
+    }
 
 
     @Override
@@ -132,10 +143,15 @@ public class SpedireUserService implements UserService{
             log.info("Password Reset link : {} " + link);
             String name = user.get().getFullName();
             String message = utils.sendEmail(emailAddress, PASSWORD_RESET, getForgotPasswordMailTemplate(name, link));
-            if (MAIL_DELIVERED_SUCCESSFULLY.equals(message)) return ForgotPasswordResponse.builder().status(true).message(String.format(RESET_INSTRUCTIONS_SENT, emailAddress)).build();
+            if (MAIL_DELIVERED_SUCCESSFULLY.equals(message)) {
+                return ForgotPasswordResponse.builder().status(true).message(String.format(RESET_INSTRUCTIONS_SENT, emailAddress)).build();
+            } else {
+                return ForgotPasswordResponse.builder().status(false).message(MAIL_DELIVERY_FAILED).build();
+            }
         }
         return ForgotPasswordResponse.builder().status(false).message(EMAIL_ADDRESS_NOT_FOUND).build();
     }
+
 
     @Override
     public ChangePasswordResponse resetPassword(ChangePasswordRequest passwordResetRequest)  {
@@ -155,6 +171,7 @@ public class SpedireUserService implements UserService{
 
     @Override
     public void saveUser(String token) throws MessagingException {
+        System.out.println("hello");
         String splitToken = token.split(" ")[1];
         DecodedJWT decodedJWT = jwtUtil.verifyToken(splitToken);
         String email = decodedJWT.getClaim(EMAIL).asString();

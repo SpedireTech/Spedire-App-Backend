@@ -12,4 +12,9 @@ public class Utils {
     public static final String SUCCESSFUL = "Successful";
     public static final String PROCEED_TO_ENTER_GENERATED_OTP = "Proceed to enter generated OTP";
     public static final String USER_PROFILE = "User Profile";
+    public static final String INCOMPLETE_REGISTRATION = "Incomplete registration, Verify your phone number to continue";
+    public static final String RESET_INSTRUCTIONS_SENT = "Reset instructions sent to %s";
+    public static final String MAIL_DELIVERY_FAILED = "Mail delivery failed";
+    public static final String FAIL_TO_SEND_MAIL = "Failed to send mail";
+
 }

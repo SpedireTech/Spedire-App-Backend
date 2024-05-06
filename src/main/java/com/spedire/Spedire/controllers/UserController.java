@@ -27,7 +27,11 @@ public class UserController {
         RegistrationResponse response;
         try {
             response = userService.createUser(registrationRequest);
-            return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().message(SUCCESSFUL).data(response).success(true).build());
+            if ( response.getOtp() == null) {
+                return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(ApiResponse.builder().message(INCOMPLETE_REGISTRATION).data(response).success(false).build());
+            } else {
+                return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().message(SUCCESSFUL).data(response).success(true).build());
+            }
         } catch (SpedireException exception) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().message(exception.getMessage()).success(false).build());
         }
@@ -64,8 +68,17 @@ public class UserController {
         ForgotPasswordResponse response;
         try {
             response = userService.forgotPassword(request);
-            return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().message(response.getMessage()).success(response.isStatus()).build());
+            if (response.getMessage().equals(String.format(RESET_INSTRUCTIONS_SENT, request.getEmail()))) {
+                return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().message(response.getMessage()).success(response.isStatus()).build());
+            } else if (response.getMessage().equals(MAIL_DELIVERY_FAILED)) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ApiResponse.builder().message(response.getMessage()).success(response.isStatus()).build());
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().message(response.getMessage()).success(response.isStatus()).build());
+            }
         } catch (SpedireException exception) {
+            if (exception.getMessage().equals(FAIL_TO_SEND_MAIL)) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ApiResponse.builder().message(exception.getMessage()).success(false).build());
+            }
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().message(exception.getMessage()).success(false).build());
         }
     }

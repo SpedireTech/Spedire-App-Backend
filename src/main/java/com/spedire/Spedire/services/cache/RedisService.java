@@ -6,6 +6,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -31,7 +32,7 @@ public class RedisService implements RedisInterface{
             userData.put("phoneNumber", user.getPhoneNumber());
         }
 
-
+        System.out.println("User data in redis == " + userData);
         if (!userData.isEmpty()) {
             redisTemplate.opsForHash().putAll(emailKey, userData);
         }
@@ -66,7 +67,6 @@ public class RedisService implements RedisInterface{
             user.setPhoneNumber(phoneNumber);
         }
         return user;
-
     }
 
 
@@ -74,4 +74,11 @@ public class RedisService implements RedisInterface{
         String emailKey = "user:" + email;
         redisTemplate.delete(emailKey);
     }
+
+    @Override
+    public boolean isUserExist(String email) {
+        return Boolean.TRUE.equals(redisTemplate.hasKey(email));
+    }
+
+
 }
