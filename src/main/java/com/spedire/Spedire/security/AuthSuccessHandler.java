@@ -61,11 +61,11 @@ public class AuthSuccessHandler implements AuthenticationSuccessHandler {
             user.setProfileImage(picture);
             redisInterface.cacheUserData(user);
             String token = jwtUtils.fetchToken(user.getEmail());
-            response.sendRedirect("http://localhost:5173/verify-number?token=" + token + "&oauth=true");
+            response.sendRedirect("http://localhost:3000/verify-number?token=" + token + "&oauth=true");
         } else {
             user = optionalUser.get();
             String accessToken = jwtUtils.generateAccessToken(user.getEmail());
-            response.sendRedirect("http://localhost:5173/loginRedirect?token="+accessToken);
+            response.sendRedirect("http://localhost:3000/login?token="+accessToken);
         }
 
     }
