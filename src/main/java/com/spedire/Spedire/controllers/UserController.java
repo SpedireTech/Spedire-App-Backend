@@ -68,8 +68,15 @@ public class UserController {
         ForgotPasswordResponse response;
         try {
             response = userService.forgotPassword(request);
-            return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().message(response.getMessage()).success(response.isStatus()).build());
+            if (response.getMessage().equals("Mail delivered successfully")) {
+                return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().message(response.getMessage()).success(response.isStatus()).build());
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().message(response.getMessage()).success(response.isStatus()).build());
+            }
         } catch (SpedireException exception) {
+            if (exception.getMessage().equals("Failed to send mail")) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ApiResponse.builder().message(exception.getMessage()).success(false).build());
+            }
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().message(exception.getMessage()).success(false).build());
         }
     }
