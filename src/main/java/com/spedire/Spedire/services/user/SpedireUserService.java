@@ -76,7 +76,9 @@ public class SpedireUserService implements UserService{
         User cachedUser = redisInterface.getUserData(registrationRequest.getEmail());
         String token = utils.generateToken(registrationRequest.getEmail());
 
-        if (exists || cachedUser != null) {return RegistrationResponse.builder().token(token).build();}
+        if (exists || cachedUser != null) {
+            return RegistrationResponse.builder().token(token).build();
+        }
 
         String encodedPassword = passwordEncoder.encode(registrationRequest.getPassword());
         cacheUserData(registrationRequest, encodedPassword);
