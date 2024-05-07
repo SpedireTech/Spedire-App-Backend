@@ -18,7 +18,9 @@ public class GeneralConfig implements WebMvcConfigurer {
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
                         .allowedHeaders("*")
-                        .allowedOrigins("*");
+                        .allowedOrigins("*")
+                        .allowedMethods("*")
+                        .allowCredentials(true);
             }
         };
     }
