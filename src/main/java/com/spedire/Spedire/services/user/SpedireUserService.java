@@ -25,6 +25,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHeaders;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -120,7 +121,7 @@ public class SpedireUserService implements UserService{
 
     @Override
     @Transactional
-    public VerifyPhoneNumberResponse verifyPhoneNumber(HttpServletRequest request, boolean route, String phoneNumber) {
+    public VerifyPhoneNumberResponse verifyPhoneNumber(HttpServletRequest request, boolean route, String phoneNumber) throws RedisConnectionFailureException {
         verifyPhoneNumberIsValid(phoneNumber);
         validatePhoneNumberDoesntExist(phoneNumber, userRepository);
         if (route) {
