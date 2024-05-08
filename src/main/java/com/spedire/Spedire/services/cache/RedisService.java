@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Service
 public class RedisService implements RedisInterface{
@@ -79,6 +80,42 @@ public class RedisService implements RedisInterface{
     public boolean isUserExist(String email) {
         return Boolean.TRUE.equals(redisTemplate.hasKey(email));
     }
+
+    @Override
+    public Map<String, Map<String, String>> getAllData() {
+        Map<String, Map<String, String>> allData = new HashMap<>();
+        Set<String> keys = redisTemplate.keys("*");
+        System.out.println(keys);
+        if (keys != null && !keys.isEmpty()) {
+            for (String key : keys) {
+                Map<Object, Object> data = redisTemplate.opsForHash().entries(key);
+                if (data != null && !data.isEmpty()) {
+                    Map<String, String> stringData = new HashMap<>();
+                    for (Map.Entry<Object, Object> entry : data.entrySet()) {
+                        stringData.put(entry.getKey().toString(), entry.getValue().toString());
+                    }
+                    allData.put(key, stringData);
+                }
+            }
+        }
+        return allData;
+    }
+
+    @Override
+    public void deleteAll() {
+        Set<String> keys = redisTemplate.keys("*");
+        if (keys != null && !keys.isEmpty()) {
+            redisTemplate.delete(keys);
+        }
+    }
+
+
+    @Override
+    public long count() {
+        Set<String> keys = redisTemplate.keys("*");
+        return keys != null ? keys.size() : 0;
+    }
+
 
 
 }

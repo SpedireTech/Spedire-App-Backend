@@ -3,6 +3,7 @@ package com.spedire.Spedire.services.cache;
 import com.spedire.Spedire.models.User;
 
 import java.util.List;
+import java.util.Map;
 
 public interface RedisInterface {
 
@@ -14,6 +15,10 @@ public interface RedisInterface {
 
     public boolean isUserExist(String email);
 
-//    public List<User> getAllUserData();
-//    public void deleteAll();
+    public void deleteAll();
+
+    public Map<String, Map<String, String>> getAllData();
+
+    public long count();
+
 }
