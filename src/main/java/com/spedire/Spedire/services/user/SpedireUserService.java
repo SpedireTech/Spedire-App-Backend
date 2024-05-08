@@ -68,6 +68,22 @@ public class SpedireUserService implements UserService{
     private final RedisInterface redisInterface;
 
 
+//    @Override
+//    public RegistrationResponse createUser(RegistrationRequest registrationRequest) {
+//        validateRequest(registrationRequest);
+//        boolean exists = redisInterface.isUserExist(registrationRequest.getEmail());
+//        User cachedUser = redisInterface.getUserData(registrationRequest.getEmail());
+//        String token = utils.generateToken(registrationRequest.getEmail());
+//
+//        if (exists || cachedUser != null) {
+//            redisInterface.cacheUserData(cachedUser);
+//        }
+//        String encodedPassword = passwordEncoder.encode(registrationRequest.getPassword());
+//        cacheUserData(registrationRequest, encodedPassword);
+//        VerifyPhoneNumberResponse response = verifyPhoneNumber(null, false, registrationRequest.getPhoneNumber());
+//        return RegistrationResponse.builder().token(token).otp(response.getOtp()).build();
+//    }
+
 
     @Override
     public RegistrationResponse createUser(RegistrationRequest registrationRequest) {
@@ -75,16 +91,15 @@ public class SpedireUserService implements UserService{
         boolean exists = redisInterface.isUserExist(registrationRequest.getEmail());
         User cachedUser = redisInterface.getUserData(registrationRequest.getEmail());
         String token = utils.generateToken(registrationRequest.getEmail());
-
-        if (exists || cachedUser != null) {
-            return RegistrationResponse.builder().token(token).build();
-        }
-
         String encodedPassword = passwordEncoder.encode(registrationRequest.getPassword());
-        cacheUserData(registrationRequest, encodedPassword);
-        VerifyPhoneNumberResponse response = verifyPhoneNumber(null, false, registrationRequest.getPhoneNumber());
+        if (!exists && cachedUser == null) {
+            cacheUserData(registrationRequest, encodedPassword);
+        }
+        assert cachedUser != null;
+        VerifyPhoneNumberResponse response = verifyPhoneNumber(null, false, cachedUser.getPhoneNumber());
         return RegistrationResponse.builder().token(token).otp(response.getOtp()).build();
     }
+
 
     private void cacheUserData(RegistrationRequest registrationRequest, String encodedPassword) {
         User user = new User();
@@ -182,6 +197,7 @@ public class SpedireUserService implements UserService{
         User user = User.builder().fullName(cachedUser.getFullName()).password(cachedUser.getPassword())
                 .phoneNumber(cachedUser.getPhoneNumber()).email(cachedUser.getEmail()).profileImage(cachedUser.getProfileImage()).otpVerificationStatus(true).createdAt(LocalDateTime.now()).build();
         User savedUser = userRepository.save(user);
+        redisInterface.deleteUserCache(email);
         javaMailService.sendMail(savedUser.getEmail(), WELCOME_TO_SPEDIRE, getWelcomeMailTemplate(savedUser.getFullName()));
         redisInterface.deleteUserCache(email);
     }
