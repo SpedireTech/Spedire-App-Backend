@@ -6,6 +6,7 @@ import com.spedire.Spedire.exceptions.SpedireException;
 import com.spedire.Spedire.services.user.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ import static org.apache.http.HttpHeaders.AUTHORIZATION;
 @AllArgsConstructor
 @RequestMapping("/api/v1/user/")
 @RestController
+@Slf4j
 public class UserController {
 
     private final UserService userService;
@@ -59,7 +61,9 @@ public class UserController {
 
     @GetMapping("profile")
     public ResponseEntity<ApiResponse<?>> fetchUserProfile(@RequestHeader(AUTHORIZATION) String token)  {
+        log.info("Getting into controller");
         UserProfileResponse response;
+
         try {
             response = userService.fetchUserProfile(token);
             return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().message(USER_PROFILE).data(response).success(true).build());
