@@ -6,6 +6,7 @@ import com.spedire.Spedire.exceptions.SpedireException;
 import com.spedire.Spedire.services.user.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
+import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,7 +33,10 @@ public class UserController {
             } else {
                 return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().message(SUCCESSFUL).data(response).success(true).build());
             }
-        } catch (SpedireException exception) {
+        } catch (SpedireException | RedisConnectionFailureException exception) {
+            if (exception.getMessage().equals("Unable to connect to Redis")) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ApiResponse.builder().message(exception.getMessage()).success(false).build());
+            }
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().message(exception.getMessage()).success(false).build());
         }
 
@@ -44,7 +48,10 @@ public class UserController {
         try {
             response = userService.verifyPhoneNumber(httpServletRequest, request.isRoute(), request.getPhoneNumber());
             return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().message(PROCEED_TO_ENTER_GENERATED_OTP).data(response).success(true).build());
-           } catch (SpedireException exception) {
+           } catch (SpedireException | RedisConnectionFailureException exception) {
+            if (exception.getMessage().equals("Unable to connect to Redis")) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ApiResponse.builder().message(exception.getMessage()).success(false).build());
+            }
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().message(exception.getMessage()).success(false).build());
         }
     }

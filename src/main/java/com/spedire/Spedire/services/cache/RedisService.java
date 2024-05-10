@@ -2,6 +2,7 @@ package com.spedire.Spedire.services.cache;
 
 import com.spedire.Spedire.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +17,7 @@ public class RedisService implements RedisInterface{
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
 
-    public void cacheUserData(User user) {
+    public void cacheUserData(User user) throws RedisConnectionFailureException {
         String emailKey = "user:" + user.getEmail();
         Map<String, String> userData = new HashMap<>();
 
@@ -40,7 +41,7 @@ public class RedisService implements RedisInterface{
     }
 
 
-    public User getUserData(String email) {
+    public User getUserData(String email) throws RedisConnectionFailureException {
         String emailKey = "user:" + email;
 
         Boolean exists = redisTemplate.hasKey(emailKey);
@@ -71,18 +72,18 @@ public class RedisService implements RedisInterface{
     }
 
 
-    public void deleteUserCache(String email) {
+    public void deleteUserCache(String email) throws RedisConnectionFailureException {
         String emailKey = "user:" + email;
         redisTemplate.delete(emailKey);
     }
 
     @Override
-    public boolean isUserExist(String email) {
+    public boolean isUserExist(String email) throws RedisConnectionFailureException {
         return Boolean.TRUE.equals(redisTemplate.hasKey(email));
     }
 
     @Override
-    public Map<String, Map<String, String>> getAllData() {
+    public Map<String, Map<String, String>> getAllData() throws RedisConnectionFailureException {
         Map<String, Map<String, String>> allData = new HashMap<>();
         Set<String> keys = redisTemplate.keys("*");
         System.out.println(keys);
@@ -102,7 +103,7 @@ public class RedisService implements RedisInterface{
     }
 
     @Override
-    public void deleteAll() {
+    public void deleteAll() throws RedisConnectionFailureException {
         Set<String> keys = redisTemplate.keys("*");
         if (keys != null && !keys.isEmpty()) {
             redisTemplate.delete(keys);
@@ -111,7 +112,7 @@ public class RedisService implements RedisInterface{
 
 
     @Override
-    public long count() {
+    public long count() throws RedisConnectionFailureException {
         Set<String> keys = redisTemplate.keys("*");
         return keys != null ? keys.size() : 0;
     }
