@@ -19,10 +19,10 @@ public class RedisController {
 
     private final RedisInterface redisInterface;
 
-//    @DeleteMapping("delete")
-//    public ResponseEntity<Obje<?>> deleteCachedUser(String token)  {
-//        boolean response = redisInterface.deleteUserData(token);
-//        return ApiResponse.builder().message("User deleted").success(response).build();
-//    }
+    @DeleteMapping("delete")
+    public String deleteCachedUser(String email)  {
+        redisInterface.deleteUserCache(email);
+        return String.format("%s deleted from cache", email);
+    }
 
 }
