@@ -142,6 +142,8 @@ public class SpedireUserService implements UserService{
 
     @Override
     public UserProfileResponse fetchUserProfile(String token) {
+        log.info("Getting into service");
+        log.info("Token : {} " + token);
         String splitToken = token.split(" ")[1];
         DecodedJWT decodedJWT = jwtUtil.verifyToken(splitToken);
         String email = decodedJWT.getClaim(EMAIL).asString();
