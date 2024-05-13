@@ -1,5 +1,9 @@
 package com.spedire.Spedire.controllers;
 
+import com.spedire.Spedire.dtos.responses.ApiResponse;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
 public class Utils {
 
     public static final String CLOSEST_LANDMARK = "Closest Landmarks";
@@ -16,5 +20,16 @@ public class Utils {
     public static final String RESET_INSTRUCTIONS_SENT = "Reset instructions sent to %s";
     public static final String MAIL_DELIVERY_FAILED = "Mail delivery failed";
     public static final String FAIL_TO_SEND_MAIL = "Failed to send mail";
+    public static final String AUTHORIZATION_IS_NULL = "Endpoint requires a valid authorization";
+
+
+
+
+    public static ResponseEntity<ApiResponse<?>> validateAuthorization(String token) {
+        if (token == null || token.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResponse.builder().message(AUTHORIZATION_IS_NULL).success(false).build());
+        }
+        return null;
+    }
 
 }

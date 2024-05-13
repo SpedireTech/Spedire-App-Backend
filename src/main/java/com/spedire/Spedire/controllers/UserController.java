@@ -61,9 +61,10 @@ public class UserController {
 
     @GetMapping("profile")
     public ResponseEntity<ApiResponse<?>> fetchUserProfile(@RequestHeader(AUTHORIZATION) String token)  {
-        log.info("Getting into controller");
-        UserProfileResponse response;
+        ResponseEntity<ApiResponse<?>> authorizationResponse = validateAuthorization(token);
+        if (authorizationResponse != null) {return authorizationResponse;}
 
+        UserProfileResponse response;
         try {
             response = userService.fetchUserProfile(token);
             return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().message(USER_PROFILE).data(response).success(true).build());

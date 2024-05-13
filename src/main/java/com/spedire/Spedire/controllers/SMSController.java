@@ -11,8 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static com.spedire.Spedire.controllers.Utils.VERIFICATION_FAILED;
-import static com.spedire.Spedire.controllers.Utils.VERIFICATION_SUCCESSFUL;
+import static com.spedire.Spedire.controllers.Utils.*;
 import static org.apache.http.HttpHeaders.AUTHORIZATION;
 
 @RestController
@@ -24,6 +23,8 @@ public class SMSController {
 
     @PostMapping("verifyOtp")
     public ResponseEntity<ApiResponse<?>> verifyOtp(@RequestBody VerifyOtpRequest request, @RequestHeader(AUTHORIZATION) String token) {
+        ResponseEntity<ApiResponse<?>> authorizationResponse = validateAuthorization(token);
+        if (authorizationResponse != null) {return authorizationResponse;}
         boolean response = false;
         try {
             response = smsService.checkVerificationCode(request.getVerificationCode(), token);

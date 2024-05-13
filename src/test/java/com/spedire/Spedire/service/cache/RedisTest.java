@@ -20,9 +20,10 @@ public class RedisTest {
 
     @Test
     public void deleteByEmailKey() {
-        String email = "alayandezainab64@gmail.com";
+        String email = "zainabalayande01@gmail.com";
         redisInterface.deleteUserCache(email);
         assertNull(redisInterface.getUserData(email));
+        assert redisInterface.count() == 0;
     }
 
     @Test

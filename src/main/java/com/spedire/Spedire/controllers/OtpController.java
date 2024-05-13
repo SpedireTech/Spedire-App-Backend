@@ -39,16 +39,16 @@ public class OtpController {
 
     @PostMapping("verifyOtp")
     public ResponseEntity<ApiResponse<?>> verifyOtp(@RequestBody VerifyOtpRequest request, @RequestHeader(AUTHORIZATION) String token)  {
+        ResponseEntity<ApiResponse<?>> authorizationResponse = validateAuthorization(token);
+        if (authorizationResponse != null) {return authorizationResponse;}
+        if (request == null || request.getVerificationCode() == null) {return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().message("Verification code is not passed").success(false).build());}
+
         boolean response;
         try {
             response = otpService.verifyOtp(request.getVerificationCode(), token, userService);
-            if (response) {
-                return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().message(REGISTRATION_COMPLETED).success(response).build());
-            } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().message(INVALID_OTP_OR_PHONE_NUMBER).success(response).build());
-            }
-           } catch (SpedireException | MessagingException exception) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().message(exception.getMessage()).success(false).build());
+            if (response) {return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().message(REGISTRATION_COMPLETED).success(response).build());
+            } else {return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().message(INVALID_OTP_OR_PHONE_NUMBER).success(response).build());}
+           } catch (SpedireException | MessagingException exception) {return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().message(exception.getMessage()).success(false).build());
         }
     }
 
