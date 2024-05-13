@@ -95,6 +95,7 @@ public class SpedireUserService implements UserService{
         String encodedPassword = passwordEncoder.encode(registrationRequest.getPassword());
         if (!exists && cachedUser == null) {
             cacheUserData(registrationRequest, encodedPassword);
+            cachedUser = redisInterface.getUserData(registrationRequest.getEmail());
         }
         assert cachedUser != null;
         VerifyPhoneNumberResponse response = verifyPhoneNumber(null, false, cachedUser.getPhoneNumber());
@@ -201,7 +202,7 @@ public class SpedireUserService implements UserService{
                 .phoneNumber(cachedUser.getPhoneNumber()).email(cachedUser.getEmail()).profileImage(cachedUser.getProfileImage()).otpVerificationStatus(true).createdAt(LocalDateTime.now()).build();
         User savedUser = userRepository.save(user);
         redisInterface.deleteUserCache(email);
-        javaMailService.sendMail(savedUser.getEmail(), WELCOME_TO_SPEDIRE, getWelcomeMailTemplate(savedUser.getFullName()));
+       // javaMailService.sendMail(savedUser.getEmail(), WELCOME_TO_SPEDIRE, getWelcomeMailTemplate(savedUser.getFullName()));
         redisInterface.deleteUserCache(email);
     }
 

@@ -33,3 +33,4 @@ build/
 .vscode/
 .gitignore
 secret.properties
+application.properties
