@@ -59,19 +59,40 @@ public class UserController {
     }
 
 
-    @GetMapping("profile")
+    @GetMapping("dashboard")
     public ResponseEntity<ApiResponse<?>> fetchUserProfile(@RequestHeader(AUTHORIZATION) String token)  {
         ResponseEntity<ApiResponse<?>> authorizationResponse = validateAuthorization(token);
-        if (authorizationResponse != null) {return authorizationResponse;}
+        if (authorizationResponse != null) {
+            return authorizationResponse;
+        }
 
-        UserProfileResponse response;
+        UserDashboardResponse response;
         try {
-            response = userService.fetchUserProfile(token);
-            return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().message(USER_PROFILE).data(response).success(true).build());
+            response = userService.fetchDashboardInfoForUser(token);
+            return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().message(USER_DASHBOARD_INFO).data(response).success(true).build());
         } catch (SpedireException exception) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().message(exception.getMessage()).success(false).build());
         }
     }
+
+
+    @PutMapping("deliveryStatus/{status}")
+    public ResponseEntity<ApiResponse<?>> deliveryStatus(
+            @RequestHeader(AUTHORIZATION) String token,
+            @PathVariable boolean status) {
+
+        ResponseEntity<ApiResponse<?>> authorizationResponse = validateAuthorization(token);
+        if (authorizationResponse != null) {
+            return authorizationResponse;
+        }
+        try {
+            userService.deliveryStatus(status, token);
+            return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().message("Delivery Status Updated").success(true).build());
+        } catch (SpedireException exception) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().message(exception.getMessage()).success(false).build());
+        }
+    }
+
 
 
 

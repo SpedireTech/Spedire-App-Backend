@@ -14,12 +14,14 @@ public interface UserService {
 
     VerifyPhoneNumberResponse verifyPhoneNumber(HttpServletRequest request, boolean route, String phoneNumber);
 
-    UserProfileResponse fetchUserProfile(String token);
+    UserDashboardResponse fetchDashboardInfoForUser(String token);
 
     ForgotPasswordResponse forgotPassword(ForgotPasswordRequest forgotPasswordRequest) throws SpedireException;
 
     ChangePasswordResponse resetPassword(ChangePasswordRequest passwordResetRequest) throws SpedireException;
 
     void saveUser(String token) throws MessagingException;
+
+    void deliveryStatus(boolean status, String token);
 
 }

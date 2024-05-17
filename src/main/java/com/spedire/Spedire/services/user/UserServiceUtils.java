@@ -5,6 +5,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.spedire.Spedire.dtos.requests.ChangePasswordRequest;
 import com.spedire.Spedire.dtos.requests.CompleteRegistrationRequest;
+import com.spedire.Spedire.dtos.responses.UserDashboardResponse;
 import com.spedire.Spedire.dtos.responses.VerifyPhoneNumberResponse;
 import com.spedire.Spedire.exceptions.SpedireException;
 import com.spedire.Spedire.models.User;
@@ -187,6 +188,19 @@ public class UserServiceUtils {
         if (user.isPresent() && !user.get().isOtpVerificationStatus()) {
             throw new SpedireException("User yet to verify Otp");
         }
+    }
+
+
+    public static UserDashboardResponse getUserDashboardResponse(User user) {
+        return UserDashboardResponse.builder().email(user.getEmail()).
+                phoneNumber(user.getPhoneNumber())
+                .totalPendingDelivery(String.valueOf(user.getTotalPendingDelivery()))
+                .totalSuccessfulDelivery(String.valueOf(user.getTotalSuccessfulDelivery()))
+                .totalSentItem(String.valueOf(user.getTotalSentItem()))
+                .walletBalance("0.00")
+                .openToDelivery(user.isOpenToDelivery())
+                .fullName(user.getFullName())
+                .totalCancelledDelivery(String.valueOf(user.getTotalCancelledDelivery())).build();
     }
 
     public String generateResetLink(String emailAddress) {

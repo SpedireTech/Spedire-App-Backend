@@ -1,11 +1,8 @@
 package com.spedire.Spedire.services.user;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.spedire.Spedire.dtos.requests.ChangePasswordRequest;
-import com.spedire.Spedire.dtos.requests.CompleteRegistrationRequest;
 import com.spedire.Spedire.dtos.requests.ForgotPasswordRequest;
 import com.spedire.Spedire.dtos.requests.RegistrationRequest;
 import com.spedire.Spedire.dtos.responses.*;
@@ -16,25 +13,17 @@ import com.spedire.Spedire.security.JwtUtil;
 import com.spedire.Spedire.services.cache.RedisInterface;
 import com.spedire.Spedire.services.email.JavaMailService;
 import com.spedire.Spedire.services.otp.OtpService;
-import com.spedire.Spedire.services.sms.SMSService;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.HttpHeaders;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 
 import static com.spedire.Spedire.security.SecurityUtils.JWT_SECRET;
 import static com.spedire.Spedire.services.email.MailTemplates.*;
@@ -142,7 +131,7 @@ public class SpedireUserService implements UserService{
     }
 
     @Override
-    public UserProfileResponse fetchUserProfile(String token) {
+    public UserDashboardResponse fetchDashboardInfoForUser(String token) {
         log.info("Getting into service");
         log.info("Token : {} " + token);
         String splitToken = token.split(" ")[1];
@@ -150,7 +139,7 @@ public class SpedireUserService implements UserService{
         String email = decodedJWT.getClaim(EMAIL).asString();
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new SpedireException(INVALID_EMAIL_ADDRESS));
-        return UserProfileResponse.builder().email(user.getEmail()).phoneNumber(user.getPhoneNumber()).fullName(user.getFullName()).build();
+        return getUserDashboardResponse(user);
     }
 
 
@@ -204,6 +193,17 @@ public class SpedireUserService implements UserService{
         redisInterface.deleteUserCache(email);
        // javaMailService.sendMail(savedUser.getEmail(), WELCOME_TO_SPEDIRE, getWelcomeMailTemplate(savedUser.getFullName()));
         redisInterface.deleteUserCache(email);
+    }
+
+    @Override
+    public void deliveryStatus(boolean status, String token) {
+        String splitToken = token.split(" ")[1];
+        DecodedJWT decodedJWT = jwtUtil.verifyToken(splitToken);
+        String email = decodedJWT.getClaim(EMAIL).asString();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new SpedireException(INVALID_EMAIL_ADDRESS));
+        user.setOpenToDelivery(status);
+        userRepository.save(user);
     }
 
 }
