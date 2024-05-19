@@ -3,7 +3,6 @@ package com.spedire.Spedire.enums;
 public enum Role {
 
     NEW_USER("NEW_USER"),
-
     SENDER("SENDER"),
 
     CARRIER("CARRIER"),

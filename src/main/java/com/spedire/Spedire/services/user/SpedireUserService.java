@@ -6,6 +6,7 @@ import com.spedire.Spedire.dtos.requests.ChangePasswordRequest;
 import com.spedire.Spedire.dtos.requests.ForgotPasswordRequest;
 import com.spedire.Spedire.dtos.requests.RegistrationRequest;
 import com.spedire.Spedire.dtos.responses.*;
+import com.spedire.Spedire.enums.Role;
 import com.spedire.Spedire.exceptions.SpedireException;
 import com.spedire.Spedire.models.User;
 import com.spedire.Spedire.repositories.UserRepository;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static com.spedire.Spedire.security.SecurityUtils.JWT_SECRET;
@@ -188,7 +190,8 @@ public class SpedireUserService implements UserService{
         User cachedUser = redisInterface.getUserData(email);
         System.out.println(cachedUser.toString());
         User user = User.builder().fullName(cachedUser.getFullName()).password(cachedUser.getPassword())
-                .phoneNumber(cachedUser.getPhoneNumber()).email(cachedUser.getEmail()).profileImage(cachedUser.getProfileImage()).otpVerificationStatus(true).createdAt(LocalDateTime.now()).build();
+                .phoneNumber(cachedUser.getPhoneNumber()).email(cachedUser.getEmail()).profileImage(cachedUser.getProfileImage())
+                .otpVerificationStatus(true).roles(List.of(Role.SENDER)).createdAt(LocalDateTime.now()).build();
         User savedUser = userRepository.save(user);
         redisInterface.deleteUserCache(email);
        // javaMailService.sendMail(savedUser.getEmail(), WELCOME_TO_SPEDIRE, getWelcomeMailTemplate(savedUser.getFullName()));

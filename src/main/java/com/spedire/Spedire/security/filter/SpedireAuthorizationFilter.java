@@ -65,14 +65,18 @@ public class SpedireAuthorizationFilter extends OncePerRequestFilter {
         Map<String, Claim> map = jwtUtil.extractClaimsFromToken(token);
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();
         Claim roles = map.get("roles");
+        System.out.println("Roles == " + roles);
         Claim email = map.get("email");
         addClaimToUserAuthorities(authorities, roles);
         Authentication authentication = new UsernamePasswordAuthenticationToken(email, null, authorities);
+        System.out.println("Authentication == " + authentication);
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
     private void addClaimToUserAuthorities(List<SimpleGrantedAuthority> authorities, Claim claim) {
+        System.out.println("here first");
         if (claim != null) {
+            System.out.println("here");
             for (int i = 0; i < claim.asMap().size(); i++) {
                 String role = (String) claim.asMap().get("role" + (i + 1));
                 if (role != null) {
@@ -80,6 +84,7 @@ public class SpedireAuthorizationFilter extends OncePerRequestFilter {
                 }
             }
         }
+        System.out.println("Authorities" + authorities);
     }
 
     

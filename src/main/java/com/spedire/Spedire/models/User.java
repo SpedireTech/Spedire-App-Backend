@@ -27,7 +27,6 @@ public class User {
     private String lastName;
     private String fullName;
     private String password;
-
     @Indexed(unique = true)
     private String phoneNumber;
     private String profileImage;
