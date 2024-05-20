@@ -56,7 +56,7 @@ public class SpedireAuthorizationFilter extends OncePerRequestFilter {
 
         if (isValidAuthorizationHeader) {
             String token = authorization.substring(tokenPrefix.length());
-            System.out.println(token + " token from filter");
+            System.out.println(token + " " + " token from filter");
             authorizeToken(token);
         }
     }
@@ -73,18 +73,15 @@ public class SpedireAuthorizationFilter extends OncePerRequestFilter {
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
+
     private void addClaimToUserAuthorities(List<SimpleGrantedAuthority> authorities, Claim claim) {
-        System.out.println("here first");
         if (claim != null) {
-            System.out.println("here");
-            for (int i = 0; i < claim.asMap().size(); i++) {
-                String role = (String) claim.asMap().get("role" + (i + 1));
-                if (role != null) {
-                    authorities.add(new SimpleGrantedAuthority(role));
-                }
+            List<String> roles = claim.asList(String.class);
+            for (String role : roles) {
+                authorities.add(new SimpleGrantedAuthority(role));
             }
         }
-        System.out.println("Authorities" + authorities);
+        System.out.println("Authorities == " + authorities);
     }
 
     

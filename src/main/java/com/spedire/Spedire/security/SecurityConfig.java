@@ -41,7 +41,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         UsernamePasswordAuthenticationFilter authenticationFilter = new SpedireAuthenticationFilter(authenticationManager,
-                objectMapper, null, null, jwtUtil,  null);
+                objectMapper, null, null, jwtUtil,  userService);
         SpedireAuthorizationFilter authorizationFilter = new SpedireAuthorizationFilter(jwtUtil);
 
 
