@@ -46,7 +46,7 @@ public class SpedireOrderService implements OrderService{
 
 
         orderRepository.save(order);
-        return CreateOrderResponse.builder().status(true).message("Order has been successfully create").build();
+        return CreateOrderResponse.builder().status(true).message("Order has been successfully created").build();
     }
 
 
