@@ -64,7 +64,7 @@ public class AuthSuccessHandler implements AuthenticationSuccessHandler {
             response.sendRedirect("http://localhost:3000/verify-number?token=" + token + "&oauth=true");
         } else {
             user = optionalUser.get();
-            String accessToken = jwtUtils.generateAccessToken(user.getEmail());
+            String accessToken = jwtUtils.generateAccessTokenForOAuth(user.getEmail());
             response.sendRedirect("http://localhost:3000/login?token="+accessToken);
         }
 

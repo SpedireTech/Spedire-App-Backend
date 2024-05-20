@@ -5,8 +5,11 @@ import com.spedire.Spedire.dtos.requests.ForgotPasswordRequest;
 import com.spedire.Spedire.dtos.requests.RegistrationRequest;
 import com.spedire.Spedire.dtos.responses.*;
 import com.spedire.Spedire.exceptions.SpedireException;
+import com.spedire.Spedire.models.User;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
+
+import java.util.Optional;
 
 public interface UserService {
 
@@ -24,4 +27,5 @@ public interface UserService {
 
     void deliveryStatus(boolean status, String token);
 
+    Optional<User> findByEmail(String email);
 }

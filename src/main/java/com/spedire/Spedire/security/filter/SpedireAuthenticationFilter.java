@@ -3,6 +3,7 @@ package com.spedire.Spedire.security.filter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spedire.Spedire.dtos.requests.LoginRequest;
 import com.spedire.Spedire.dtos.responses.ApiResponse;
+import com.spedire.Spedire.models.User;
 import com.spedire.Spedire.security.JwtUtil;
 import com.spedire.Spedire.services.user.UserService;
 import jakarta.servlet.FilterChain;
@@ -22,6 +23,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.spedire.Spedire.security.SecurityUtils.BADCREDENTIALSEXCEPTION;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -58,7 +60,8 @@ public class SpedireAuthenticationFilter extends UsernamePasswordAuthenticationF
                                             HttpServletResponse response,
                                             FilterChain chain,
                                             Authentication authResult)  {
-        String accessToken = jwtUtil.generateAccessToken(email);
+        Optional<User> foundUser = userService.findByEmail(email);
+        String accessToken = jwtUtil.generateAccessToken(email, foundUser.get().getRoles());
         Map<String, Object> responseData = new HashMap<>();
 //        ApiResponse<?> successResponse = ApiResponse.builder().success(true).message("Login successful").data(accessToken).build();
         responseData.put("access_token", accessToken);

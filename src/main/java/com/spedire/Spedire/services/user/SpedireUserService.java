@@ -60,23 +60,6 @@ public class SpedireUserService implements UserService{
     private final RedisInterface redisInterface;
 
 
-//    @Override
-//    public RegistrationResponse createUser(RegistrationRequest registrationRequest) {
-//        validateRequest(registrationRequest);
-//        boolean exists = redisInterface.isUserExist(registrationRequest.getEmail());
-//        User cachedUser = redisInterface.getUserData(registrationRequest.getEmail());
-//        String token = utils.generateToken(registrationRequest.getEmail());
-//
-//        if (exists || cachedUser != null) {
-//            redisInterface.cacheUserData(cachedUser);
-//        }
-//        String encodedPassword = passwordEncoder.encode(registrationRequest.getPassword());
-//        cacheUserData(registrationRequest, encodedPassword);
-//        VerifyPhoneNumberResponse response = verifyPhoneNumber(null, false, registrationRequest.getPhoneNumber());
-//        return RegistrationResponse.builder().token(token).otp(response.getOtp()).build();
-//    }
-
-
     @Override
     public RegistrationResponse createUser(RegistrationRequest registrationRequest) {
         validateRequest(registrationRequest);
@@ -207,6 +190,11 @@ public class SpedireUserService implements UserService{
                 .orElseThrow(() -> new SpedireException(INVALID_EMAIL_ADDRESS));
         user.setOpenToDelivery(status);
         userRepository.save(user);
+    }
+
+    @Override
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 
 }
