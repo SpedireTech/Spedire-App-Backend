@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -11,7 +14,7 @@ public class CreateOrderRequest {
 
     private String senderName;
     private String senderId;
-    private String senderLocation;
+    private List<String> senderLocation;
 
     private String senderPhoneNumber;
 
@@ -30,5 +33,7 @@ public class CreateOrderRequest {
     private String dueTime;
 
     private String picture;
+
+    private String token;
 
 }

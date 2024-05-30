@@ -28,6 +28,7 @@ public class SpedireOrderService implements OrderService{
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
+        order.setSenderName(createOrderRequest.getSenderName());
         order.setDueTime(timeConverter(createOrderRequest));
         order.setPicture(createOrderRequest.getPicture());
         order.setItemDescription(createOrderRequest.getItemDescription());
@@ -41,7 +42,7 @@ public class SpedireOrderService implements OrderService{
 
 
         order.setSenderLocation(createOrderRequest.getSenderLocation());
-        order.setSenderId(createOrderRequest.getSenderId());
+        order.setSenderId(OrderUtils.getSenderIdFromIncomingToken(createOrderRequest.getToken()));
         order.setSenderPhoneNumber(createOrderRequest.getSenderPhoneNumber());
 
 

@@ -11,6 +11,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Date;
+import java.util.List;
 
 @Document
 @Getter
@@ -32,7 +33,9 @@ public class Order {
 
     private String senderId;
 
-    private String senderLocation;
+    private String senderName;
+
+    private List<String> senderLocation;
 
     private String receiverLocation;
 
