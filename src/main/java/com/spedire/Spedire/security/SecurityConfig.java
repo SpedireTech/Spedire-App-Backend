@@ -54,7 +54,7 @@ public class SecurityConfig {
                 .addFilterBefore(authorizationFilter, SpedireAuthenticationFilter.class)
                 .addFilterAt(authenticationFilter, UsernamePasswordAuthenticationFilter.class).oauth2Login(c -> c.successHandler(authSuccessHandler))
                 .authorizeHttpRequests(request -> request.requestMatchers("/api/v1/user/sign-up", "/api/v1/user/testing", "/api/v1/user/verifyPhoneNumber", "/api/v1/sms/verify-otp", "/api/v1/otp/verifyOtp","/login").permitAll()
-                        .requestMatchers("/api/v1/user/forgotPassword", "/api/v1/user/resetPassword", "/api/v1/user/dashboard", "/api/v1/user/deliveryStatus/{status}", "/api/v1/location/nearbyPlaces", "/api/v1/order/createOrder").hasAnyAuthority(new SimpleGrantedAuthority(Role.SENDER.name()).getAuthority(), new SimpleGrantedAuthority(Role.CARRIER.name()).getAuthority()).anyRequest().authenticated())
+                        .requestMatchers("/api/v1/user/forgotPassword", "/api/v1/user/resetPassword", "/api/v1/user/dashboard", "/api/v1/user/deliveryStatus/{status}", "/api/v1/location/nearbyPlaces", "/api/v1/order/createOrder", "/api/v1/order/matchOrder").hasAnyAuthority(new SimpleGrantedAuthority(Role.SENDER.name()).getAuthority(), new SimpleGrantedAuthority(Role.CARRIER.name()).getAuthority()).anyRequest().authenticated())
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         .accessDeniedHandler(accessDeniedHandler)
                         .authenticationEntryPoint(authenticationEntryPoint))
