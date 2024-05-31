@@ -28,12 +28,12 @@ public class CreateOrderRequest {
 
     private String price;
 
-    private String dueDate;
+     private String dueDate;
 
     private String dueTime;
 
     private String picture;
 
-    private String token;
+  //  private String token;
 
 }
