@@ -22,6 +22,8 @@ public class SpedireOrderService implements OrderService{
     private final OrderRepository orderRepository;
     @Override
     public CreateOrderResponse createOrder(CreateOrderRequest createOrderRequest) {
+        System.out.println("Getting here in Service");
+
         Order order = new Order();
         try {
             order.setDueDate(dateConverter(createOrderRequest));
