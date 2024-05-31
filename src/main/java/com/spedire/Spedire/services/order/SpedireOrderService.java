@@ -6,6 +6,7 @@ import com.spedire.Spedire.models.Order;
 import com.spedire.Spedire.repositories.OrderRepository;
 import com.spedire.Spedire.repositories.UserRepository;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -17,36 +18,36 @@ import java.time.format.DateTimeFormatter;
 import java.util.Date;
 @AllArgsConstructor
 @Service
+@Slf4j
 public class SpedireOrderService implements OrderService{
 
     private final OrderRepository orderRepository;
     @Override
     public CreateOrderResponse createOrder(CreateOrderRequest createOrderRequest) {
+        log.info("Create Order");
         Order order = new Order();
         try {
             order.setDueDate(dateConverter(createOrderRequest));
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
+
+        log.info("hello ");
         order.setSenderName(createOrderRequest.getSenderName());
-        order.setDueTime(timeConverter(createOrderRequest));
+     //   order.setDueTime(timeConverter(createOrderRequest));
         order.setPicture(createOrderRequest.getPicture());
         order.setItemDescription(createOrderRequest.getItemDescription());
         order.setPrice(new BigDecimal(createOrderRequest.getPrice()));
-
-
         order.setReceiverName(createOrderRequest.getReceiverName());
         order.setReceiverLocation(createOrderRequest.getReceiverLocation());
         order.setReceiverPhoneNumber(createOrderRequest.getReceiverPhoneNumber());
         order.setReceiverName(createOrderRequest.getReceiverName());
-
-
         order.setSenderLocation(createOrderRequest.getSenderLocation());
-        order.setSenderId(OrderUtils.getSenderIdFromIncomingToken(createOrderRequest.getToken()));
+        order.setSenderId("664e339fca817508f16db8e6");
         order.setSenderPhoneNumber(createOrderRequest.getSenderPhoneNumber());
-
-
+        log.info("type");
         orderRepository.save(order);
+        log.info("reache here");
         return CreateOrderResponse.builder().status(true).message("Order has been successfully created").build();
     }
 

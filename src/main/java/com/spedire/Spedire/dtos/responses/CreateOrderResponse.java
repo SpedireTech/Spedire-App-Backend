@@ -1,10 +1,12 @@
 package com.spedire.Spedire.dtos.responses;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import lombok.*;
 
 @AllArgsConstructor
 @Builder
+@ToString
+@Getter
+@Setter
 public class CreateOrderResponse {
 
     private String message;
