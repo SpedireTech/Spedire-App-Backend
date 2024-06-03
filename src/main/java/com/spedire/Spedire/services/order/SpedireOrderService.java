@@ -34,7 +34,7 @@ public class SpedireOrderService implements OrderService{
 
         log.info("hello ");
         order.setSenderName(createOrderRequest.getSenderName());
-     //   order.setDueTime(timeConverter(createOrderRequest));
+        order.setDueTime(timeConverter(createOrderRequest));
         order.setPicture(createOrderRequest.getPicture());
         order.setItemDescription(createOrderRequest.getItemDescription());
         order.setPrice(new BigDecimal(createOrderRequest.getPrice()));

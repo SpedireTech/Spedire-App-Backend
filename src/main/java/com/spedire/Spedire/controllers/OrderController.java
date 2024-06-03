@@ -1,5 +1,6 @@
 package com.spedire.Spedire.controllers;
 
+import com.spedire.Spedire.dtos.requests.AcceptedOrderDto;
 import com.spedire.Spedire.dtos.requests.CreateOrderRequest;
 import com.spedire.Spedire.dtos.requests.MatchedOrderDto;
 import com.spedire.Spedire.dtos.responses.ApiResponse;
@@ -34,6 +35,20 @@ public class OrderController {
     public ResponseEntity<?> matchOrder(@RequestBody MatchedOrderDto order) {
         var response = acceptedOrder.matchOrder(order);
         return ResponseEntity.status(HttpStatus.SC_OK).body(response);
+    }
+
+    @GetMapping("/acceptOrder")
+
+    public ResponseEntity<?> acceptOrder(@RequestBody AcceptedOrderDto order) {
+        var response = acceptedOrder.acceptOrder(order);
+        return ResponseEntity.status(HttpStatus.SC_OK).body(ApiResponse.builder().message("Order Accepted").data(response).build());
+    }
+
+    @GetMapping("/acceptedOrders")
+
+    public ResponseEntity<?> acceptedOrders() {
+        var response = acceptedOrder.senderAcceptedOrders();
+        return ResponseEntity.status(HttpStatus.SC_OK).body(ApiResponse.builder().message("Here are list of your accepted orders").data(response).build());
     }
 
 }

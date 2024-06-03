@@ -33,6 +33,8 @@ public class Order {
 
     private String senderId;
 
+    private String carriedId;
+
     private String senderName;
 
     private List<String> senderLocation;
@@ -44,6 +46,14 @@ public class Order {
     private String receiverPhoneNumber;
 
     private String receiverName;
+
+    private String carrierImage;
+
+    private String carrierFullName;
+
+    private String carrierLocation;
+
+    private String carrierPhoneNumber;
 
 }
 

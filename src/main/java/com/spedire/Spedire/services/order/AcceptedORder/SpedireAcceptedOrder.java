@@ -3,22 +3,32 @@ package com.spedire.Spedire.services.order.AcceptedORder;
 import com.spedire.Spedire.dtos.requests.AcceptedOrderDto;
 import com.spedire.Spedire.dtos.requests.MatchedOrderDto;
 import com.spedire.Spedire.dtos.responses.AcceptedOrderResponse;
+import com.spedire.Spedire.dtos.responses.AcceptedOrderResponseForSender;
 import com.spedire.Spedire.dtos.responses.MatchedOrderResponse;
 import com.spedire.Spedire.models.Order;
+import com.spedire.Spedire.models.User;
+import com.spedire.Spedire.repositories.AcceptedOrderRepository;
 import com.spedire.Spedire.repositories.OrderRepository;
+import com.spedire.Spedire.repositories.UserRepository;
 import com.spedire.Spedire.services.order.OrderService;
 import com.spedire.Spedire.services.order.OrderUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
 public class SpedireAcceptedOrder implements AcceptedOrder{
 
     private final OrderRepository orderRepository;
+
+    private final AcceptedOrderRepository acceptedOrderRepository;
+
+    private final UserRepository userRepository;
 
 
 
@@ -50,6 +60,46 @@ public class SpedireAcceptedOrder implements AcceptedOrder{
 
     @Override
     public AcceptedOrderResponse acceptOrder(AcceptedOrderDto acceptedOrderDto) {
-        return null;
+        String carrierId = "";
+        Order acceptedOrder = new Order();
+
+
+        for (Order order : orderRepository.findAll()) {
+            if (order.getId().equals(acceptedOrderDto.getOrderId())){
+                order.setCarriedId(carrierId);
+                order.setPrice(BigDecimal.valueOf(1000));
+                acceptedOrder = order;
+            }
+        }
+        Optional<User> foundUser = userRepository.findById(carrierId);
+        acceptedOrder.setCarrierImage(foundUser.get().getProfileImage());
+        acceptedOrder.setCarrierFullName(foundUser.get().getFullName());
+        acceptedOrder.setCarrierPhoneNumber(foundUser.get().getPhoneNumber());
+        acceptedOrderRepository.save(acceptedOrder);
+      return AcceptedOrderUtils.convertOrderToOrderResponseForCarrier(acceptedOrder);
+
+
     }
+
+    @Override
+    public List<AcceptedOrderResponseForSender> senderAcceptedOrders() {
+        String senderId = "";
+        var orders = acceptedOrderRepository.findAll();
+        var allAcceptedOrders = new ArrayList<Order>();
+
+        for (Order order : orders) {
+            if (order.getSenderId().equals(senderId)){
+                allAcceptedOrders.add(order);
+            }
+        }
+
+        var acceptedOrders = new ArrayList<AcceptedOrderResponseForSender>();
+        for (Order order : allAcceptedOrders) {
+            var response = AcceptedOrderUtils.convertOrderToOrderResponseForSender(order);
+            acceptedOrders.add(response);
+        }
+        return acceptedOrders;
+
+    }
+
 }
