@@ -48,7 +48,7 @@ public class SpedireOrderService implements OrderService{
         order.setSenderPhoneNumber(createOrderRequest.getSenderPhoneNumber());
         log.info("type");
         orderRepository.save(order);
-        log.info("reache here");
+        log.info("reach here");
         return CreateOrderResponse.builder().status(true).message("Order has been successfully created").build();
     }
 

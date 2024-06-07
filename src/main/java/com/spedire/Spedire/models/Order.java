@@ -44,6 +44,7 @@ public class Order {
     private String receiverPhoneNumber;
 
     private String receiverName;
+    private boolean payState;
 
 }
 
