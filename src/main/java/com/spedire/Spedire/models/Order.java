@@ -23,7 +23,9 @@ public class Order {
 
     private String itemDescription;
 
-    private BigDecimal price;
+    private String itemName;
+
+    private BigDecimal itemValue;
 
     private Date dueDate;
 
@@ -44,7 +46,14 @@ public class Order {
     private String receiverPhoneNumber;
 
     private String receiverName;
+
     private boolean payState;
+
+    private String pickUpNote;
+
+    private String dropOffNote;
+
+
 
 }
 
