@@ -19,6 +19,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.spedire.Spedire.security.SecurityUtils.JWT_SECRET;
@@ -43,7 +44,7 @@ public class JwtUtil {
         return verifier.verify(token);
     }
 
-    public String generateAccessToken(String email, List<Role> roles) {
+    public String generateAccessToken(String email, Set<Role> roles) {
         List<String> roleNames = roles.stream()
                 .map(Role::getName)
                 .collect(Collectors.toList());

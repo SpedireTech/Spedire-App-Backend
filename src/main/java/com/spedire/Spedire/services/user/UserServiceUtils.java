@@ -200,6 +200,7 @@ public class UserServiceUtils {
                 .walletBalance("0.00")
                 .openToDelivery(user.isOpenToDelivery())
                 .fullName(user.getFullName())
+                .upgradeToCarrier(user.isUpgraded())
                 .totalCancelledDelivery(String.valueOf(user.getTotalCancelledDelivery())).build();
     }
 

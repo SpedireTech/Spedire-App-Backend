@@ -24,8 +24,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static com.spedire.Spedire.security.SecurityUtils.JWT_SECRET;
 import static com.spedire.Spedire.services.email.MailTemplates.*;
@@ -174,11 +176,17 @@ public class SpedireUserService implements UserService{
         System.out.println(cachedUser.toString());
         User user = User.builder().fullName(cachedUser.getFullName()).password(cachedUser.getPassword())
                 .phoneNumber(cachedUser.getPhoneNumber()).email(cachedUser.getEmail()).profileImage(cachedUser.getProfileImage())
-                .otpVerificationStatus(true).roles(List.of(Role.SENDER)).createdAt(LocalDateTime.now()).build();
+                .otpVerificationStatus(true).roles(new HashSet<>(Set.of(Role.SENDER))).createdAt(LocalDateTime.now()).build();
         User savedUser = userRepository.save(user);
         redisInterface.deleteUserCache(email);
        // javaMailService.sendMail(savedUser.getEmail(), WELCOME_TO_SPEDIRE, getWelcomeMailTemplate(savedUser.getFullName()));
         redisInterface.deleteUserCache(email);
+    }
+
+    @Override
+    public void save(User user) {
+        userRepository.save(user);
+
     }
 
     @Override

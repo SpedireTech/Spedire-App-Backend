@@ -21,6 +21,7 @@ public class Utils {
     public static final String MAIL_DELIVERY_FAILED = "Mail delivery failed";
     public static final String FAIL_TO_SEND_MAIL = "Failed to send mail";
     public static final String AUTHORIZATION_IS_NULL = "Endpoint requires a valid authorization";
+    public static final String  UPGRADE_SUCCESSFUL = "Upgrade Successful";
 
 
 
