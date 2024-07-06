@@ -29,7 +29,7 @@ public class CreateOrderRequest {
 
     private String itemDescription;
 
-    private String itemValue;
+    private String price;
 
      private String dueDate;
 

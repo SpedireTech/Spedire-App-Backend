@@ -47,7 +47,6 @@ public class SpedireOrderService implements OrderService{
         order.setSenderId("664e339fca817508f16db8e6");
         order.setSenderPhoneNumber(createOrderRequest.getSenderPhoneNumber());
         order.setItemName(createOrderRequest.getItemName());
-        order.setItemValue(createOrderRequest.getItemValue());
         order.setPickUpNote(createOrderRequest.getPickUpNote());
 
         log.info("type");
