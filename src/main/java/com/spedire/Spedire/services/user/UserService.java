@@ -25,6 +25,8 @@ public interface UserService {
 
     void saveUser(String token) throws MessagingException;
 
+    void save(User user) ;
+
     void deliveryStatus(boolean status, String token);
 
     Optional<User> findByEmail(String email);

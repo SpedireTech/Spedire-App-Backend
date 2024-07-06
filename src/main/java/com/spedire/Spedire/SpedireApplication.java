@@ -9,4 +9,5 @@ public class SpedireApplication {
     public static void main(String[] args) {
         SpringApplication.run(SpedireApplication.class, args);
     }
+
 }

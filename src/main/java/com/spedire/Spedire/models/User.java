@@ -10,7 +10,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Setter
 @Getter
@@ -33,22 +35,15 @@ public class User {
 
     @Indexed(unique = true)
     private String email;
+    private boolean upgraded;
 
     private boolean otpVerificationStatus;
 
-    private List<Role> roles = new ArrayList<>();
+    private Set<Role> roles = new HashSet<>();
+
 
     private LocalDateTime createdAt;
-
-
-    /**
-     * name: String E.g Ikenna.R
-     * walletAmount: Big Decimal
-     * totalSentItem
-     * totalSuccessfulDelivery
-     * totalPendingDelivery
-     * totalCancelledDelivery
-     * openToDeliver: boolean*/
+    private KYC kyc;
 
     private Wallet wallet;
     private int totalSentItem;

@@ -41,7 +41,6 @@ public class UserController {
             }
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().message(exception.getMessage()).success(false).build());
         }
-
     }
 
     @PostMapping("verifyPhoneNumber")

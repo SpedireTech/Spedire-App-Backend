@@ -23,7 +23,9 @@ public class Order {
 
     private String itemDescription;
 
-    private BigDecimal price;
+    private String itemName;
+
+    private BigDecimal itemValue;
 
     private Date dueDate;
 
@@ -47,6 +49,7 @@ public class Order {
 
     private String receiverName;
 
+<<<<<<< HEAD
     private String carrierImage;
 
     private String carrierFullName;
@@ -54,6 +57,15 @@ public class Order {
     private String carrierLocation;
 
     private String carrierPhoneNumber;
+=======
+    private boolean payState;
+
+    private String pickUpNote;
+
+    private String dropOffNote;
+
+
+>>>>>>> b557b51759e9f2c11f7ff35fb7ea0dfa4cf35fe7
 
 }
 

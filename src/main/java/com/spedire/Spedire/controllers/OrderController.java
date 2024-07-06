@@ -31,7 +31,6 @@ public class OrderController {
     }
 
     @GetMapping("/matchOrder")
-
     public ResponseEntity<?> matchOrder(@RequestBody MatchedOrderDto order) {
         var response = acceptedOrder.matchOrder(order);
         return ResponseEntity.status(HttpStatus.SC_OK).body(response);

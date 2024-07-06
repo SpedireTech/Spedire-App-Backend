@@ -24,6 +24,7 @@ public class SpedireOrderService implements OrderService{
     private final OrderRepository orderRepository;
     @Override
     public CreateOrderResponse createOrder(CreateOrderRequest createOrderRequest) {
+
         log.info("Create Order");
         Order order = new Order();
         try {
@@ -45,9 +46,13 @@ public class SpedireOrderService implements OrderService{
         order.setSenderLocation(createOrderRequest.getSenderLocation());
         order.setSenderId("664e339fca817508f16db8e6");
         order.setSenderPhoneNumber(createOrderRequest.getSenderPhoneNumber());
+        order.setItemName(createOrderRequest.getItemName());
+        order.setItemValue(createOrderRequest.getItemValue());
+        order.setPickUpNote(createOrderRequest.getPickUpNote());
+
         log.info("type");
         orderRepository.save(order);
-        log.info("reache here");
+        log.info("reach here");
         return CreateOrderResponse.builder().status(true).message("Order has been successfully created").build();
     }
 

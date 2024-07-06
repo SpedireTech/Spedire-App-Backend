@@ -53,11 +53,21 @@ public class SecurityConfig {
                 .sessionManagement(c -> c.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(authorizationFilter, SpedireAuthenticationFilter.class)
                 .addFilterAt(authenticationFilter, UsernamePasswordAuthenticationFilter.class).oauth2Login(c -> c.successHandler(authSuccessHandler))
+<<<<<<< HEAD
                 .authorizeHttpRequests(request -> request.requestMatchers("/api/v1/user/sign-up", "/api/v1/user/testing", "/api/v1/user/verifyPhoneNumber", "/api/v1/sms/verify-otp", "/api/v1/otp/verifyOtp","/login","/api/v1/order/matchOrder","/api/v1/order/createOrder", "/api/v1/order/acceptOrder", "/api/v1/order/acceptedOrders").permitAll()
                         .requestMatchers("/api/v1/user/forgotPassword", "/api/v1/user/resetPassword", "/api/v1/user/dashboard", "/api/v1/user/deliveryStatus/{status}", "/api/v1/location/nearbyPlaces" ).hasAnyAuthority(new SimpleGrantedAuthority(Role.SENDER.name()).getAuthority(), new SimpleGrantedAuthority(Role.CARRIER.name()).getAuthority()).anyRequest().authenticated())
              //   .exceptionHandling(exceptionHandling -> exceptionHandling
              //           .accessDeniedHandler(accessDeniedHandler)
               //          .authenticationEntryPoint(authenticationEntryPoint))
+=======
+                .authorizeHttpRequests(request -> request.requestMatchers("/api/v1/user/sign-up", "/api/v1/user/testing",
+                                "/api/v1/user/verifyPhoneNumber", "/api/v1/sms/verify-otp", "/api/v1/otp/verifyOtp","/login","/api/v1/order/matchOrder","/api/v1/order/createOrder", "/api/v1/pay", "/verify/{reference}", "/api/v1/carrier/upgrade", "/api/v1/carrier/status").permitAll()
+                        .requestMatchers("/api/v1/user/forgotPassword", "/api/v1/user/resetPassword", "/api/v1/user/dashboard",
+                                "/api/v1/user/deliveryStatus/{status}", "/api/v1/location/nearbyPlaces" ).hasAnyAuthority(new SimpleGrantedAuthority(Role.SENDER.name()).getAuthority(), new SimpleGrantedAuthority(Role.CARRIER.name()).getAuthority()).anyRequest().authenticated())
+                .exceptionHandling(exceptionHandling -> exceptionHandling
+                        .accessDeniedHandler(accessDeniedHandler)
+                        .authenticationEntryPoint(authenticationEntryPoint))
+>>>>>>> b557b51759e9f2c11f7ff35fb7ea0dfa4cf35fe7
 
                 .build();
     }

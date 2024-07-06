@@ -19,5 +19,6 @@ public class UserDashboardResponse {
     private String totalCancelledDelivery;
     private String walletBalance;
     private boolean openToDelivery;
+    private boolean upgradeToCarrier;
 
 }
