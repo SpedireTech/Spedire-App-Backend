@@ -4,6 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
+<<<<<<< HEAD
     <list default="true" id="5eafb18e-b763-4884-a2f7-8257028d01ca" name="Changes" comment="">
       <change afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/controllers/CarrierController.java" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/dtos/requests/UpgradeRequest.java" afterDir="false" />
@@ -45,42 +46,25 @@
       <change beforePath="$PROJECT_DIR$/target/test-classes/com/spedire/Spedire/service/SmsServiceTest.class" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/target/test-classes/com/spedire/Spedire/service/UserServiceTest.class" beforeDir="false" />
     </list>
+=======
+    <list default="true" id="0ade4e70-6853-4885-bc1a-540a02e799bb" name="Changes" comment="" />
+>>>>>>> cd20a6063d29124396d21fe320df54b28f338e73
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="FileTemplateManagerImpl">
-    <option name="RECENT_TEMPLATES">
-      <list>
-        <option value="Interface" />
-        <option value="Class" />
-      </list>
-    </option>
-  </component>
   <component name="Git.Settings">
-    <option name="RECENT_BRANCH_BY_REPOSITORY">
-      <map>
-        <entry key="$PROJECT_DIR$" value="indev" />
-      </map>
-    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory">{
-  &quot;lastFilter&quot;: {
-    &quot;state&quot;: &quot;OPEN&quot;,
-    &quot;assignee&quot;: &quot;SamuelBriggs&quot;
-  }
-}</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/SpedireTech/Spedire-App-Backend.git&quot;,
-    &quot;accountId&quot;: &quot;3ebaba86-4b37-46de-bb4f-a09d4509cb51&quot;
-  }
-}</component>
-  <component name="MarkdownSettingsMigration">
-    <option name="stateVersion" value="1" />
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="mavenHomeTypeForPersistence" value="WRAPPER" />
+      </MavenGeneralSettings>
+    </option>
   </component>
+<<<<<<< HEAD
   <component name="MavenImportPreferences">
     <option name="generalSettings">
       <MavenGeneralSettings>
@@ -93,10 +77,18 @@
   &quot;associatedIndex&quot;: 1
 }</component>
   <component name="ProjectId" id="2caR7wMMwyhMpZvlC9w1V43crg2" />
+=======
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 7
+}]]></component>
+  <component name="ProjectId" id="2iNUtaYuKGad3rUZSVqORBd75VM" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+>>>>>>> cd20a6063d29124396d21fe320df54b28f338e73
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
+<<<<<<< HEAD
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
     &quot;Notification.DisplayName-DoNotAsk-Lombok plugin&quot;: &quot;Lombok integration problem&quot;,
@@ -229,13 +221,24 @@
       </set>
     </attachedChunks>
   </component>
+=======
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.SpedireApplication.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "redis",
+    "kotlin-language-version-configured": "true"
+  }
+}]]></component>
+>>>>>>> cd20a6063d29124396d21fe320df54b28f338e73
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="5eafb18e-b763-4884-a2f7-8257028d01ca" name="Changes" comment="" />
-      <created>1708347541116</created>
+      <changelist id="0ade4e70-6853-4885-bc1a-540a02e799bb" name="Changes" comment="" />
+      <created>1719330744282</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
+<<<<<<< HEAD
       <updated>1708347541116</updated>
       <workItem from="1708347542304" duration="1134000" />
       <workItem from="1708349137245" duration="2318000" />
@@ -267,21 +270,10 @@
       <workItem from="1720028982280" duration="625000" />
       <workItem from="1720029894644" duration="467000" />
       <workItem from="1720091773393" duration="21134000" />
+=======
+      <updated>1719330744282</updated>
+>>>>>>> cd20a6063d29124396d21fe320df54b28f338e73
     </task>
     <servers />
-  </component>
-  <component name="TypeScriptGeneratedFilesManager">
-    <option name="version" value="3" />
-  </component>
-  <component name="Vcs.Log.Tabs.Properties">
-    <option name="TAB_STATES">
-      <map>
-        <entry key="MAIN">
-          <value>
-            <State />
-          </value>
-        </entry>
-      </map>
-    </option>
   </component>
 </project>

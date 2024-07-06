@@ -12,7 +12,10 @@ import java.util.List;
 @AllArgsConstructor
 public class CreateOrderRequest {
 
+    private String pickUpNote;
+
     private String senderName;
+    private String itemName;
     private String senderId;
     private List<String> senderLocation;
 
@@ -26,7 +29,7 @@ public class CreateOrderRequest {
 
     private String itemDescription;
 
-    private String price;
+    private String itemValue;
 
      private String dueDate;
 
