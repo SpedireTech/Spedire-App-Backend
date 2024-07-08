@@ -18,7 +18,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         //You need to log in to access this resource
-        ApiResponse<?> errorResponse = ApiResponse.builder().success(false).message("Unauthorized").build();
+        ApiResponse<?> errorResponse = ApiResponse.builder().success(false).message("Unauthorized! Please login").build();
         ObjectMapper mapper = new ObjectMapper();
         String jsonResponse = mapper.writeValueAsString(errorResponse);
         response.getOutputStream().write(jsonResponse.getBytes());

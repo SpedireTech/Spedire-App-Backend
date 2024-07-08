@@ -47,9 +47,9 @@ public class SecurityConfig {
                                 "/api/v1/user/verifyPhoneNumber", "/api/v1/sms/verify-otp", "/api/v1/otp/verifyOtp","/login","/api/v1/order/matchOrder","/api/v1/order/createOrder", "/api/v1/pay", "/verify/{reference}", "/api/v1/carrier/upgrade", "/api/v1/carrier/status").permitAll()
                         .requestMatchers("/api/v1/user/forgotPassword", "/api/v1/user/resetPassword", "/api/v1/user/dashboard",
                                 "/api/v1/user/deliveryStatus/{status}", "/api/v1/location/nearbyPlaces" ).hasAnyAuthority(new SimpleGrantedAuthority(Role.SENDER.name()).getAuthority(), new SimpleGrantedAuthority(Role.CARRIER.name()).getAuthority()).anyRequest().authenticated())
-                // .exceptionHandling(exceptionHandling -> exceptionHandling
-                //         .accessDeniedHandler(accessDeniedHandler)
-                        // .authenticationEntryPoint(authenticationEntryPoint))
+                 .exceptionHandling(exceptionHandling -> exceptionHandling
+                         .accessDeniedHandler(accessDeniedHandler)
+                         .authenticationEntryPoint(authenticationEntryPoint))
                 .build();
     }
 }

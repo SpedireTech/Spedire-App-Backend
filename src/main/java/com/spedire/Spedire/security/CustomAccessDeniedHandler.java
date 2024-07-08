@@ -20,8 +20,8 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         response.setContentType(APPLICATION_JSON_VALUE);
-//        response.getWriter().write("Access Denied: You do not have the necessary permissions to access this resource.");
-
+//        response.getWriter().write("");
+        // Access Denied: You do not have the necessary permissions to access this resource.
         ApiResponse<?> errorResponse = ApiResponse.builder().success(false).message("Access Denied.").build();
         ObjectMapper mapper = new ObjectMapper();
         String jsonResponse = mapper.writeValueAsString(errorResponse);

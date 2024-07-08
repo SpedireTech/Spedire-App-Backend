@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -29,7 +28,7 @@ public class CreateOrderRequest {
 
     private String itemDescription;
 
-    private String price;
+    private String itemValue;
 
      private String dueDate;
 
