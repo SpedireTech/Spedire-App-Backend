@@ -63,7 +63,7 @@ public class SpedireOrderService implements OrderService{
 
     public static Date dateConverter(CreateOrderRequest createOrderRequest) throws ParseException {
         String date = createOrderRequest.getDueDate();
-        String format = "mm/dd/yyyy";
+        String format = "MM/dd/yyyy";
         DateFormat dateFormat = new SimpleDateFormat(format);
         return dateFormat.parse(date);
     }
