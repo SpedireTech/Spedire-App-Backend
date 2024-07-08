@@ -25,7 +25,7 @@ public class AcceptedOrderUtils {
                 .carrierPhoneNumber(foundOrder.getCarrierPhoneNumber())
                 .carrierName(foundOrder.getCarrierFullName())
                 .itemDescription(foundOrder.getItemDescription())
-                .costOfDelivery(String.valueOf(foundOrder.getPrice())).build();
+                .costOfDelivery(String.valueOf(foundOrder.getItemValue())).build();
 
     }
 

@@ -2,6 +2,7 @@ package com.spedire.Spedire.services.order;
 
 import com.spedire.Spedire.dtos.requests.CreateOrderRequest;
 import com.spedire.Spedire.dtos.responses.CreateOrderResponse;
+import com.spedire.Spedire.exceptions.InvalidDateException;
 import com.spedire.Spedire.models.Order;
 import com.spedire.Spedire.repositories.OrderRepository;
 import lombok.AllArgsConstructor;
@@ -25,17 +26,18 @@ public class SpedireOrderService implements OrderService{
     public CreateOrderResponse createOrder(CreateOrderRequest createOrderRequest) {
         log.info("Create Order");
         Order order = new Order();
+
         try {
             order.setDueDate(dateConverter(createOrderRequest));
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
+        } catch (ParseException exception) {
+            throw new InvalidDateException("Invalid date format. Please provide the date in 'MM/dd/yyyy' format.");
         }
         log.info("hello ");
         order.setSenderName(createOrderRequest.getSenderName());
         order.setDueTime(timeConverter(createOrderRequest));
         order.setPicture(createOrderRequest.getPicture());
         order.setItemDescription(createOrderRequest.getItemDescription());
-        order.setPrice(new BigDecimal(createOrderRequest.getItemValue()));
+        order.setItemValue(new BigDecimal(createOrderRequest.getItemValue()));
         order.setReceiverName(createOrderRequest.getReceiverName());
         order.setReceiverLocation(createOrderRequest.getReceiverLocation());
         order.setReceiverPhoneNumber(createOrderRequest.getReceiverPhoneNumber());

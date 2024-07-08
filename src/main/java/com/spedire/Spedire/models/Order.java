@@ -1,14 +1,11 @@
 package com.spedire.Spedire.models;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
@@ -25,7 +22,7 @@ public class Order {
 
     private String itemName;
 
-    private BigDecimal price;
+    private BigDecimal itemValue;
 
     private Date dueDate;
 

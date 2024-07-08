@@ -10,7 +10,6 @@ import com.spedire.Spedire.models.User;
 import com.spedire.Spedire.repositories.AcceptedOrderRepository;
 import com.spedire.Spedire.repositories.OrderRepository;
 import com.spedire.Spedire.repositories.UserRepository;
-import com.spedire.Spedire.services.order.OrderService;
 import com.spedire.Spedire.services.order.OrderUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -67,7 +66,7 @@ public class SpedireAcceptedOrder implements AcceptedOrder{
         for (Order order : orderRepository.findAll()) {
             if (order.getId().equals(acceptedOrderDto.getOrderId())){
                 order.setCarriedId(carrierId);
-                order.setPrice(BigDecimal.valueOf(1000));
+                order.setItemValue(BigDecimal.valueOf(1000));
                 acceptedOrder = order;
             }
         }
