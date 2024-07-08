@@ -2,6 +2,7 @@ package com.spedire.Spedire.services.order;
 
 import com.spedire.Spedire.dtos.requests.CreateOrderRequest;
 import com.spedire.Spedire.dtos.responses.CreateOrderResponse;
+import com.spedire.Spedire.exceptions.InvalidDateException;
 import com.spedire.Spedire.models.Order;
 import com.spedire.Spedire.repositories.OrderRepository;
 import com.spedire.Spedire.repositories.UserRepository;
@@ -24,13 +25,11 @@ public class SpedireOrderService implements OrderService{
     private final OrderRepository orderRepository;
     @Override
     public CreateOrderResponse createOrder(CreateOrderRequest createOrderRequest) {
-
-        log.info("Create Order");
         Order order = new Order();
         try {
             order.setDueDate(dateConverter(createOrderRequest));
         } catch (ParseException e) {
-            throw new RuntimeException(e);
+            throw new InvalidDateException("Invalid date format. Please provide the date in 'MM/dd/yyyy' format.");
         }
 
         log.info("hello ");
@@ -38,7 +37,7 @@ public class SpedireOrderService implements OrderService{
      //   order.setDueTime(timeConverter(createOrderRequest));
         order.setPicture(createOrderRequest.getPicture());
         order.setItemDescription(createOrderRequest.getItemDescription());
-        order.setPrice(new BigDecimal(createOrderRequest.getPrice()));
+        order.setItemValue(new BigDecimal(createOrderRequest.getItemValue()));
         order.setReceiverName(createOrderRequest.getReceiverName());
         order.setReceiverLocation(createOrderRequest.getReceiverLocation());
         order.setReceiverPhoneNumber(createOrderRequest.getReceiverPhoneNumber());
@@ -47,7 +46,6 @@ public class SpedireOrderService implements OrderService{
         order.setSenderId("664e339fca817508f16db8e6");
         order.setSenderPhoneNumber(createOrderRequest.getSenderPhoneNumber());
         order.setItemName(createOrderRequest.getItemName());
-        order.setItemValue(createOrderRequest.getItemValue());
         order.setPickUpNote(createOrderRequest.getPickUpNote());
 
         log.info("type");
