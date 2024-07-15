@@ -17,6 +17,7 @@ public class OrderListDtoResponse {
     private String costOfDelivery;
     private String senderName;
     private String senderPhoneNumber;
-    private List<String> senderLocation;
+//    private List<String> senderLocation;
+    private String senderLocation;
     private String receiverLocation;
 }

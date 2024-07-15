@@ -59,7 +59,7 @@ public class UserServiceUtils {
     public static final String RESET_INSTRUCTIONS_SENT = "Reset instructions sent to %s";
     public static final String MAIL_DELIVERY_FAILED = "Mail delivery failed";
     public static final String MAIL_DELIVERED_SUCCESSFULLY = "Mail delivered successfully";
-    public static final String INVALID_EMAIL_ADDRESS = "Invalid email address";
+    public static final String INVALID_EMAIL_ADDRESS = "Invalid email savedAddress";
     public static final String INCOMPLETE_REGISTRATION = "Incomplete registration, Verify your phone number to continue";
 
 
@@ -105,7 +105,7 @@ public class UserServiceUtils {
     protected static void validateEmailAddress(String email) {
         Matcher matcher = emailPattern.matcher(email);
         if (!matcher.matches()) {
-            throw new SpedireException("Invalid email address");
+            throw new SpedireException("Invalid email savedAddress");
         }
     }
 

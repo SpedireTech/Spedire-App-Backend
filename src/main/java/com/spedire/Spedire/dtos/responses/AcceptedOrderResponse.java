@@ -17,7 +17,8 @@ public class AcceptedOrderResponse {
     private String costOfDelivery;
     private String senderName;
     private String senderPhoneNumber;
-    private List<String> senderPossibleLocations;
+//    private List<String> senderPossibleLocations;
+    private String senderPossibleLocations;
     private String receiverName;
     private String receiverPhoneNumber;
     private String receiverLocation;

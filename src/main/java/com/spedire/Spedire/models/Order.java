@@ -36,7 +36,8 @@ public class Order {
 
     private String senderName;
 
-    private List<String> senderLocation;
+//    private List<String> senderLocation;
+    private String senderLocation;
 
     private String receiverLocation;
 

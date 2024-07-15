@@ -37,5 +37,14 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(NullValueExpection.class)
+    public ResponseEntity<ApiResponse<?>> handleNullValueException(NullValueExpection ex, WebRequest request) {
+        ApiResponse<?> errorResponse = ApiResponse.builder()
+                .success(false)
+                .message(ex.getMessage())
+                .build();
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
 
 }

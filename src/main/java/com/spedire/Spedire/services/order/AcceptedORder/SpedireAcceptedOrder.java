@@ -37,21 +37,21 @@ public class SpedireAcceptedOrder implements AcceptedOrder{
        var allOrders = orderRepository.findAll();
 
        List<Order> matchedOrders = new ArrayList<>();
-
-       for (Order order : allOrders) {
-          var senderPossibleLocations =  order.getSenderLocation();
-          var carrierPossibleLocations = matchedOrderDto.getCurrentLocation();
-          boolean commonLocation =  senderPossibleLocations.stream().anyMatch(carrierPossibleLocations::contains);
-          if (!commonLocation) break;
-
-       String receiverPossibleLocations =  order.getReceiverLocation();
-       String carrierCurrentLocation = matchedOrderDto.getDestination();
-
-       if (receiverPossibleLocations.equals(carrierCurrentLocation)){
-           matchedOrders.add(order);
-       }
-
-       }
+//
+//       for (Order order : allOrders) {
+//          var senderPossibleLocations =  order.getSenderLocation();
+//          var carrierPossibleLocations = matchedOrderDto.getCurrentLocation();
+//          boolean commonLocation =  senderPossibleLocations.stream().anyMatch(carrierPossibleLocations::contains);
+//          if (!commonLocation) break;
+//
+//       String receiverPossibleLocations =  order.getReceiverLocation();
+//       String carrierCurrentLocation = matchedOrderDto.getDestination();
+//
+//       if (receiverPossibleLocations.equals(carrierCurrentLocation)){
+//           matchedOrders.add(order);
+//       }
+//
+//       }
         var response =  matchedOrders.stream().map(OrderUtils::convertFromOrderToOrderListDto).toList();
        return MatchedOrderResponse.builder().matchedOrders(response).build();
 

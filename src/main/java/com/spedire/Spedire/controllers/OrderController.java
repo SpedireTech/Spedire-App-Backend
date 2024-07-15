@@ -13,6 +13,8 @@ import org.apache.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import static com.spedire.Spedire.controllers.Utils.INCOMPLETE_REGISTRATION;
+
 @RestController
 @AllArgsConstructor
 @Slf4j
@@ -30,7 +32,7 @@ public class OrderController {
         return response;
     }
 
-    @GetMapping("/matchOrder")
+    @PostMapping("/matchOrder")
     public ResponseEntity<?> matchOrder(@RequestBody MatchedOrderDto order) {
         var response = acceptedOrder.matchOrder(order);
         return ResponseEntity.status(HttpStatus.SC_OK).body(response);

@@ -11,7 +11,8 @@ import java.util.List;
 public class MatchedOrderDto {
 
     private String destination;
-    private ArrayList<String> currentLocation;
+//    private ArrayList<String> currentLocation;
+    private String currentLocation;
     private String token;
 
 
