@@ -1,10 +1,7 @@
 package com.spedire.Spedire.controllers;
 
 import com.spedire.Spedire.dtos.requests.UpgradeRequest;
-import com.spedire.Spedire.dtos.responses.ApiResponse;
-import com.spedire.Spedire.dtos.responses.CheckCarrierUpgradeResponse;
-import com.spedire.Spedire.dtos.responses.UpgradeResponse;
-import com.spedire.Spedire.dtos.responses.UserDashboardResponse;
+import com.spedire.Spedire.dtos.responses.*;
 import com.spedire.Spedire.exceptions.SpedireException;
 import com.spedire.Spedire.services.carrier.CarrierService;
 import lombok.AllArgsConstructor;
@@ -43,6 +40,26 @@ public class CarrierController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ApiResponse.builder().message("An unexpected error occurred").success(false).build());
         }
     }
+
+
+    @PostMapping("/downgrade")
+    public ResponseEntity<ApiResponse<?>> downgradeCarrier() {
+        try {
+            DowngradeCarrierResponse response = carrierService.downgradeCarrierToSender();
+            if ("Downgrade Successful".equals(response.getMessage())) {
+                return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().message(response.getMessage()).success(true).build());
+            } else if ("User is not a carrier".equals(response.getMessage())) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(ApiResponse.builder().message(response.getMessage()).success(false).build());
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().message("Bad Request! Downgrade failed").data(response).success(false).build());
+            }
+        } catch (SpedireException exception) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().message(exception.getMessage()).success(false).build());
+        } catch (Exception exception) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ApiResponse.builder().message("An unexpected error occurred").success(false).build());
+        }
+}
+
 
 
     @PostMapping("/status")

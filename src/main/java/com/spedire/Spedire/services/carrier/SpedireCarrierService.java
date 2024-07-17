@@ -2,9 +2,11 @@ package com.spedire.Spedire.services.carrier;
 
 import com.spedire.Spedire.dtos.requests.UpgradeRequest;
 import com.spedire.Spedire.dtos.responses.CheckCarrierUpgradeResponse;
+import com.spedire.Spedire.dtos.responses.DowngradeCarrierResponse;
 import com.spedire.Spedire.dtos.responses.UpgradeResponse;
 import com.spedire.Spedire.dtos.responses.UserDashboardResponse;
 import com.spedire.Spedire.enums.Role;
+import com.spedire.Spedire.exceptions.SpedireException;
 import com.spedire.Spedire.models.Bank;
 import com.spedire.Spedire.models.IdVerification;
 import com.spedire.Spedire.models.KYC;
@@ -16,6 +18,7 @@ import org.apache.catalina.security.SecurityConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -51,6 +54,51 @@ public class SpedireCarrierService implements CarrierService {
        }
         return UpgradeResponse.builder().message("Upgrade Successful").build();
     }
+
+
+    @Override
+    @Transactional
+    public DowngradeCarrierResponse downgradeCarrierToSender() {
+        String carrierEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        validateUserExist(carrierEmail, userRepository);
+
+        var foundUser = userService.findByEmail(checkNoExtraCharacterBeforeAndAfterEmail(carrierEmail));
+        if (foundUser.isPresent()) {
+            User user = foundUser.get();
+            if (user.getRoles().contains(Role.CARRIER)) {
+                user.getRoles().remove(Role.CARRIER);
+                user.setKyc(null);
+                userRepository.save(user);
+                return DowngradeCarrierResponse.builder().message("Downgrade Successful").build();
+            } else {
+                return DowngradeCarrierResponse.builder().message("User is not a carrier").build();
+            }
+        } else {
+            throw new SpedireException("User not found");
+        }
+    }
+
+
+    @Override
+    @Transactional
+    public String addRoleSenderToUser(String email) {
+        validateUserExist(email, userRepository);
+
+        var foundUser = userService.findByEmail(email);
+        if (foundUser.isPresent()) {
+            User user = foundUser.get();
+            if (!user.getRoles().contains(Role.SENDER)) {
+                user.getRoles().add(Role.SENDER);
+                userRepository.save(user);
+                return "Role SENDER added successfully";
+            } else {
+                return "User already has the SENDER role";
+            }
+        } else {
+            throw new SpedireException("User not found");
+        }
+    }
+
 
     @Override
     public CheckCarrierUpgradeResponse checkCarrierUpgradeStatus() {

@@ -95,7 +95,7 @@ public class UserController {
 
 
 
-    @PostMapping("forgotPassword")
+    @PostMapping("/api/v1/user/forgotPassword")
     public ResponseEntity<?> forgotPassword (@RequestBody ForgotPasswordRequest request)  {
         ForgotPasswordResponse response;
         try {

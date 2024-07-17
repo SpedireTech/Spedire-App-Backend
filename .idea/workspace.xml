@@ -5,34 +5,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="cd32c1ae-8de2-4169-8453-38a88ef00260" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/controllers/AddressController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/dtos/responses/SavedAddressResponse.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/exceptions/InvalidTimeException.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/exceptions/NullValueExpection.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/models/SavedAddress.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/repositories/SavedAddressRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/savedAddress/Address.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/savedAddress/SavedAddressImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/dtos/responses/DowngradeCarrierResponse.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mvnw" beforeDir="false" afterPath="$PROJECT_DIR$/mvnw" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/controllers/OrderController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/controllers/OrderController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/dtos/requests/CreateOrderRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/dtos/requests/CreateOrderRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/dtos/requests/MatchedOrderDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/dtos/requests/MatchedOrderDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/dtos/responses/AcceptedOrderResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/dtos/responses/AcceptedOrderResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/dtos/responses/OrderListDtoResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/dtos/responses/OrderListDtoResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/exceptions/GlobalExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/exceptions/GlobalExceptionHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/models/Order.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/models/Order.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/controllers/CarrierController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/controllers/CarrierController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/controllers/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/controllers/UserController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/security/GeneralConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/security/GeneralConfig.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/security/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/security/SecurityConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/order/AcceptedORder/SpedireAcceptedOrder.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/order/AcceptedORder/SpedireAcceptedOrder.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/order/SpedireOrderService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/order/SpedireOrderService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/user/UserServiceUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/user/UserServiceUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/carrier/CarrierService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/carrier/CarrierService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/carrier/SpedireCarrierService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/carrier/SpedireCarrierService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/secret.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/secret.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/spedire/Spedire/dtos/requests/CreateOrderRequest.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/spedire/Spedire/dtos/requests/CreateOrderRequest.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/spedire/Spedire/exceptions/GlobalExceptionHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/spedire/Spedire/exceptions/GlobalExceptionHandler.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/spedire/Spedire/services/order/SpedireOrderService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/spedire/Spedire/services/order/SpedireOrderService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/spedire/Spedire/services/user/SpedireUserService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/spedire/Spedire/services/user/SpedireUserService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/spedire/Spedire/services/user/UserServiceUtils.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/spedire/Spedire/services/user/UserServiceUtils.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/secret.properties" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/secret.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/spedire/Spedire/service/carrier/CarrierTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/spedire/Spedire/service/carrier/CarrierTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/spedire/Spedire/controllers/AddressController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/spedire/Spedire/controllers/AddressController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/spedire/Spedire/security/GeneralConfig$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/spedire/Spedire/security/GeneralConfig$1.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -96,7 +80,7 @@
       <recent name="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/utils" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.SpedireApplication">
+  <component name="RunManager" selected="JUnit.CarrierTest.addRoleSenderToUserroles">
     <configuration default="true" type="AZURE_FUNCTION_SUPPORT" factoryName="Run Functions">
       <option name="appName" />
       <option name="appServicePlanName" />
@@ -159,6 +143,22 @@
       <option name="USE_OPTIONS" value="false" />
       <option name="OPTIONS" value="" />
       <method v="2" />
+    </configuration>
+    <configuration name="CarrierTest.addRoleSenderToUserroles" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="Spedire" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.spedire.Spedire.service.carrier.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.spedire.Spedire.service.carrier" />
+      <option name="MAIN_CLASS_NAME" value="com.spedire.Spedire.service.carrier.CarrierTest" />
+      <option name="METHOD_NAME" value="addRoleSenderToUserroles" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
     </configuration>
     <configuration name="CarrierTest.checkCarrierUpgradeStatus" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="Spedire" />
@@ -292,6 +292,7 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.CarrierTest.addRoleSenderToUserroles" />
         <item itemvalue="Application.SpedireApplication" />
         <item itemvalue="JUnit.CarrierTest.checkCarrierUpgradeStatus" />
         <item itemvalue="JUnit.CarrierTest.upgradeUserToCarrier" />
@@ -352,6 +353,10 @@
       <workItem from="1720951042537" duration="73000" />
       <workItem from="1721044836872" duration="1249000" />
       <workItem from="1721059786519" duration="7008000" />
+      <workItem from="1721126850619" duration="16000" />
+      <workItem from="1721127348631" duration="269000" />
+      <workItem from="1721156912271" duration="1063000" />
+      <workItem from="1721212006669" duration="15194000" />
     </task>
     <servers />
   </component>
