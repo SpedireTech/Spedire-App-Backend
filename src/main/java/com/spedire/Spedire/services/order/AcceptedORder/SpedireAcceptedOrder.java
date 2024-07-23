@@ -38,7 +38,11 @@ public class SpedireAcceptedOrder implements AcceptedOrder{
 
        List<Order> matchedOrders = new ArrayList<>();
 //
-//       for (Order order : allOrders) {
+       for (Order order : allOrders) {
+           var senderLocation = order.getSenderTown();
+           if (matchedOrderDto.getCurrentLocation().equals(senderLocation) && matchedOrderDto.getDestination().equals(order.getReceiverTown())) matchedOrders.add(order);
+       }
+
 //          var senderPossibleLocations =  order.getSenderLocation();
 //          var carrierPossibleLocations = matchedOrderDto.getCurrentLocation();
 //          boolean commonLocation =  senderPossibleLocations.stream().anyMatch(carrierPossibleLocations::contains);
