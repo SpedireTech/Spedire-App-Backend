@@ -11,7 +11,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class GeneralConfig implements WebMvcConfigurer {
 
     @Bean
-
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
             @Override

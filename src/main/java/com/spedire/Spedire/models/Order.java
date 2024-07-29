@@ -1,11 +1,12 @@
 package com.spedire.Spedire.models;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
@@ -13,8 +14,12 @@ import java.util.List;
 @Document
 @Getter
 @Setter
-
+@Builder
+@AllArgsConstructor
+@RequiredArgsConstructor
+@ToString
 public class Order {
+
     @Id
     private String id;
 
@@ -60,6 +65,13 @@ public class Order {
     private String pickUpNote;
 
     private String dropOffNote;
+
+    private OrderPayment orderPayment;
+
+    private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
+
 
 }
 

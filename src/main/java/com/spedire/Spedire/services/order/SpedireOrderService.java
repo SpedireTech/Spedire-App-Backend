@@ -2,11 +2,9 @@ package com.spedire.Spedire.services.order;
 
 import com.spedire.Spedire.dtos.requests.CreateOrderRequest;
 import com.spedire.Spedire.dtos.responses.CreateOrderResponse;
-import com.spedire.Spedire.exceptions.InvalidDateException;
-import com.spedire.Spedire.exceptions.InvalidTimeException;
-import com.spedire.Spedire.exceptions.NullValueExpection;
-import com.spedire.Spedire.exceptions.SpedireException;
+import com.spedire.Spedire.exceptions.*;
 import com.spedire.Spedire.models.Order;
+import com.spedire.Spedire.models.OrderPayment;
 import com.spedire.Spedire.repositories.OrderRepository;
 import com.spedire.Spedire.services.savedAddress.Address;
 import lombok.AllArgsConstructor;
@@ -19,7 +17,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -45,6 +46,67 @@ public class SpedireOrderService implements OrderService {
         return CreateOrderResponse.builder().status(true).message("Order has been successfully created").build();
     }
 
+    @Override
+    public Optional<Order> findOrderById(String orderId) {
+        Optional<Order> order = orderRepository.findById(orderId);
+        if (order.isEmpty()) {
+            throw new OrderNotFoundException("Order not found");
+        }
+        return order;
+    }
+
+    @Override
+    public void saveOrder(Order foundOrder) {
+        orderRepository.save(foundOrder);
+    }
+
+
+    @Override
+    public Optional<Order> findOrderByReference(String reference) {
+        List<Order> allOrders = orderRepository.findAll();
+        for (Order order : allOrders) {
+            OrderPayment orderPayment = order.getOrderPayment();
+            if (orderPayment != null && reference.equals(orderPayment.getTransactionReference())) {
+                return Optional.of(order);
+            }
+        }
+        return Optional.empty();
+    }
+
+
+//    @Override
+//    public List<Order> findOrdersByPaymentStatus(String pending) {
+//        List<Order> orders = new ArrayList<>();
+//        OrderPayment orderPayment;
+//        List<Order> allOrder = orderRepository.findAll();
+//        for (Order order: allOrder) {
+//            orderPayment = order.getOrderPayment();
+//            if (orderPayment.getPaymentStatus().name().equals(pending)) {
+//                orders.add(order);
+//            }
+//        }
+//        return orders;
+//    }
+
+
+    @Override
+    public List<Order> findOrdersByPaymentStatus(String pending) {
+        List<Order> orders = new ArrayList<>();
+        List<Order> allOrder = orderRepository.findAll();
+        for (Order order : allOrder) {
+            OrderPayment orderPayment = order.getOrderPayment();
+            if (orderPayment != null && orderPayment.getPaymentStatus().name().equals(pending)) {
+                orders.add(order);
+            }
+        }
+        return orders;
+    }
+
+    @Override
+    public void deleteOrder(Order order) {
+        orderRepository.delete(order);
+    }
+
     private void saveAddress(CreateOrderRequest createOrderRequest) {
         boolean isSenderAddressSaved = createOrderRequest.isSaveSenderAddress();
         boolean isReceiverAddressSaved = createOrderRequest.isSaveReceiverAddress();
@@ -61,14 +123,14 @@ public class SpedireOrderService implements OrderService {
 
 
     private void validateRequest(CreateOrderRequest createOrderRequest) {
-        if (createOrderRequest.getItemValue() == null) throw new NullValueExpection("Item value is null");
-        if (createOrderRequest.getItemName() == null) throw new NullValueExpection("Item name is null");
-        if (createOrderRequest.getDueDate() == null) throw new NullValueExpection("Due date is null");
-        if (createOrderRequest.getDueTime() == null) throw new NullValueExpection("Due time is null");
-        if (createOrderRequest.getSenderLocation() == null) throw new NullValueExpection("Sender location is required");
-        if (createOrderRequest.getReceiverLocation() == null) throw new NullValueExpection("Receiver location is required");
-        if (createOrderRequest.getReceiverName() == null) throw new NullValueExpection("Receiver name cannot be null");
-        if (createOrderRequest.getReceiverPhoneNumber() == null) throw new NullValueExpection("Receiver phone number is null");
+        if (createOrderRequest.getItemValue() == null) throw new NullValueException("Item value is null");
+        if (createOrderRequest.getItemName() == null) throw new NullValueException("Item name is null");
+        if (createOrderRequest.getDueDate() == null) throw new NullValueException("Due date is null");
+        if (createOrderRequest.getDueTime() == null) throw new NullValueException("Due time is null");
+        if (createOrderRequest.getSenderLocation() == null) throw new NullValueException("Sender location is required");
+        if (createOrderRequest.getReceiverLocation() == null) throw new NullValueException("Receiver location is required");
+        if (createOrderRequest.getReceiverName() == null) throw new NullValueException("Receiver name cannot be null");
+        if (createOrderRequest.getReceiverPhoneNumber() == null) throw new NullValueException("Receiver phone number is null");
         verifyPhoneNumberIsValid(createOrderRequest.getReceiverPhoneNumber());
     }
 
