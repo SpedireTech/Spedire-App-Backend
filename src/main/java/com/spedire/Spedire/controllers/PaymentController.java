@@ -9,6 +9,7 @@ import com.spedire.Spedire.dtos.responses.RegistrationResponse;
 import com.spedire.Spedire.exceptions.SpedireException;
 import com.spedire.Spedire.services.payment.Payment;
 import com.spedire.Spedire.services.payment.PaymentStatusHandler;
+import com.spedire.Spedire.services.websocket.WebSocketService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.xml.bind.DatatypeConverter;
@@ -42,12 +43,13 @@ public class PaymentController {
     @Value("${paystack.secret.key}")
     private String paystackSecretKey;
 
+    private final WebSocketService webSocketService;
 
-    private final PaymentStatusHandler paymentStatusHandler;
+//    private final PaymentStatusHandler paymentStatusHandler;
 
 
-    public PaymentController(PaymentStatusHandler paymentStatusHandler, Payment payment) {
-        this.paymentStatusHandler = paymentStatusHandler;
+    public PaymentController(WebSocketService webSocketService, Payment payment) {
+        this.webSocketService = webSocketService;
         this.payment = payment;
     }
 
@@ -82,6 +84,8 @@ public class PaymentController {
         }
     }
 
+
+
     @PostMapping("/webhook")
     public ResponseEntity<?> handleWebhook(
             @RequestHeader("x-paystack-signature") String signature,
@@ -103,12 +107,7 @@ public class PaymentController {
                 logger.info("Webhook successfully received for reference: {}", reference);
 
                 PaymentVerificationResponse response = payment.updatePaymentInfoFromWebhook(reference, jsonPayload);
-//                System.out.println("response.getStats == " + response.getStatus());
-                try {
-                    paymentStatusHandler.sendPaymentStatusUpdate(response.getStatus());
-                } catch (Exception exception) {
-                    logger.error("Error sending WebSocket message", exception);
-                }
+                webSocketService.sendMessage("/topic/payment-status", response);
 
                 return ResponseEntity.ok(ApiResponse.builder().message("Payment record updated").success(true).data(response).build());
             } else {
@@ -120,7 +119,6 @@ public class PaymentController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error processing webhook");
         }
     }
-
 
 
     private boolean verifySignature(String payload, String signature, String secretKey) {
