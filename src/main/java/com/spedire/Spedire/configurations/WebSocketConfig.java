@@ -19,7 +19,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/websocket")
-                .setAllowedOrigins("http://localhost:3000", "https://299f-102-89-33-251.ngrok-free.app")
+                .setAllowedOrigins("http://localhost:3000", "https://500c-102-89-34-49.ngrok-free.app", "http://localhost:3001")
                 .withSockJS();
     }
 

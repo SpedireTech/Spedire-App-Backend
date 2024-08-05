@@ -1,6 +1,7 @@
 package com.spedire.Spedire.services.payment;
 
 import com.spedire.Spedire.dtos.requests.PaymentRequest;
+import com.spedire.Spedire.dtos.responses.ApiResponse;
 import com.spedire.Spedire.dtos.responses.PaymentInitializationResponse;
 import com.spedire.Spedire.dtos.responses.PaymentVerificationResponse;
 import com.spedire.Spedire.enums.PaymentStatus;
@@ -49,11 +50,11 @@ public class PaymentImpl implements Payment {
             foundOrder = order.get();
             if (foundOrder.isPayState()) {
                 logger.warn("Order {} has already been paid for.", paymentRequest.getOrderId());
-                return ResponseEntity.status(HttpStatus.CONFLICT).body("The order has already been paid for.");
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(ApiResponse.builder().message("The order has already been paid for").success(false).build());
             }
         } else {
             logger.error("Order {} not found.", paymentRequest.getOrderId());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Order not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.builder().message("Order not found").success(false).build());
         }
 
         RestTemplate restTemplate = new RestTemplate();

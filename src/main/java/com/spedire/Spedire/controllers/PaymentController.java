@@ -29,11 +29,16 @@ import org.springframework.web.bind.annotation.*;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
+import java.util.Objects;
+
+import static com.spedire.Spedire.controllers.Utils.extractMessageFromResponseBody;
+import static com.spedire.Spedire.controllers.Utils.verifySignature;
+
 
 @Validated
 @RestController
 @Slf4j
-@RequestMapping("/api/v1/")
+@RequestMapping("/api/v1/payment")
 public class PaymentController {
 
     static final Logger logger = LoggerFactory.getLogger(PaymentController.class);
@@ -45,8 +50,6 @@ public class PaymentController {
 
     private final WebSocketService webSocketService;
 
-//    private final PaymentStatusHandler paymentStatusHandler;
-
 
     public PaymentController(WebSocketService webSocketService, Payment payment) {
         this.webSocketService = webSocketService;
@@ -54,8 +57,8 @@ public class PaymentController {
     }
 
 
-    @PostMapping("payment")
-    public ResponseEntity<ApiResponse<?>> initiatePayment(@Valid @RequestBody PaymentRequest request) {
+    @PostMapping("/initiate")
+    public ResponseEntity<?> initiatePayment(@Valid @RequestBody PaymentRequest request) {
         ResponseEntity<?> response = payment.initiatePayment(request);
         if (response.getStatusCode() == HttpStatus.OK) {
             return ResponseEntity.ok(ApiResponse.builder()
@@ -64,23 +67,21 @@ public class PaymentController {
                     .success(true)
                     .build());
         } else {
-            return ResponseEntity.status(response.getStatusCode()).body(ApiResponse.builder()
-                    .message("Payment Initialization Failed")
-                    .data(response.getBody())
-                    .success(false)
-                    .build());
+            return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
         }
     }
 
 
-    @GetMapping("verify-payment/{reference}")
+    @GetMapping("/verify/{reference}")
     public ResponseEntity<ApiResponse<?>> verifyPayment(@PathVariable String reference) {
         ResponseEntity<?> response = payment.verifyPayment(reference);
         if (response.getStatusCode() == HttpStatus.OK) {
             return ResponseEntity.ok(new ApiResponse<>("Payment verification successful", true, response.getBody()));
         } else {
+            String responseBody = Objects.requireNonNull(response.getBody()).toString();
+            String errorMessage = extractMessageFromResponseBody(responseBody);
             return ResponseEntity.status(response.getStatusCode())
-                    .body(new ApiResponse<>("Payment verification failed",false, response.getBody()));
+                    .body(new ApiResponse<>(errorMessage, false, null));
         }
     }
 
@@ -107,9 +108,10 @@ public class PaymentController {
                 logger.info("Webhook successfully received for reference: {}", reference);
 
                 PaymentVerificationResponse response = payment.updatePaymentInfoFromWebhook(reference, jsonPayload);
-                webSocketService.sendMessage("/topic/payment-status", response);
+                var responseEntity = ResponseEntity.ok(ApiResponse.builder().message("Payment record updated").success(true).data(response).build());
+                webSocketService.sendMessage("/topic/payment-status", responseEntity.getBody());
 
-                return ResponseEntity.ok(ApiResponse.builder().message("Payment record updated").success(true).data(response).build());
+                return responseEntity;
             } else {
                 logger.warn("Unhandled event: {}", event);
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Unhandled event");
@@ -121,21 +123,6 @@ public class PaymentController {
     }
 
 
-    private boolean verifySignature(String payload, String signature, String secretKey) {
-        try {
-            String HMAC_SHA512 = "HmacSHA512";
-            byte[] byteKey = secretKey.getBytes("UTF-8");
-            SecretKeySpec keySpec = new SecretKeySpec(byteKey, HMAC_SHA512);
-            Mac sha512_HMAC = Mac.getInstance(HMAC_SHA512);
-            sha512_HMAC.init(keySpec);
-            byte[] macData = sha512_HMAC.doFinal(payload.getBytes("UTF-8"));
-            String expectedSignature = DatatypeConverter.printHexBinary(macData).toLowerCase();
-            return expectedSignature.equals(signature);
-        } catch (Exception e) {
-            logger.error("Error verifying signature", e);
-            return false;
-        }
-    }
 
 
 }

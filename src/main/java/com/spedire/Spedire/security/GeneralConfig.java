@@ -16,7 +16,7 @@ public class GeneralConfig implements WebMvcConfigurer {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:3000", "https://299f-102-89-33-251.ngrok-free.app")
+                        .allowedOrigins("http://localhost:3000", "http://localhost:3001", " https://500c-102-89-34-49.ngrok-free.app ")
                         .allowedOrigins("*")
                         .allowedHeaders("*")
                         .allowedMethods("GET", "POST", "PUT", "DELETE");
