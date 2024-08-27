@@ -5,11 +5,10 @@ import com.spedire.Spedire.dtos.requests.MatchedOrderDto;
 import com.spedire.Spedire.dtos.responses.AcceptedOrderResponse;
 import com.spedire.Spedire.dtos.responses.AcceptedOrderResponseForSender;
 import com.spedire.Spedire.dtos.responses.MatchedOrderResponse;
+import com.spedire.Spedire.models.CarrierPool;
 import com.spedire.Spedire.models.Order;
 import com.spedire.Spedire.models.User;
-import com.spedire.Spedire.repositories.AcceptedOrderRepository;
-import com.spedire.Spedire.repositories.OrderRepository;
-import com.spedire.Spedire.repositories.UserRepository;
+import com.spedire.Spedire.repositories.*;
 import com.spedire.Spedire.services.order.OrderUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,6 +24,7 @@ public class SpedireAcceptedOrder implements AcceptedOrder{
 
     private final OrderRepository orderRepository;
 
+   private final CarrierPoolRepository carrierPoolRepository;
     private final AcceptedOrderRepository acceptedOrderRepository;
 
     private final UserRepository userRepository;
@@ -56,6 +56,12 @@ public class SpedireAcceptedOrder implements AcceptedOrder{
 //       }
 //
 //       }
+        CarrierPool carrierPool = new CarrierPool();
+       carrierPool.setName("Dummy Name");
+       carrierPool.setDestination(matchedOrderDto.getDestination());
+       carrierPool.setCurrentLocation(matchedOrderDto.getCurrentLocation());
+       carrierPoolRepository.save(carrierPool);
+
         var response =  matchedOrders.stream().map(OrderUtils::convertFromOrderToOrderListDto).toList();
        return MatchedOrderResponse.builder().matchedOrders(response).build();
 
