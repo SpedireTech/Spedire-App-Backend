@@ -41,7 +41,8 @@ public class SpedireOrderService implements OrderService {
     public CreateOrderResponse createOrder(CreateOrderRequest createOrderRequest) {
         validateRequest(createOrderRequest);
         Order order = buildOrder(createOrderRequest);
-        orderRepository.save(order);
+        Order savedOrder = orderRepository.save(order);
+        log.info("New Order received with id: {}", savedOrder.getId());
         saveAddress(createOrderRequest);
         return CreateOrderResponse.builder().status(true).message("Order has been successfully created").build();
     }

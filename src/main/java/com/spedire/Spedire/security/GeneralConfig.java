@@ -10,20 +10,21 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class GeneralConfig implements WebMvcConfigurer {
 
+
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:3000", "http://localhost:3001", " https://500c-102-89-34-49.ngrok-free.app ")
+                        .allowedOrigins("http://localhost:3000", "http://localhost:3001", "https://2f05-102-89-22-44.ngrok-free.app")
                         .allowedOrigins("*")
                         .allowedHeaders("*")
                         .allowedMethods("GET", "POST", "PUT", "DELETE");
-
             }
 
         };
+
     }
 
 }

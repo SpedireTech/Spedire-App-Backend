@@ -9,10 +9,12 @@ public class WebSocketService {
 
     private final SimpMessagingTemplate messagingTemplate;
 
+
     @Autowired
     public WebSocketService(SimpMessagingTemplate messagingTemplate) {
         this.messagingTemplate = messagingTemplate;
     }
+
 
     public void sendMessage(String destination, Object message) {
         messagingTemplate.convertAndSend(destination, message);

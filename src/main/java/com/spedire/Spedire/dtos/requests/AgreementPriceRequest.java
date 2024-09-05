@@ -5,9 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
+public class AgreementPriceRequest {
 
-public class AcceptedOrderDto {
-    private String orderId;
-
-
+    private String amount;
 }

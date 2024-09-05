@@ -1,10 +1,10 @@
 package com.spedire.Spedire.services.carrier;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.spedire.Spedire.dtos.requests.AgreementPriceRequest;
+import com.spedire.Spedire.dtos.requests.PaymentRequest;
 import com.spedire.Spedire.dtos.requests.UpgradeRequest;
-import com.spedire.Spedire.dtos.responses.CheckCarrierUpgradeResponse;
-import com.spedire.Spedire.dtos.responses.DowngradeCarrierResponse;
-import com.spedire.Spedire.dtos.responses.UpgradeResponse;
-import com.spedire.Spedire.dtos.responses.UserDashboardResponse;
+import com.spedire.Spedire.dtos.responses.*;
 import com.spedire.Spedire.enums.Role;
 import com.spedire.Spedire.exceptions.SpedireException;
 import com.spedire.Spedire.models.Bank;
@@ -12,14 +12,18 @@ import com.spedire.Spedire.models.IdVerification;
 import com.spedire.Spedire.models.KYC;
 import com.spedire.Spedire.models.User;
 import com.spedire.Spedire.repositories.UserRepository;
+import com.spedire.Spedire.services.payment.Payment;
 import com.spedire.Spedire.services.user.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.security.SecurityConfig;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import static com.spedire.Spedire.services.carrier.CarrierUtils.*;
@@ -28,11 +32,18 @@ import static com.spedire.Spedire.services.carrier.CarrierUtils.*;
 @Slf4j
 public class SpedireCarrierService implements CarrierService {
 
-    @Autowired
-    private UserService userService;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserService userService;
+
+    private final UserRepository userRepository;
+
+    private final Payment paymentService;
+
+    public SpedireCarrierService(UserService userService, UserRepository userRepository, Payment paymentService) {
+        this.userService = userService;
+        this.userRepository = userRepository;
+        this.paymentService = paymentService;
+    }
 
     @Override
     public UpgradeResponse upgradeToCarrier(UpgradeRequest request) {
@@ -97,6 +108,19 @@ public class SpedireCarrierService implements CarrierService {
         } else {
             throw new SpedireException("User not found");
         }
+    }
+
+    @Override
+    public AgreementPriceResponse acceptAgreedPrice(AgreementPriceRequest request) {
+        ResponseEntity<?> response = paymentService.initiatePayment(new PaymentRequest(Integer.valueOf(request.getAmount()), "66d9e1585a083568b9346907"));
+        PaymentInitializationResponse paymentResponse = (PaymentInitializationResponse) response.getBody();
+        String authorizationUrl = paymentResponse.getAuthorizationUrl();
+        String reference = paymentResponse.getReference();
+        return mapResponse(request.getAmount(), authorizationUrl, reference);
+    }
+
+    private AgreementPriceResponse mapResponse(String amount, String authorizationUrl, String reference) {
+        return new AgreementPriceResponse(amount, authorizationUrl, reference);
     }
 
 
