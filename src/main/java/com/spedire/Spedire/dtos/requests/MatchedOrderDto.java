@@ -15,5 +15,27 @@ public class MatchedOrderDto {
     private String currentLocation;
     private String token;
 
+    public String getDestination() {
+        return destination;
+    }
 
+    public void setDestination(String destination) {
+        this.destination = destination;
+    }
+
+    public String getCurrentLocation() {
+        return currentLocation;
+    }
+
+    public void setCurrentLocation(String currentLocation) {
+        this.currentLocation = currentLocation;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
 }
