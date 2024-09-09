@@ -4,6 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
+<<<<<<< HEAD
     <list default="true" id="14a91c5d-574e-49dd-a81f-f21cf400d22a" name="Changes" comment="feat: add service charge endpoint">
       <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
@@ -51,6 +52,10 @@
       <change beforePath="$PROJECT_DIR$/target/classes/com/spedire/Spedire/services/order/OrderUtils.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/spedire/Spedire/services/order/OrderUtils.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/com/spedire/Spedire/services/order/SpedireOrderService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/spedire/Spedire/services/order/SpedireOrderService.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/secret.properties" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/secret.properties" afterDir="false" />
+=======
+    <list default="true" id="14a91c5d-574e-49dd-a81f-f21cf400d22a" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+>>>>>>> 0947b1a4de4e950a2f65c7269d40746c93d2f128
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -84,6 +89,7 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
+<<<<<<< HEAD
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "Application.SpedireApplication.executor": "Run",
@@ -137,6 +143,16 @@
       </method>
     </configuration>
   </component>
+=======
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.SpedireApplication.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;indev&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;
+  }
+}</component>
+>>>>>>> 0947b1a4de4e950a2f65c7269d40746c93d2f128
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
