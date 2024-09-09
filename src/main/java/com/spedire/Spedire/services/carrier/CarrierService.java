@@ -1,6 +1,6 @@
 package com.spedire.Spedire.services.carrier;
 
-import com.spedire.Spedire.dtos.requests.AgreementPriceRequest;
+import com.spedire.Spedire.dtos.requests.ServiceChargeRequest;
 import com.spedire.Spedire.dtos.requests.UpgradeRequest;
 import com.spedire.Spedire.dtos.responses.*;
 
@@ -12,7 +12,7 @@ public interface CarrierService {
     CheckCarrierUpgradeResponse checkCarrierUpgradeStatus();
     String addRoleSenderToUser(String email);
 
-    AgreementPriceResponse acceptAgreedPrice(AgreementPriceRequest request);
+    ServiceChargeResponse acceptServiceCharge(ServiceChargeRequest request);
 
 
 }

@@ -12,7 +12,6 @@ public interface AcceptedOrder {
 
     MatchedOrderResponse matchOrder (MatchedOrderDto matchedOrderDto);
 
-
     AcceptedOrderResponse acceptOrder (AcceptedOrderDto acceptedOrderDto);
 
    List<AcceptedOrderResponseForSender> senderAcceptedOrders();

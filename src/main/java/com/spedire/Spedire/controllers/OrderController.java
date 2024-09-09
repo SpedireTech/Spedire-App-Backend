@@ -25,11 +25,8 @@ public class OrderController {
     private final AcceptedOrder acceptedOrder;
 
     @PostMapping("/createOrder")
-    public CreateOrderResponse createOrder(@RequestBody CreateOrderRequest order) {
-        log.info("getting here");
-        var response = orderService.createOrder(order);
-        log.info(response.toString() + " this is response");
-        return response;
+    public CreateOrderResponse<?>  createOrder(@RequestBody CreateOrderRequest order) {
+        return orderService.createOrder(order);
     }
 
     @PostMapping("/matchOrder")

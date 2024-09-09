@@ -1,7 +1,7 @@
 package com.spedire.Spedire.services.order;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.spedire.Spedire.dtos.responses.OrderListDtoResponse;
+import com.spedire.Spedire.dtos.responses.CarrierListDtoResponse;
 import com.spedire.Spedire.models.Order;
 import com.spedire.Spedire.security.JwtUtil;
 
@@ -14,12 +14,13 @@ public class OrderUtils {
         return decodedJWT.getClaim("userId").asString();
     }
 
-    public static OrderListDtoResponse convertFromOrderToOrderListDto(Order order){
-        return   OrderListDtoResponse.builder()
+    public static CarrierListDtoResponse convertFromOrderToOrderListDto(Order order){
+        return   CarrierListDtoResponse.builder()
                 .orderId(order.getId())
                 .image(order.getPicture())
                 .senderName(order.getSenderName())
-                .costOfDelivery("950.00").senderName(order.getSenderPhoneNumber())
+                .costOfDelivery("950.00")
+                .senderPhoneNumber(order.getSenderPhoneNumber())
                 .itemDescription(order.getItemDescription())
                 .senderLocation(order.getSenderLocation())
                 .receiverLocation(order.getReceiverLocation())

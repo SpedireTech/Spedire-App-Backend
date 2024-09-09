@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public interface OrderService {
 
-    CreateOrderResponse createOrder(CreateOrderRequest createOrderRequest);
+    CreateOrderResponse<?> createOrder(CreateOrderRequest createOrderRequest);
 
 
     Optional<Order> findOrderById(String orderId);

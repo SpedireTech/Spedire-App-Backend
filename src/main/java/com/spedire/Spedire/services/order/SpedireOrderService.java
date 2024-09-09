@@ -1,11 +1,14 @@
 package com.spedire.Spedire.services.order;
 
 import com.spedire.Spedire.dtos.requests.CreateOrderRequest;
+import com.spedire.Spedire.dtos.requests.MatchedOrderDto;
 import com.spedire.Spedire.dtos.responses.CreateOrderResponse;
+import com.spedire.Spedire.dtos.responses.MatchedOrderResponse;
 import com.spedire.Spedire.exceptions.*;
 import com.spedire.Spedire.models.Order;
 import com.spedire.Spedire.models.OrderPayment;
 import com.spedire.Spedire.repositories.OrderRepository;
+import com.spedire.Spedire.services.order.AcceptedORder.AcceptedOrder;
 import com.spedire.Spedire.services.savedAddress.Address;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,17 +36,21 @@ public class SpedireOrderService implements OrderService {
 
     private final Address savedAddress;
 
+    private final AcceptedOrder acceptedOrder;
     private static final String PHONE_NUMBER_REGEX = "^(080|091|070|081|090)\\d{8}$";
 
     private static final Pattern pattern = Pattern.compile(PHONE_NUMBER_REGEX);
 
     @Override
-    public CreateOrderResponse createOrder(CreateOrderRequest createOrderRequest) {
+    public CreateOrderResponse<?>  createOrder(CreateOrderRequest createOrderRequest) {
         validateRequest(createOrderRequest);
         Order order = buildOrder(createOrderRequest);
         Order savedOrder = orderRepository.save(order);
         log.info("New Order received with id: {}", savedOrder.getId());
         saveAddress(createOrderRequest);
+        MatchedOrderResponse matchFound = null;
+//        MatchedOrderResponse matchFound = acceptedOrder.matchOrder(new MatchedOrderDto(createOrderRequest.getMatchType(), savedOrder.getSenderTown(), savedOrder.getCarrierTown()));
+        if (matchFound != null) return CreateOrderResponse.builder().status(true).message("We found you some pretty nice match").data(matchFound).build();
         return CreateOrderResponse.builder().status(true).message("Order has been successfully created").build();
     }
 

@@ -5,9 +5,11 @@ import com.spedire.Spedire.dtos.requests.MatchedOrderDto;
 import com.spedire.Spedire.dtos.responses.AcceptedOrderResponse;
 import com.spedire.Spedire.dtos.responses.AcceptedOrderResponseForSender;
 import com.spedire.Spedire.dtos.responses.MatchedOrderResponse;
+import com.spedire.Spedire.models.CarrierDelivery;
 import com.spedire.Spedire.models.Order;
 import com.spedire.Spedire.models.User;
 import com.spedire.Spedire.repositories.AcceptedOrderRepository;
+import com.spedire.Spedire.repositories.CarrierDeliveryRepository;
 import com.spedire.Spedire.repositories.OrderRepository;
 import com.spedire.Spedire.repositories.UserRepository;
 import com.spedire.Spedire.services.order.OrderUtils;
@@ -26,6 +28,7 @@ public class SpedireAcceptedOrder implements AcceptedOrder{
     private final OrderRepository orderRepository;
 
     private final AcceptedOrderRepository acceptedOrderRepository;
+    private final CarrierDeliveryRepository carrierDeliveryRepository;
 
     private final UserRepository userRepository;
 
@@ -33,31 +36,33 @@ public class SpedireAcceptedOrder implements AcceptedOrder{
 
     @Override
     public MatchedOrderResponse matchOrder(MatchedOrderDto matchedOrderDto) {
+        String matchType = matchedOrderDto.getMatchType();
+        List<Order> matchedOrders = new ArrayList<>();
+        switch (matchType.toUpperCase()) {
+            case "SENDER" -> {
+                List<CarrierDelivery>  carrierDeliveries = carrierDeliveryRepository.findAll();
+//                for (CarrierDelivery order : carrierDeliveries) {
+//                    String senderLocation = order.getSenderTown();
+//                    if (matchedOrderDto.getCurrentLocation().equals(senderLocation) && matchedOrderDto.getDestination().equals(order.getReceiverTown()))
+//                        matchedOrders.add(order);
+//                }
+                var response = matchedOrders.stream().map(OrderUtils::convertFromOrderToOrderListDto).toList();
+                return MatchedOrderResponse.builder().matchedOrders(response).build();
+            }
+            case "CARRIER" -> {
+                List<Order>  allOrders = orderRepository.findAll();
+                carrierDeliveryRepository.save(CarrierDelivery.builder().currentLocation(matchedOrderDto.getCurrentLocation()).destination(matchedOrderDto.getDestination()).build());
+                for (Order order : allOrders) {
+                    String senderLocation = order.getSenderTown();
+                    if (matchedOrderDto.getCurrentLocation().equals(senderLocation) && matchedOrderDto.getDestination().equals(order.getReceiverTown()))
+                        matchedOrders.add(order);
+                }
+                var response = matchedOrders.stream().map(OrderUtils::convertFromOrderToOrderListDto).toList();
+                return MatchedOrderResponse.builder().matchedOrders(response).build();
+            }
+            default -> throw new IllegalArgumentException("Invalid match type: " + matchType);
+        }
 
-       var allOrders = orderRepository.findAll();
-
-       List<Order> matchedOrders = new ArrayList<>();
-//
-       for (Order order : allOrders) {
-           var senderLocation = order.getSenderTown();
-           if (matchedOrderDto.getCurrentLocation().equals(senderLocation) && matchedOrderDto.getDestination().equals(order.getReceiverTown())) matchedOrders.add(order);
-       }
-
-//          var senderPossibleLocations =  order.getSenderLocation();
-//          var carrierPossibleLocations = matchedOrderDto.getCurrentLocation();
-//          boolean commonLocation =  senderPossibleLocations.stream().anyMatch(carrierPossibleLocations::contains);
-//          if (!commonLocation) break;
-//
-//       String receiverPossibleLocations =  order.getReceiverLocation();
-//       String carrierCurrentLocation = matchedOrderDto.getDestination();
-//
-//       if (receiverPossibleLocations.equals(carrierCurrentLocation)){
-//           matchedOrders.add(order);
-//       }
-//
-//       }
-        var response =  matchedOrders.stream().map(OrderUtils::convertFromOrderToOrderListDto).toList();
-       return MatchedOrderResponse.builder().matchedOrders(response).build();
 
     }
 

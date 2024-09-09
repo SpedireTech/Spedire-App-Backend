@@ -30,13 +30,7 @@ public class CreateOrderRequest {
 
     private boolean saveSenderAddress;
     private boolean saveReceiverAddress;
+//    private String matchType;
 
-
-
-//    private String senderId;
-//    private List<String> senderLocation;
-//    private String senderPhoneNumber;
-//    private String itemDescription;
-//    private String senderName;
 
 }

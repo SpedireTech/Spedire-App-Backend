@@ -48,7 +48,7 @@ public class SecurityConfig {
                                 "/api/v1/user/verifyPhoneNumber", "/api/v1/sms/verify-otp", "/api/v1/otp/verifyOtp","/login","/api/v1/order/createOrder", "/api/v1/payment/**","/api/v1/carrier/upgrade", "/api/v1/carrier/status", "/websocket/**").permitAll()
                         .requestMatchers("/api/v1/order/matchOrder", "/api/v1/address/sender", "/api/v1/address/receiver").authenticated()
                         .requestMatchers("/api/v1/user/forgotPassword", "/api/v1/user/resetPassword", "/api/v1/user/dashboard",
-                                "/api/v1/user/deliveryStatus/{status}", "/api/v1/location/nearbyPlaces", "/api/v1/carrier/downgrade", "/api/v1/carrier/agreed-price").hasAnyAuthority(new SimpleGrantedAuthority(Role.SENDER.name()).getAuthority(), new SimpleGrantedAuthority(Role.CARRIER.name()).getAuthority()).anyRequest().authenticated())
+                                "/api/v1/user/deliveryStatus/{status}", "/api/v1/location/nearbyPlaces", "/api/v1/carrier/downgrade", "/api/v1/carrier/service-charge").hasAnyAuthority(new SimpleGrantedAuthority(Role.SENDER.name()).getAuthority(), new SimpleGrantedAuthority(Role.CARRIER.name()).getAuthority()).anyRequest().authenticated())
                  .exceptionHandling(exceptionHandling -> exceptionHandling
                          .accessDeniedHandler(accessDeniedHandler)
                          .authenticationEntryPoint(authenticationEntryPoint))

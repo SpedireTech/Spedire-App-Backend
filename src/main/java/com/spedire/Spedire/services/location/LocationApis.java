@@ -1,11 +1,16 @@
 package com.spedire.Spedire.services.location;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.List;
 
 import static com.spedire.Spedire.services.location.LocationUtils.*;
@@ -26,6 +31,33 @@ public class LocationApis implements LocationService {
         JSONObject object = new JSONObject(res.body());
         return object.getJSONObject("location");
     }
+
+//    public static JSONObject getCoordinatesFromAddress(String address) throws URISyntaxException, IOException, InterruptedException, IOException {
+//        String baseUrl = "https://api.mapbox.com/search/geocode/v6/forward";
+//        String encodedAddress = address.replace(" ", "%20").replace(",", "%2C");
+//
+//        String requestUrl = String.format("%s?address=%s&access_token=%s", baseUrl, encodedAddress, MAPBOX_APIKEY);
+//        HttpClient client = HttpClient.newHttpClient();
+//        HttpRequest request = HttpRequest.newBuilder().uri(new URI(requestUrl)).GET().build();
+//        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+//
+//        JSONObject responseObject = new JSONObject(response.body());
+//        if (responseObject.has("features")) {
+//            JSONObject firstFeature = responseObject.getJSONArray("features").getJSONObject(0);
+//            JSONObject geometry = firstFeature.getJSONObject("geometry");
+//            JSONArray coordinatesArray = geometry.getJSONArray("coordinates");
+//            double longitude = coordinatesArray.getDouble(0);
+//            double latitude = coordinatesArray.getDouble(1);
+//
+//            JSONObject coordinates = new JSONObject();
+//            coordinates.put("longitude", longitude);
+//            coordinates.put("latitude", latitude);
+//
+//            return coordinates;
+//        } else {
+//            throw new RuntimeException("No features found in the response.");
+//        }
+//    }
 
 
     @Override

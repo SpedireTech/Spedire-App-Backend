@@ -1,7 +1,6 @@
 package com.spedire.Spedire.services.carrier;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.spedire.Spedire.dtos.requests.AgreementPriceRequest;
+import com.spedire.Spedire.dtos.requests.ServiceChargeRequest;
 import com.spedire.Spedire.dtos.requests.PaymentRequest;
 import com.spedire.Spedire.dtos.requests.UpgradeRequest;
 import com.spedire.Spedire.dtos.responses.*;
@@ -15,16 +14,10 @@ import com.spedire.Spedire.repositories.UserRepository;
 import com.spedire.Spedire.services.payment.Payment;
 import com.spedire.Spedire.services.user.UserService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.security.SecurityConfig;
-import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.math.BigDecimal;
-import java.util.List;
 
 import static com.spedire.Spedire.services.carrier.CarrierUtils.*;
 
@@ -72,7 +65,6 @@ public class SpedireCarrierService implements CarrierService {
     public DowngradeCarrierResponse downgradeCarrierToSender() {
         String carrierEmail = SecurityContextHolder.getContext().getAuthentication().getName();
         validateUserExist(carrierEmail, userRepository);
-
         var foundUser = userService.findByEmail(checkNoExtraCharacterBeforeAndAfterEmail(carrierEmail));
         if (foundUser.isPresent()) {
             User user = foundUser.get();
@@ -111,16 +103,16 @@ public class SpedireCarrierService implements CarrierService {
     }
 
     @Override
-    public AgreementPriceResponse acceptAgreedPrice(AgreementPriceRequest request) {
+    public ServiceChargeResponse acceptServiceCharge(ServiceChargeRequest request) {
         ResponseEntity<?> response = paymentService.initiatePayment(new PaymentRequest(Integer.valueOf(request.getAmount()), "66d9e1585a083568b9346907"));
         PaymentInitializationResponse paymentResponse = (PaymentInitializationResponse) response.getBody();
         String authorizationUrl = paymentResponse.getAuthorizationUrl();
         String reference = paymentResponse.getReference();
-        return mapResponse(request.getAmount(), authorizationUrl, reference);
+        return mapResponse(request.getAmount(), request.getOrderId(), authorizationUrl, reference);
     }
 
-    private AgreementPriceResponse mapResponse(String amount, String authorizationUrl, String reference) {
-        return new AgreementPriceResponse(amount, authorizationUrl, reference);
+    private ServiceChargeResponse mapResponse(String amount, String orderId, String authorizationUrl, String reference) {
+        return new ServiceChargeResponse(amount, orderId, authorizationUrl, reference);
     }
 
 

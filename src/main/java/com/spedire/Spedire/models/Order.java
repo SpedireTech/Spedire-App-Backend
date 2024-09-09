@@ -1,15 +1,14 @@
 package com.spedire.Spedire.models;
 
+import com.spedire.Spedire.enums.OrderType;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Date;
-import java.util.List;
 
 @Document
 @Getter
@@ -41,12 +40,12 @@ public class Order {
 
     private String senderName;
 
-//    private List<String> senderLocation;
     private String senderLocation;
 
-    private String SenderTown;
+    private String senderTown;
 
     private String receiverLocation;
+    private OrderType orderType;
 
     private String carrierTown;
 
@@ -139,11 +138,11 @@ public class Order {
     }
 
     public String getSenderTown() {
-        return SenderTown;
+        return senderTown;
     }
 
     public void setSenderTown(String senderTown) {
-        SenderTown = senderTown;
+        this.senderTown = senderTown;
     }
 
     public String getReceiverLocation() {
