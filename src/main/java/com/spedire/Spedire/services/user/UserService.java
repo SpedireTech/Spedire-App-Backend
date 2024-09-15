@@ -30,4 +30,7 @@ public interface UserService {
     void deliveryStatus(boolean status, String token);
 
     Optional<User> findByEmail(String email);
+
+    User findById(String senderId);
+
 }

@@ -1,5 +1,6 @@
 package com.spedire.Spedire.services.order.AcceptedORder;
 
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.spedire.Spedire.dtos.requests.AcceptedOrderDto;
 import com.spedire.Spedire.dtos.requests.MatchedOrderDto;
 import com.spedire.Spedire.dtos.responses.AcceptedOrderResponse;
@@ -14,48 +15,71 @@ import com.spedire.Spedire.repositories.UserRepository;
 import com.spedire.Spedire.models.CarrierPool;
 import com.spedire.Spedire.repositories.*;
 import com.spedire.Spedire.services.order.OrderUtils;
+import com.spedire.Spedire.services.user.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import static com.spedire.Spedire.services.user.UserServiceUtils.EMAIL;
+import static org.apache.http.HttpHeaders.AUTHORIZATION;
 
 @Service
 @AllArgsConstructor
 public class SpedireAcceptedOrder implements AcceptedOrder{
 
     private final OrderRepository orderRepository;
-
-   private final CarrierPoolRepository carrierPoolRepository;
+    private AcceptedOrderUtils utils;
+    private final CarrierPoolRepository carrierPoolRepository;
     private final AcceptedOrderRepository acceptedOrderRepository;
-    private final CarrierDeliveryRepository carrierDeliveryRepository;
 
+    private final HttpServletRequest request;
     private final UserRepository userRepository;
+    private final UserService userService;
+    private final OrderUtils orderUtils;
 
 
 
     @Override
     public MatchedOrderResponse matchOrder(MatchedOrderDto matchedOrderDto) {
-
-        var allOrders = orderRepository.findAll();
-
+        String authorizationHeader = request.getHeader(AUTHORIZATION);
+        DecodedJWT decodedJWT = utils.extractTokenDetails(authorizationHeader);
+        String email = decodedJWT.getClaim(EMAIL).asString();
+        User user = userService.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+        var allOrders = orderRepository.findOrderBySenderTown(matchedOrderDto.getCarrierTown());
         List<Order> matchedOrders = new ArrayList<>();
-//
         for (Order order : allOrders) {
             var senderLocation = order.getSenderTown();
-            if (matchedOrderDto.getCurrentLocation().equals(senderLocation) && matchedOrderDto.getDestination().equals(order.getReceiverTown())) matchedOrders.add(order);
+            if (senderLocation.equals(matchedOrderDto.getCarrierTown())) matchedOrders.add(order);
         }
-
-        CarrierPool carrierPool = new CarrierPool();
-        carrierPool.setName("Dummy Name");
-        carrierPool.setDestination(matchedOrderDto.getDestination());
-        carrierPool.setCurrentLocation(matchedOrderDto.getCurrentLocation());
-        carrierPoolRepository.save(carrierPool);
-
-        var response =  matchedOrders.stream().map(OrderUtils::convertFromOrderToOrderListDto).toList();
-        return MatchedOrderResponse.builder().matchedOrders(response).build();
+        if (matchedOrders.size() != 0) {
+            var response = matchedOrders.stream().map(order -> {
+                try {
+                    return orderUtils.convertFromOrderToOrderListDto(order, matchedOrderDto.getCurrentLocation());
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }).toList();
+            return MatchedOrderResponse.builder().status(true).message("We found some order going your way").matchedOrders(response).build();
+        } else {
+            CarrierPool carrierPool = new CarrierPool();
+            carrierPool.setName(user.getFullName());
+            carrierPool.setPhoneNumber(user.getPhoneNumber());
+            carrierPool.setDeliveryCount(user.getDeliveryCount());
+            carrierPool.setRating("4");
+            carrierPool.setDestination(matchedOrderDto.getDestination());
+            carrierPool.setCurrentLocation(matchedOrderDto.getCurrentLocation());
+            carrierPool.setCarrierTown(matchedOrderDto.getCarrierTown());
+            carrierPoolRepository.save(carrierPool);
+            return MatchedOrderResponse.builder().status(true).message("Please hold! We are matching your request").build();
+        }
 
     }
 

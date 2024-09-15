@@ -1,4 +1,4 @@
-package com.spedire.Spedire.services.location;
+package com.spedire.Spedire.services.location.google;
 
 import lombok.SneakyThrows;
 import org.json.JSONArray;

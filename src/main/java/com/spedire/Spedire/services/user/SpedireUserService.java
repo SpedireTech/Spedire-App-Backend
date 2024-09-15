@@ -205,4 +205,9 @@ public class SpedireUserService implements UserService{
         return userRepository.findByEmail(email);
     }
 
+    @Override
+    public User findById(String senderId) {
+        return userRepository.findById(senderId).orElseThrow(() -> new SpedireException("User not found"));
+    }
+
 }

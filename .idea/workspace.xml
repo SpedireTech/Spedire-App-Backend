@@ -4,58 +4,37 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-<<<<<<< HEAD
-    <list default="true" id="14a91c5d-574e-49dd-a81f-f21cf400d22a" name="Changes" comment="feat: add service charge endpoint">
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/enums/OrderType.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/models/CarrierDelivery.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/repositories/CarrierDeliveryRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="14a91c5d-574e-49dd-a81f-f21cf400d22a" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/location/mapBox/MapBoxService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/location/mapBox/MapBoxServiceImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/location/mapBox/MapBoxUtils.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/controllers/LocationApiController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/controllers/LocationApiController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/controllers/OrderController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/controllers/OrderController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/dtos/requests/AgreementPriceRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/dtos/requests/AgreementPriceRequest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/dtos/requests/CreateOrderRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/dtos/requests/CreateOrderRequest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/dtos/requests/MatchedOrderDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/dtos/requests/MatchedOrderDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/dtos/responses/AgreementPriceResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/dtos/responses/AgreementPriceResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/dtos/responses/CreateOrderResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/dtos/responses/CreateOrderResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/dtos/responses/CarrierListDtoResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/dtos/responses/CarrierListDtoResponse.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/dtos/responses/MatchedOrderResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/dtos/responses/MatchedOrderResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/dtos/responses/OrderListDtoResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/dtos/responses/CarrierListDtoResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/models/Order.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/models/Order.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/repositories/AcceptedOrderRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/repositories/AcceptedOrderRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/repositories/MatchedOrderRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/repositories/MatchedOrderRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/enums/OrderType.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/enums/OrderType.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/models/CarrierPool.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/models/CarrierPool.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/models/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/models/User.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/repositories/CarrierPoolRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/repositories/CarrierPoolRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/repositories/OrderRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/repositories/OrderRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/carrier/CarrierService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/carrier/CarrierService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/carrier/CarrierUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/carrier/CarrierUtils.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/carrier/SpedireCarrierService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/carrier/SpedireCarrierService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/order/AcceptedORder/AcceptedOrder.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/order/AcceptedORder/AcceptedOrder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/location/LocationApis.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/location/google/LocationApis.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/location/LocationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/location/google/LocationService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/location/LocationUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/location/google/LocationUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/order/AcceptedORder/AcceptedOrderUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/order/AcceptedORder/AcceptedOrderUtils.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/order/AcceptedORder/SpedireAcceptedOrder.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/order/AcceptedORder/SpedireAcceptedOrder.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/order/OrderService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/order/OrderService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/order/OrderUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/order/OrderUtils.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/order/SpedireOrderService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/order/SpedireOrderService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/spedire/Spedire/controllers/OrderController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/spedire/Spedire/controllers/OrderController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/spedire/Spedire/dtos/requests/AgreementPriceRequest.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/spedire/Spedire/dtos/requests/AgreementPriceRequest.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/spedire/Spedire/dtos/requests/CreateOrderRequest.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/spedire/Spedire/dtos/requests/CreateOrderRequest.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/spedire/Spedire/dtos/requests/MatchedOrderDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/spedire/Spedire/dtos/requests/MatchedOrderDto.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/spedire/Spedire/dtos/responses/AgreementPriceResponse$AgreementPriceResponseBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/spedire/Spedire/dtos/responses/AgreementPriceResponse$AgreementPriceResponseBuilder.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/spedire/Spedire/dtos/responses/AgreementPriceResponse.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/spedire/Spedire/dtos/responses/AgreementPriceResponse.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/spedire/Spedire/dtos/responses/CreateOrderResponse$CreateOrderResponseBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/spedire/Spedire/dtos/responses/CreateOrderResponse$CreateOrderResponseBuilder.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/spedire/Spedire/dtos/responses/CreateOrderResponse.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/spedire/Spedire/dtos/responses/CreateOrderResponse.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/spedire/Spedire/dtos/responses/MatchedOrderResponse$MatchedOrderResponseBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/spedire/Spedire/dtos/responses/MatchedOrderResponse$MatchedOrderResponseBuilder.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/spedire/Spedire/dtos/responses/MatchedOrderResponse.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/spedire/Spedire/dtos/responses/MatchedOrderResponse.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/spedire/Spedire/dtos/responses/OrderListDtoResponse$OrderListDtoResponseBuilder.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/spedire/Spedire/dtos/responses/OrderListDtoResponse.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/spedire/Spedire/models/Order$OrderBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/spedire/Spedire/models/Order$OrderBuilder.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/spedire/Spedire/models/Order.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/spedire/Spedire/models/Order.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/spedire/Spedire/services/carrier/SpedireCarrierService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/spedire/Spedire/services/carrier/SpedireCarrierService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/spedire/Spedire/services/order/AcceptedORder/SpedireAcceptedOrder.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/spedire/Spedire/services/order/AcceptedORder/SpedireAcceptedOrder.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/spedire/Spedire/services/order/OrderService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/spedire/Spedire/services/order/OrderService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/spedire/Spedire/services/order/OrderUtils.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/spedire/Spedire/services/order/OrderUtils.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/spedire/Spedire/services/order/SpedireOrderService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/spedire/Spedire/services/order/SpedireOrderService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/secret.properties" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/secret.properties" afterDir="false" />
-=======
-    <list default="true" id="14a91c5d-574e-49dd-a81f-f21cf400d22a" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
->>>>>>> 0947b1a4de4e950a2f65c7269d40746c93d2f128
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/user/SpedireUserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/user/SpedireUserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/user/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/user/UserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/secret.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/secret.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -89,7 +68,6 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-<<<<<<< HEAD
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "Application.SpedireApplication.executor": "Run",
@@ -97,13 +75,24 @@
     "RequestMappingsPanelOrder1": "1",
     "RequestMappingsPanelWidth0": "75",
     "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "new__branch",
+    "WebServerToolWindowFactoryState": "false",
+    "git-widget-placeholder": "indev",
     "kotlin-language-version-configured": "true",
-    "node.js.selected.package.tslint": "(autodetect)"
+    "node.js.detected.package.eslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "spring.configuration.checksum": "6ecff62750d1244306e4bc57fb5bfc88",
+    "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RunAnythingCache">
+    <option name="myCommands">
+      <command value="mvn clean" />
+      <command value="mvn install" />
+    </option>
+  </component>
   <component name="RunManager">
     <configuration default="true" type="AZURE_FUNCTION_SUPPORT" factoryName="Run Functions">
       <option name="appName" />
@@ -143,16 +132,6 @@
       </method>
     </configuration>
   </component>
-=======
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Application.SpedireApplication.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;indev&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;
-  }
-}</component>
->>>>>>> 0947b1a4de4e950a2f65c7269d40746c93d2f128
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -161,8 +140,12 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1721739955270</updated>
+      <workItem from="1726327893551" duration="10545000" />
     </task>
     <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="feat: add service charge endpoint" />

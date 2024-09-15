@@ -11,7 +11,6 @@ public class MatchedOrderDto {
 
     private String currentLocation;
     private String destination;
-    private String matchType;
-
+    private String carrierTown;
 
 }

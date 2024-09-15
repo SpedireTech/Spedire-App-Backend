@@ -4,6 +4,10 @@ import com.spedire.Spedire.dtos.requests.ServiceChargeRequest;
 import com.spedire.Spedire.dtos.requests.UpgradeRequest;
 import com.spedire.Spedire.dtos.responses.*;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.List;
+
 public interface CarrierService {
 
     UpgradeResponse upgradeToCarrier(UpgradeRequest request);
@@ -13,6 +17,7 @@ public interface CarrierService {
     String addRoleSenderToUser(String email);
 
     ServiceChargeResponse acceptServiceCharge(ServiceChargeRequest request);
+    List<Object> matchOrderRequest(String senderLocation, String senderTown) throws Exception;
 
 
 }

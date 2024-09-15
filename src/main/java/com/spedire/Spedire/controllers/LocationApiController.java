@@ -1,7 +1,7 @@
 package com.spedire.Spedire.controllers;
 
 import com.spedire.Spedire.dtos.responses.ApiResponse;
-import com.spedire.Spedire.services.location.LocationApis;
+import com.spedire.Spedire.services.location.google.LocationApis;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 

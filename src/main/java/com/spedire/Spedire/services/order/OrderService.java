@@ -3,14 +3,16 @@ package com.spedire.Spedire.services.order;
 import com.spedire.Spedire.dtos.requests.CreateOrderRequest;
 import com.spedire.Spedire.dtos.responses.CreateOrderResponse;
 import com.spedire.Spedire.models.Order;
+import com.spedire.Spedire.services.carrier.CarrierService;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 
 public interface OrderService {
 
-    CreateOrderResponse<?> createOrder(CreateOrderRequest createOrderRequest);
-
+    CreateOrderResponse<?> createOrder(CreateOrderRequest createOrderRequest, CarrierService carrierService) throws Exception;
 
     Optional<Order> findOrderById(String orderId);
 

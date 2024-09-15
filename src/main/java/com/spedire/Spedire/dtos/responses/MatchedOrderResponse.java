@@ -13,6 +13,9 @@ import java.util.List;
 @Setter
 public class MatchedOrderResponse {
 
+    private String message;
+    private boolean status;
     private List<CarrierListDtoResponse> matchedOrders;
+
 
 }

@@ -6,18 +6,26 @@ import com.spedire.Spedire.dtos.requests.UpgradeRequest;
 import com.spedire.Spedire.dtos.responses.*;
 import com.spedire.Spedire.enums.Role;
 import com.spedire.Spedire.exceptions.SpedireException;
-import com.spedire.Spedire.models.Bank;
-import com.spedire.Spedire.models.IdVerification;
-import com.spedire.Spedire.models.KYC;
-import com.spedire.Spedire.models.User;
+import com.spedire.Spedire.models.*;
+import com.spedire.Spedire.repositories.CarrierPoolRepository;
 import com.spedire.Spedire.repositories.UserRepository;
+import com.spedire.Spedire.services.location.mapBox.MapBoxService;
 import com.spedire.Spedire.services.payment.Payment;
 import com.spedire.Spedire.services.user.UserService;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import static com.spedire.Spedire.services.carrier.CarrierUtils.*;
 
@@ -27,15 +35,20 @@ public class SpedireCarrierService implements CarrierService {
 
 
     private final UserService userService;
-
     private final UserRepository userRepository;
-
     private final Payment paymentService;
+    private final MapBoxService mapBoxService;
+    private final CarrierPoolRepository carrierPoolRepository;
 
-    public SpedireCarrierService(UserService userService, UserRepository userRepository, Payment paymentService) {
+
+
+    public SpedireCarrierService(UserService userService, UserRepository userRepository, Payment paymentService,
+                                 MapBoxService mapBoxService, CarrierPoolRepository carrierPoolRepository) {
         this.userService = userService;
         this.userRepository = userRepository;
         this.paymentService = paymentService;
+        this.mapBoxService = mapBoxService;
+        this.carrierPoolRepository = carrierPoolRepository;
     }
 
     @Override
@@ -111,8 +124,19 @@ public class SpedireCarrierService implements CarrierService {
         return mapResponse(request.getAmount(), request.getOrderId(), authorizationUrl, reference);
     }
 
-    private ServiceChargeResponse mapResponse(String amount, String orderId, String authorizationUrl, String reference) {
-        return new ServiceChargeResponse(amount, orderId, authorizationUrl, reference);
+    @Override
+    public List<Object> matchOrderRequest(String senderLocation, String senderTown) throws Exception {
+        List<Object> objectList = new ArrayList<>();
+        if (!carrierPoolRepository.findCarrierPoolByCarrierTown(senderTown).isEmpty()) {
+            for (CarrierPool carriers: carrierPoolRepository.findCarrierPoolByCarrierTown(senderTown)) {
+                Map<String, String> map = new LinkedHashMap<>();
+                String minutesAway = mapBoxService.getMinutesAway(senderLocation, carriers.getCurrentLocation());
+                map.put("name", carriers.getName()); map.put("minutesAway", minutesAway); map.put("number", carriers.getPhoneNumber());
+                map.put("rating", carriers.getRating()); map.put("deliveryCount", carriers.getDeliveryCount());
+                objectList.add(map);
+            }
+        }
+        return objectList;
     }
 
 

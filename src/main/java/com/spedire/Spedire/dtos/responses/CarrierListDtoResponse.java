@@ -9,8 +9,9 @@ import lombok.Setter;
 @Builder
 public class CarrierListDtoResponse {
     private String orderId;
-    private String itemType;
-    private String itemDescription;
+    private String dropOffNote;
+    private String pickUpNote;
+    private String minutesAway;
     private String image;
     private String costOfDelivery;
     private String senderName;

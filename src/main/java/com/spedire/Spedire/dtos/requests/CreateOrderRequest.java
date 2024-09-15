@@ -5,8 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.List;
-
 @Getter
 @Setter
 @AllArgsConstructor
@@ -21,16 +19,15 @@ public class CreateOrderRequest {
     private String receiverPhoneNumber;
     private String receiverLocation;
 
-
     private String itemValue;
     private String dueDate;
     private String dueTime;
     private String picture;
     private String dropOffNote;
+    private String SenderTown;
 
     private boolean saveSenderAddress;
     private boolean saveReceiverAddress;
-//    private String matchType;
 
 
 }
