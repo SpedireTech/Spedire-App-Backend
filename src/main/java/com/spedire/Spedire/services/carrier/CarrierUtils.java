@@ -1,6 +1,7 @@
 package com.spedire.Spedire.services.carrier;
 
 import com.spedire.Spedire.dtos.requests.UpgradeRequest;
+import com.spedire.Spedire.dtos.responses.ServiceChargeResponse;
 import com.spedire.Spedire.exceptions.SpedireException;
 import com.spedire.Spedire.repositories.UserRepository;
 
@@ -27,5 +28,8 @@ public class CarrierUtils {
         return email;
     }
 
+    static ServiceChargeResponse mapResponse(String amount, String orderId, String authorizationUrl, String reference) {
+        return new ServiceChargeResponse(amount, orderId, authorizationUrl, reference);
+    }
 
 }

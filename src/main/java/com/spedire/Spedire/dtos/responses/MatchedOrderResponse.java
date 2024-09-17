@@ -1,6 +1,5 @@
 package com.spedire.Spedire.dtos.responses;
 
-import com.spedire.Spedire.models.Order;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,8 +11,11 @@ import java.util.List;
 @Builder
 @Getter
 @Setter
-
 public class MatchedOrderResponse {
 
-    private List<OrderListDtoResponse> matchedOrders;
+    private String message;
+    private boolean status;
+    private List<CarrierListDtoResponse> matchedOrders;
+
+
 }

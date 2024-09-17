@@ -1,26 +1,31 @@
 package com.spedire.Spedire.services.carrier;
 
+import com.spedire.Spedire.dtos.requests.ServiceChargeRequest;
+import com.spedire.Spedire.dtos.requests.PaymentRequest;
 import com.spedire.Spedire.dtos.requests.UpgradeRequest;
-import com.spedire.Spedire.dtos.responses.CheckCarrierUpgradeResponse;
-import com.spedire.Spedire.dtos.responses.DowngradeCarrierResponse;
-import com.spedire.Spedire.dtos.responses.UpgradeResponse;
-import com.spedire.Spedire.dtos.responses.UserDashboardResponse;
+import com.spedire.Spedire.dtos.responses.*;
 import com.spedire.Spedire.enums.Role;
 import com.spedire.Spedire.exceptions.SpedireException;
-import com.spedire.Spedire.models.Bank;
-import com.spedire.Spedire.models.IdVerification;
-import com.spedire.Spedire.models.KYC;
-import com.spedire.Spedire.models.User;
+import com.spedire.Spedire.models.*;
+import com.spedire.Spedire.repositories.CarrierPoolRepository;
 import com.spedire.Spedire.repositories.UserRepository;
+import com.spedire.Spedire.services.location.mapBox.MapBoxService;
+import com.spedire.Spedire.services.payment.Payment;
 import com.spedire.Spedire.services.user.UserService;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.security.SecurityConfig;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.spedire.Spedire.services.carrier.CarrierUtils.*;
 
@@ -28,11 +33,23 @@ import static com.spedire.Spedire.services.carrier.CarrierUtils.*;
 @Slf4j
 public class SpedireCarrierService implements CarrierService {
 
-    @Autowired
-    private UserService userService;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserService userService;
+    private final UserRepository userRepository;
+    private final Payment paymentService;
+    private final MapBoxService mapBoxService;
+    private final CarrierPoolRepository carrierPoolRepository;
+
+
+
+    public SpedireCarrierService(UserService userService, UserRepository userRepository, Payment paymentService,
+                                 MapBoxService mapBoxService, CarrierPoolRepository carrierPoolRepository) {
+        this.userService = userService;
+        this.userRepository = userRepository;
+        this.paymentService = paymentService;
+        this.mapBoxService = mapBoxService;
+        this.carrierPoolRepository = carrierPoolRepository;
+    }
 
     @Override
     public UpgradeResponse upgradeToCarrier(UpgradeRequest request) {
@@ -61,7 +78,6 @@ public class SpedireCarrierService implements CarrierService {
     public DowngradeCarrierResponse downgradeCarrierToSender() {
         String carrierEmail = SecurityContextHolder.getContext().getAuthentication().getName();
         validateUserExist(carrierEmail, userRepository);
-
         var foundUser = userService.findByEmail(checkNoExtraCharacterBeforeAndAfterEmail(carrierEmail));
         if (foundUser.isPresent()) {
             User user = foundUser.get();
@@ -97,6 +113,30 @@ public class SpedireCarrierService implements CarrierService {
         } else {
             throw new SpedireException("User not found");
         }
+    }
+
+    @Override
+    public ServiceChargeResponse acceptServiceCharge(ServiceChargeRequest request) {
+        ResponseEntity<?> response = paymentService.initiatePayment(new PaymentRequest(Integer.valueOf(request.getAmount()), "66d9e1585a083568b9346907"));
+        PaymentInitializationResponse paymentResponse = (PaymentInitializationResponse) response.getBody();
+        String authorizationUrl = paymentResponse.getAuthorizationUrl();
+        String reference = paymentResponse.getReference();
+        return mapResponse(request.getAmount(), request.getOrderId(), authorizationUrl, reference);
+    }
+
+    @Override
+    public List<Object> matchOrderRequest(String senderLocation, String senderTown) throws Exception {
+        List<Object> objectList = new ArrayList<>();
+        if (!carrierPoolRepository.findCarrierPoolByCarrierTown(senderTown).isEmpty()) {
+            for (CarrierPool carriers: carrierPoolRepository.findCarrierPoolByCarrierTown(senderTown)) {
+                Map<String, String> map = new LinkedHashMap<>();
+                String minutesAway = mapBoxService.getMinutesAway(senderLocation, carriers.getCurrentLocation());
+                map.put("name", carriers.getName()); map.put("minutesAway", minutesAway); map.put("number", carriers.getPhoneNumber());
+                map.put("rating", carriers.getRating()); map.put("deliveryCount", carriers.getDeliveryCount());
+                objectList.add(map);
+            }
+        }
+        return objectList;
     }
 
 

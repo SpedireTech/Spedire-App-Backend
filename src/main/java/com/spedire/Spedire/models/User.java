@@ -32,9 +32,11 @@ public class User {
     @Indexed(unique = true)
     private String phoneNumber;
     private String profileImage;
+    private String deliveryCount;
 
     @Indexed(unique = true)
     private String email;
+    private String rating;
     private boolean upgraded;
 
     private boolean otpVerificationStatus;

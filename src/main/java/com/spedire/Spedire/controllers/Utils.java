@@ -1,11 +1,20 @@
 package com.spedire.Spedire.controllers;
 
 import com.spedire.Spedire.dtos.responses.ApiResponse;
+import jakarta.xml.bind.DatatypeConverter;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.awt.print.Pageable;
+
 public class Utils {
 
+    static final Logger logger = LoggerFactory.getLogger(Utils.class);
     public static final String CLOSEST_LANDMARK = "Closest Landmarks";
     public static final String NO_LANDMARK = "No Landmarks";
     public static final String OTP_AVAILABLE = "OTP Available";
@@ -32,5 +41,33 @@ public class Utils {
         }
         return null;
     }
+
+
+    public static String extractMessageFromResponseBody(String responseBody) {
+        try {
+            JSONObject jsonResponse = new JSONObject(responseBody);
+            return jsonResponse.getString("message");
+        } catch (Exception e) {
+            return "Payment verification failed";
+        }
+
+    }
+
+    public static boolean verifySignature(String payload, String signature, String secretKey) {
+        try {
+            String HMAC_SHA512 = "HmacSHA512";
+            byte[] byteKey = secretKey.getBytes("UTF-8");
+            SecretKeySpec keySpec = new SecretKeySpec(byteKey, HMAC_SHA512);
+            Mac sha512_HMAC = Mac.getInstance(HMAC_SHA512);
+            sha512_HMAC.init(keySpec);
+            byte[] macData = sha512_HMAC.doFinal(payload.getBytes("UTF-8"));
+            String expectedSignature = DatatypeConverter.printHexBinary(macData).toLowerCase();
+            return expectedSignature.equals(signature);
+        } catch (Exception e) {
+            logger.error("Error verifying signature", e);
+            return false;
+        }
+    }
+
 
 }

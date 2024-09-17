@@ -1,5 +1,6 @@
 package com.spedire.Spedire.controllers;
 
+import com.spedire.Spedire.dtos.requests.ServiceChargeRequest;
 import com.spedire.Spedire.dtos.requests.UpgradeRequest;
 import com.spedire.Spedire.dtos.responses.*;
 import com.spedire.Spedire.exceptions.SpedireException;
@@ -71,6 +72,12 @@ public class CarrierController {
         } catch (SpedireException exception) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().message(exception.getMessage()).success(false).build());
         }
+    }
+
+    @PostMapping("/service-charge")
+    public ResponseEntity<ApiResponse<?>> acceptAgreedPrice(@RequestBody ServiceChargeRequest request) {
+        var ref = carrierService.acceptServiceCharge(request);
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().message("Initialization successful").success(true).data(ref).build());
     }
 
 

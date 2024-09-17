@@ -1,27 +1,40 @@
 package com.spedire.Spedire.services.order;
 
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.spedire.Spedire.dtos.requests.CreateOrderRequest;
 import com.spedire.Spedire.dtos.responses.CreateOrderResponse;
-import com.spedire.Spedire.exceptions.InvalidDateException;
-import com.spedire.Spedire.exceptions.InvalidTimeException;
-import com.spedire.Spedire.exceptions.NullValueExpection;
-import com.spedire.Spedire.exceptions.SpedireException;
+import com.spedire.Spedire.exceptions.*;
+import com.spedire.Spedire.models.CarrierPool;
 import com.spedire.Spedire.models.Order;
+import com.spedire.Spedire.models.OrderPayment;
+import com.spedire.Spedire.models.User;
+import com.spedire.Spedire.repositories.CarrierPoolRepository;
 import com.spedire.Spedire.repositories.OrderRepository;
+import com.spedire.Spedire.services.carrier.CarrierService;
+import com.spedire.Spedire.services.location.google.LocationService;
+import com.spedire.Spedire.services.location.mapBox.MapBoxService;
 import com.spedire.Spedire.services.savedAddress.Address;
+import com.spedire.Spedire.services.user.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.net.URISyntaxException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.spedire.Spedire.services.user.UserServiceUtils.EMAIL;
+import static org.apache.http.HttpHeaders.AUTHORIZATION;
 
 @AllArgsConstructor
 @Service
@@ -29,20 +42,76 @@ import java.util.regex.Pattern;
 public class SpedireOrderService implements OrderService {
 
     private final OrderRepository orderRepository;
-
     private final Address savedAddress;
-
+    private final HttpServletRequest request;
+    private final UserService userService;
+    private final OrderUtils utils;
     private static final String PHONE_NUMBER_REGEX = "^(080|091|070|081|090)\\d{8}$";
-
     private static final Pattern pattern = Pattern.compile(PHONE_NUMBER_REGEX);
 
     @Override
-    public CreateOrderResponse createOrder(CreateOrderRequest createOrderRequest) {
+    public CreateOrderResponse<?>  createOrder(CreateOrderRequest createOrderRequest, CarrierService carrierService) throws Exception {
+        String authorizationHeader = request.getHeader(AUTHORIZATION);
+        DecodedJWT decodedJWT = utils.extractTokenDetails(authorizationHeader);
+        String email = decodedJWT.getClaim(EMAIL).asString();
+        User user = userService.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
         validateRequest(createOrderRequest);
-        Order order = buildOrder(createOrderRequest);
-        orderRepository.save(order);
+        Order order = buildOrder(createOrderRequest, user.getId());
+        Order savedOrder = orderRepository.save(order);
+        log.info("New Order received with id: {}", savedOrder.getId());
         saveAddress(createOrderRequest);
+        List<Object> matchResult = carrierService.matchOrderRequest(createOrderRequest.getSenderLocation(), createOrderRequest.getSenderTown());
+        if (matchResult.size() != 0) return CreateOrderResponse.builder().status(true).message("We found you some pretty nice match").data(matchResult).build();
         return CreateOrderResponse.builder().status(true).message("Order has been successfully created").build();
+    }
+
+
+
+    @Override
+    public Optional<Order> findOrderById(String orderId) {
+        Optional<Order> order = orderRepository.findById(orderId);
+        if (order.isEmpty()) {
+            throw new OrderNotFoundException("Order not found");
+        }
+        return order;
+    }
+
+    @Override
+    public void saveOrder(Order foundOrder) {
+        orderRepository.save(foundOrder);
+    }
+
+
+    @Override
+    public Optional<Order> findOrderByReference(String reference) {
+        List<Order> allOrders = orderRepository.findAll();
+        for (Order order : allOrders) {
+            OrderPayment orderPayment = order.getOrderPayment();
+            if (orderPayment != null && reference.equals(orderPayment.getTransactionReference())) {
+                return Optional.of(order);
+            }
+        }
+        return Optional.empty();
+    }
+
+
+
+    @Override
+    public List<Order> findOrdersByPaymentStatus(String pending) {
+        List<Order> orders = new ArrayList<>();
+        List<Order> allOrder = orderRepository.findAll();
+        for (Order order : allOrder) {
+            OrderPayment orderPayment = order.getOrderPayment();
+            if (orderPayment != null && orderPayment.getPaymentStatus().name().equals(pending)) {
+                orders.add(order);
+            }
+        }
+        return orders;
+    }
+
+    @Override
+    public void deleteOrder(Order order) {
+        orderRepository.delete(order);
     }
 
     private void saveAddress(CreateOrderRequest createOrderRequest) {
@@ -61,18 +130,18 @@ public class SpedireOrderService implements OrderService {
 
 
     private void validateRequest(CreateOrderRequest createOrderRequest) {
-        if (createOrderRequest.getItemValue() == null) throw new NullValueExpection("Item value is null");
-        if (createOrderRequest.getItemName() == null) throw new NullValueExpection("Item name is null");
-        if (createOrderRequest.getDueDate() == null) throw new NullValueExpection("Due date is null");
-        if (createOrderRequest.getDueTime() == null) throw new NullValueExpection("Due time is null");
-        if (createOrderRequest.getSenderLocation() == null) throw new NullValueExpection("Sender location is required");
-        if (createOrderRequest.getReceiverLocation() == null) throw new NullValueExpection("Receiver location is required");
-        if (createOrderRequest.getReceiverName() == null) throw new NullValueExpection("Receiver name cannot be null");
-        if (createOrderRequest.getReceiverPhoneNumber() == null) throw new NullValueExpection("Receiver phone number is null");
+        if (createOrderRequest.getItemValue() == null) throw new NullValueException("Item value is null");
+        if (createOrderRequest.getItemName() == null) throw new NullValueException("Item name is null");
+        if (createOrderRequest.getDueDate() == null) throw new NullValueException("Due date is null");
+        if (createOrderRequest.getDueTime() == null) throw new NullValueException("Due time is null");
+        if (createOrderRequest.getSenderLocation() == null) throw new NullValueException("Sender location is required");
+        if (createOrderRequest.getReceiverLocation() == null) throw new NullValueException("Receiver location is required");
+        if (createOrderRequest.getReceiverName() == null) throw new NullValueException("Receiver name cannot be null");
+        if (createOrderRequest.getReceiverPhoneNumber() == null) throw new NullValueException("Receiver phone number is null");
         verifyPhoneNumberIsValid(createOrderRequest.getReceiverPhoneNumber());
     }
 
-    private Order buildOrder(CreateOrderRequest createOrderRequest) {
+    private Order buildOrder(CreateOrderRequest createOrderRequest, String senderId) {
         Order order = new Order();
         try {
             order.setDueDate(dateConverter(createOrderRequest.getDueDate()));
@@ -92,9 +161,11 @@ public class SpedireOrderService implements OrderService {
         order.setReceiverLocation(createOrderRequest.getReceiverLocation());
         order.setReceiverPhoneNumber(createOrderRequest.getReceiverPhoneNumber());
         order.setSenderLocation(createOrderRequest.getSenderLocation());
-        order.setSenderId("664e339fca817508f16db8e6");
+        order.setSenderId(senderId);
         order.setItemName(createOrderRequest.getItemName());
         order.setPickUpNote(createOrderRequest.getPickUpNote());
+        order.setSenderTown(createOrderRequest.getSenderTown());
+        order.setDropOffNote(createOrderRequest.getDropOffNote());
         return order;
     }
 

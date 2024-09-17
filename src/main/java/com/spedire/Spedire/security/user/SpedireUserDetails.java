@@ -55,4 +55,5 @@ public class SpedireUserDetails implements UserDetails {
     public boolean isEnabled() {
         return false;
     }
+
 }

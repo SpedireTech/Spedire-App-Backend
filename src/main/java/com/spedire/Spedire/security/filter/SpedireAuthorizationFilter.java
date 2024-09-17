@@ -56,7 +56,6 @@ public class SpedireAuthorizationFilter extends OncePerRequestFilter {
 
         if (isValidAuthorizationHeader) {
             String token = authorization.substring(tokenPrefix.length());
-            System.out.println(token + " " + " token from filter");
             authorizeToken(token);
         }
     }
@@ -65,11 +64,9 @@ public class SpedireAuthorizationFilter extends OncePerRequestFilter {
         Map<String, Claim> map = jwtUtil.extractClaimsFromToken(token);
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();
         Claim roles = map.get("roles");
-        System.out.println("Roles == " + roles);
         Claim email = map.get("email");
         addClaimToUserAuthorities(authorities, roles);
         Authentication authentication = new UsernamePasswordAuthenticationToken(email, null, authorities);
-        System.out.println("Authentication == " + authentication);
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
@@ -81,7 +78,6 @@ public class SpedireAuthorizationFilter extends OncePerRequestFilter {
                 authorities.add(new SimpleGrantedAuthority(role));
             }
         }
-        System.out.println("Authorities == " + authorities);
     }
 
     

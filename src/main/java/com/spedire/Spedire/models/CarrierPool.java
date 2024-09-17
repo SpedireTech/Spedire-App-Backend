@@ -9,6 +9,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document
 @Builder
 @ToString
+@AllArgsConstructor
+@RequiredArgsConstructor
 public class CarrierPool {
     @Id
     private String id;
@@ -16,6 +18,11 @@ public class CarrierPool {
     private String name;
 
     private String destination;
+    private String currentLocation;
+    private String carrierTown;
+    private String phoneNumber;
+    private String rating;
+    private String deliveryCount;
 
     public String getId() {
         return id;
@@ -48,9 +55,6 @@ public class CarrierPool {
     public void setCurrentLocation(String currentLocation) {
         this.currentLocation = currentLocation;
     }
-
-    private String currentLocation;
-
 
 
 }

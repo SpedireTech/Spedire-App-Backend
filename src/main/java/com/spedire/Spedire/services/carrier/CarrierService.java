@@ -1,10 +1,12 @@
 package com.spedire.Spedire.services.carrier;
 
+import com.spedire.Spedire.dtos.requests.ServiceChargeRequest;
 import com.spedire.Spedire.dtos.requests.UpgradeRequest;
-import com.spedire.Spedire.dtos.responses.CheckCarrierUpgradeResponse;
-import com.spedire.Spedire.dtos.responses.DowngradeCarrierResponse;
-import com.spedire.Spedire.dtos.responses.UpgradeResponse;
-import com.spedire.Spedire.dtos.responses.UserDashboardResponse;
+import com.spedire.Spedire.dtos.responses.*;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.List;
 
 public interface CarrierService {
 
@@ -13,6 +15,9 @@ public interface CarrierService {
 
     CheckCarrierUpgradeResponse checkCarrierUpgradeStatus();
     String addRoleSenderToUser(String email);
+
+    ServiceChargeResponse acceptServiceCharge(ServiceChargeRequest request);
+    List<Object> matchOrderRequest(String senderLocation, String senderTown) throws Exception;
 
 
 }

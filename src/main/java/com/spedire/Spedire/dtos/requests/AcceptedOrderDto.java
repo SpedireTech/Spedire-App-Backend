@@ -8,4 +8,6 @@ import lombok.Setter;
 
 public class AcceptedOrderDto {
     private String orderId;
+
+
 }

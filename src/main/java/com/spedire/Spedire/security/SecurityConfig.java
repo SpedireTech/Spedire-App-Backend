@@ -31,6 +31,7 @@ public class SecurityConfig {
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
     private final RedisInterface redisInterface;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         UsernamePasswordAuthenticationFilter authenticationFilter = new SpedireAuthenticationFilter(authenticationManager,
@@ -44,13 +45,14 @@ public class SecurityConfig {
                 .addFilterBefore(authorizationFilter, SpedireAuthenticationFilter.class)
                 .addFilterAt(authenticationFilter, UsernamePasswordAuthenticationFilter.class).oauth2Login(c -> c.successHandler(authSuccessHandler))
                 .authorizeHttpRequests(request -> request.requestMatchers("/api/v1/user/sign-up", "/api/v1/user/testing",
-                                "/api/v1/user/verifyPhoneNumber", "/api/v1/sms/verify-otp", "/api/v1/otp/verifyOtp","/login","/api/v1/order/createOrder", "/api/v1/pay", "/verify/{reference}", "/api/v1/carrier/upgrade", "/api/v1/carrier/status").permitAll()
+                                "/api/v1/user/verifyPhoneNumber", "/api/v1/sms/verify-otp", "/api/v1/otp/verifyOtp","/login","/api/v1/order/createOrder", "/api/v1/payment/**","/api/v1/carrier/upgrade", "/api/v1/carrier/status", "/websocket/**").permitAll()
                         .requestMatchers("/api/v1/order/matchOrder", "/api/v1/address/sender", "/api/v1/address/receiver").authenticated()
                         .requestMatchers("/api/v1/user/forgotPassword", "/api/v1/user/resetPassword", "/api/v1/user/dashboard",
-                                "/api/v1/user/deliveryStatus/{status}", "/api/v1/location/nearbyPlaces", "/api/v1/carrier/downgrade" ).hasAnyAuthority(new SimpleGrantedAuthority(Role.SENDER.name()).getAuthority(), new SimpleGrantedAuthority(Role.CARRIER.name()).getAuthority()).anyRequest().authenticated())
+                                "/api/v1/user/deliveryStatus/{status}", "/api/v1/location/nearbyPlaces", "/api/v1/carrier/downgrade", "/api/v1/carrier/service-charge").hasAnyAuthority(new SimpleGrantedAuthority(Role.SENDER.name()).getAuthority(), new SimpleGrantedAuthority(Role.CARRIER.name()).getAuthority()).anyRequest().authenticated())
                  .exceptionHandling(exceptionHandling -> exceptionHandling
                          .accessDeniedHandler(accessDeniedHandler)
                          .authenticationEntryPoint(authenticationEntryPoint))
                 .build();
     }
+
 }
