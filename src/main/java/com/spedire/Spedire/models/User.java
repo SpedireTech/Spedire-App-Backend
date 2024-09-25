@@ -53,8 +53,7 @@ public class User {
     private int totalPendingDelivery;
     private int totalCancelledDelivery;
     private boolean openToDelivery;
+    private String reviewId;
 
-    public User(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
+
 }
