@@ -210,4 +210,6 @@ public class SpedireUserService implements UserService{
         return userRepository.findById(senderId).orElseThrow(() -> new SpedireException("User not found"));
     }
 
+
+
 }

@@ -15,4 +15,7 @@ public class ApiResponse<T> {
     private boolean success;
     private T data;
 
+    public ApiResponse(boolean b, String userRatedSuccessfully, ReviewResponse reviewResponse) {
+
+    }
 }

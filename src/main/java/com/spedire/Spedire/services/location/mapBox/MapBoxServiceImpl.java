@@ -43,25 +43,7 @@ public class MapBoxServiceImpl implements MapBoxService {
 
         String requestUrl = String.format("%s?country=ng&address_number=%s&street=%s&place=%s&access_token=%s",
                 baseUrl, encodedHouseNumber, encodedStreet, encodedPlace, MAPBOX_APIKEY);
-
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder().uri(new URI(requestUrl)).GET().build();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        JSONObject responseObject = new JSONObject(response.body());
-        if (responseObject.has("features")) {
-            JSONObject firstFeature = responseObject.getJSONArray("features").getJSONObject(0);
-            JSONObject geometry = firstFeature.getJSONObject("geometry");
-            JSONArray coordinatesArray = geometry.getJSONArray("coordinates");
-            double longitude = coordinatesArray.getDouble(0);
-            double latitude = coordinatesArray.getDouble(1);
-
-            JSONObject coordinates = new JSONObject();
-            coordinates.put("longitude", longitude);
-            coordinates.put("latitude", latitude);
-            return coordinates;
-        } else {
-            throw new RuntimeException("No features found in the response.");
-        }
+        return null;
     }
 
 
@@ -94,6 +76,7 @@ public class MapBoxServiceImpl implements MapBoxService {
             }
         }
     }
+
 
 
     @Override
