@@ -5,21 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="14a91c5d-574e-49dd-a81f-f21cf400d22a" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/controllers/ReviewController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/dtos/requests/ReviewRequest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/dtos/responses/ReviewResponse.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/models/Review.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/repositories/ReviewRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/review/ReviewInterface.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/review/ReviewService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/dtos/responses/ApiResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/dtos/responses/ApiResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/models/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/models/User.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/security/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/security/SecurityConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/location/mapBox/MapBoxServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/location/mapBox/MapBoxServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/models/Order.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/models/Order.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/order/SpedireOrderService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/order/SpedireOrderService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/review/ReviewService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/review/ReviewService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/savedAddress/SavedAddressImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/savedAddress/SavedAddressImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/user/SpedireUserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/user/SpedireUserService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/user/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/user/UserService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/spedire/Spedire/service/user/UserServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/spedire/Spedire/service/user/UserServiceTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/user/UserServiceUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/user/UserServiceUtils.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -132,6 +124,8 @@
       <workItem from="1726941265109" duration="323000" />
       <workItem from="1727170034137" duration="2378000" />
       <workItem from="1727272348574" duration="11891000" />
+      <workItem from="1728930379495" duration="3666000" />
+      <workItem from="1729075337673" duration="3957000" />
     </task>
     <servers />
   </component>

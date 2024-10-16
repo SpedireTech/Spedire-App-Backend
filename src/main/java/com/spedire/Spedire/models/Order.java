@@ -21,33 +21,35 @@ public class Order {
 
     @Id
     private String id;
-
     private String itemDescription;
-
     private String itemName;
-
     private BigDecimal itemValue;
-
     private Date dueDate;
-
     private LocalTime dueTime;
-
     private String picture;
-
     private String senderId;
-
     private String carriedId;
-
     private String senderName;
-
     private String senderLocation;
-
     private String senderTown;
-
     private String receiverLocation;
     private OrderType orderType;
-
     private String carrierTown;
+    private String receiverTown;
+    private String senderPhoneNumber;
+    private String receiverPhoneNumber;
+    private String receiverName;
+    private String carrierImage;
+    private String carrierFullName;
+    private String carrierLocation;
+    private String carrierPhoneNumber;
+    private boolean payState;
+    private String pickUpNote;
+    private String dropOffNote;
+    private OrderPayment orderPayment;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
 
     public String getId() {
         return id;
@@ -153,6 +155,14 @@ public class Order {
         this.receiverLocation = receiverLocation;
     }
 
+    public OrderType getOrderType() {
+        return orderType;
+    }
+
+    public void setOrderType(OrderType orderType) {
+        this.orderType = orderType;
+    }
+
     public String getCarrierTown() {
         return carrierTown;
     }
@@ -249,35 +259,29 @@ public class Order {
         this.dropOffNote = dropOffNote;
     }
 
-    private String receiverTown;
+    public OrderPayment getOrderPayment() {
+        return orderPayment;
+    }
 
-    private String senderPhoneNumber;
+    public void setOrderPayment(OrderPayment orderPayment) {
+        this.orderPayment = orderPayment;
+    }
 
-    private String receiverPhoneNumber;
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
 
-    private String receiverName;
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
 
-    private String carrierImage;
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
 
-    private String carrierFullName;
-
-    private String carrierLocation;
-
-    private String carrierPhoneNumber;
-
-    private boolean payState;
-
-    private String pickUpNote;
-
-    private String dropOffNote;
-
-    private OrderPayment orderPayment;
-
-    private LocalDateTime createdAt;
-
-    private LocalDateTime updatedAt;
-
-
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 }
 
 

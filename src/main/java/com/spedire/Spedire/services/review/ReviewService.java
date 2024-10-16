@@ -75,7 +75,7 @@ public class ReviewService implements ReviewInterface {
     private int calculateAverageRating(List<Integer> ratings) {
         if (ratings.isEmpty()) return 0;
         int sum = ratings.stream().mapToInt(Integer::intValue).sum();
-        return sum / 2;
+        return sum / ratings.size();
     }
 
 }

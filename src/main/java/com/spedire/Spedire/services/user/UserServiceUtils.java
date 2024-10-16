@@ -109,6 +109,17 @@ public class UserServiceUtils {
         }
     }
 
+    public static void validatePassword(String password) {
+        String passwordPattern = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$";
+        Pattern pattern = Pattern.compile(passwordPattern);
+        Matcher matcher = pattern.matcher(password);
+
+        if (!matcher.matches()) {
+            throw new SpedireException("Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character.");
+        }
+    }
+
+
     public DecodedJWT extractTokenDetails(String token) {
         String splitToken = token.split(" ")[1];
         return jwtUtil.verifyToken(splitToken);

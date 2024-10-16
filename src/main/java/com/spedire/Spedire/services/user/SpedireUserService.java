@@ -93,6 +93,7 @@ public class SpedireUserService implements UserService{
         validateEmailAddress(registrationRequest.getEmail());
         validateEmailDoesntExist(registrationRequest.getEmail(), userRepository);
         validatePhoneNumberDoesntExist(registrationRequest.getPhoneNumber(), userRepository);
+        validatePassword(registrationRequest.getPassword());
     }
 
 

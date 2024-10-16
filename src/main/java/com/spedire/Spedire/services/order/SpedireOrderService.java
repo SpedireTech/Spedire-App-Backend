@@ -3,6 +3,7 @@ package com.spedire.Spedire.services.order;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.spedire.Spedire.dtos.requests.CreateOrderRequest;
 import com.spedire.Spedire.dtos.responses.CreateOrderResponse;
+import com.spedire.Spedire.enums.OrderType;
 import com.spedire.Spedire.exceptions.*;
 import com.spedire.Spedire.models.CarrierPool;
 import com.spedire.Spedire.models.Order;
@@ -27,6 +28,7 @@ import java.net.URISyntaxException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -56,7 +58,7 @@ public class SpedireOrderService implements OrderService {
         String email = decodedJWT.getClaim(EMAIL).asString();
         User user = userService.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
         validateRequest(createOrderRequest);
-        Order order = buildOrder(createOrderRequest, user.getId());
+        Order order = buildOrder(createOrderRequest, user);
         Order savedOrder = orderRepository.save(order);
         log.info("New Order received with id: {}", savedOrder.getId());
         saveAddress(createOrderRequest);
@@ -141,7 +143,7 @@ public class SpedireOrderService implements OrderService {
         verifyPhoneNumberIsValid(createOrderRequest.getReceiverPhoneNumber());
     }
 
-    private Order buildOrder(CreateOrderRequest createOrderRequest, String senderId) {
+    private Order buildOrder(CreateOrderRequest createOrderRequest, User user) {
         Order order = new Order();
         try {
             order.setDueDate(dateConverter(createOrderRequest.getDueDate()));
@@ -161,11 +163,14 @@ public class SpedireOrderService implements OrderService {
         order.setReceiverLocation(createOrderRequest.getReceiverLocation());
         order.setReceiverPhoneNumber(createOrderRequest.getReceiverPhoneNumber());
         order.setSenderLocation(createOrderRequest.getSenderLocation());
-        order.setSenderId(senderId);
+        order.setSenderId(user.getId());
+        order.setSenderName(user.getFullName());
         order.setItemName(createOrderRequest.getItemName());
         order.setPickUpNote(createOrderRequest.getPickUpNote());
         order.setSenderTown(createOrderRequest.getSenderTown());
         order.setDropOffNote(createOrderRequest.getDropOffNote());
+        order.setCreatedAt(LocalDateTime.now());
+        order.setOrderType(OrderType.AWAITING_MATCH);
         return order;
     }
 

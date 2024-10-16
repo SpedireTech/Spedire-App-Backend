@@ -24,7 +24,6 @@ public class SavedAddressImpl implements Address{
     @Override
     public void saveAddress(String senderAddress, String receiverAddress) {
         String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
-        System.out.println("Email is = " + email);
         SavedAddress savedAddress = SavedAddress.builder().senderAddress(senderAddress).receiverAddress(receiverAddress).email(email).build();
         savedAddressRepository.save(savedAddress);
     }
