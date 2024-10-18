@@ -29,7 +29,7 @@ public class OtpController {
     public ResponseEntity<ApiResponse<?>> getOtp(@RequestBody SavePhoneNumberRequest request)  {
         OtpResponse response;
         try {
-            response = otpService.generateOtp(request.getPhoneNumber());
+            response = otpService.generateOtpWithTermii(request.getPhoneNumber());
             return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().message(OTP_AVAILABLE).data(response).success(true).build());
         } catch (SpedireException exception) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().message(exception.getMessage()).success(false).build());
@@ -39,14 +39,14 @@ public class OtpController {
 
     @PostMapping("verifyOtp")
     public ResponseEntity<ApiResponse<?>> verifyOtp(@RequestBody VerifyOtpRequest request, @RequestHeader(AUTHORIZATION) String token)  {
-        System.out.println("Token is == " + token);
+
         ResponseEntity<ApiResponse<?>> authorizationResponse = validateAuthorization(token);
         if (authorizationResponse != null) {return authorizationResponse;}
         if (request == null || request.getVerificationCode() == null) {return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().message("Verification code is not passed").success(false).build());}
 
         boolean response;
         try {
-            response = otpService.verifyOtp(request.getVerificationCode(), token, userService);
+            response = otpService.verifyOtpWithTermii(request.getVerificationCode(), request.getPin_id());
             if (response) {return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().message(REGISTRATION_COMPLETED).success(response).build());
             } else {return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().message(INVALID_OTP_OR_PHONE_NUMBER).success(response).build());}
            } catch (SpedireException | MessagingException exception) {return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().message(exception.getMessage()).success(false).build());

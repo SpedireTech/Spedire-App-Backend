@@ -59,7 +59,7 @@ public class SpedireAcceptedOrder implements AcceptedOrder{
             var senderLocation = order.getSenderTown();
             if (senderLocation.equals(matchedOrderDto.getCarrierTown())) matchedOrders.add(order);
         }
-        if (matchedOrders.size() != 0) {
+        if (!matchedOrders.isEmpty()) {
             var response = matchedOrders.stream().map(order -> {
                 try {
                     return orderUtils.convertFromOrderToOrderListDto(order, matchedOrderDto.getCurrentLocation());
@@ -67,6 +67,7 @@ public class SpedireAcceptedOrder implements AcceptedOrder{
                     throw new RuntimeException(e);
                 }
             }).toList();
+
             return MatchedOrderResponse.builder().status(true).message("We found some order going your way").matchedOrders(response).build();
         } else {
             CarrierPool carrierPool = new CarrierPool();
