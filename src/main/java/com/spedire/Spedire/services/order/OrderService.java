@@ -4,6 +4,7 @@ import com.spedire.Spedire.dtos.requests.CreateOrderRequest;
 import com.spedire.Spedire.dtos.responses.CreateOrderResponse;
 import com.spedire.Spedire.models.Order;
 import com.spedire.Spedire.services.carrier.CarrierService;
+import org.springframework.data.mongodb.core.aggregation.BooleanOperators;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -24,4 +25,9 @@ public interface OrderService {
 
     void deleteOrder(Order order);
 
+    List<Order> pendingOrderHistory(String token);
+
+    List<Order> completedOrderHistory(String token);
+
+    List<Order> acceptedOrderHistory(String token);
 }
