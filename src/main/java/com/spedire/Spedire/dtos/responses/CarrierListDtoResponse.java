@@ -13,7 +13,6 @@ public class CarrierListDtoResponse {
     private String pickUpNote;
     private String minutesAway;
     private String image;
-    private String costOfDelivery;
     private String senderName;
     private String senderPhoneNumber;
     private String senderLocation;

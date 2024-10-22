@@ -7,6 +7,7 @@ import com.spedire.Spedire.dtos.responses.AcceptedOrderResponse;
 import com.spedire.Spedire.dtos.responses.AcceptedOrderResponseForSender;
 import com.spedire.Spedire.dtos.responses.MatchedOrderResponse;
 import com.spedire.Spedire.models.Order;
+import com.spedire.Spedire.models.SenderPool;
 import com.spedire.Spedire.models.User;
 import com.spedire.Spedire.repositories.AcceptedOrderRepository;
 import com.spedire.Spedire.repositories.CarrierDeliveryRepository;
@@ -14,8 +15,12 @@ import com.spedire.Spedire.repositories.OrderRepository;
 import com.spedire.Spedire.repositories.UserRepository;
 import com.spedire.Spedire.models.CarrierPool;
 import com.spedire.Spedire.repositories.*;
+import com.spedire.Spedire.services.email.JavaMailService;
 import com.spedire.Spedire.services.order.OrderUtils;
+import com.spedire.Spedire.services.review.ReviewInterface;
+import com.spedire.Spedire.services.sender.SenderService;
 import com.spedire.Spedire.services.user.UserService;
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -39,27 +44,34 @@ public class SpedireAcceptedOrder implements AcceptedOrder{
     private AcceptedOrderUtils utils;
     private final CarrierPoolRepository carrierPoolRepository;
     private final AcceptedOrderRepository acceptedOrderRepository;
-
+    private final JavaMailService javaMailService;
     private final HttpServletRequest request;
     private final UserRepository userRepository;
+    private final ReviewInterface reviewInterface;
     private final UserService userService;
+    private final SenderPoolRepository senderPoolRepository;
+    private final SenderService senderService;
     private final OrderUtils orderUtils;
 
 
 
+
+
+
     @Override
-    public MatchedOrderResponse matchOrder(MatchedOrderDto matchedOrderDto) {
+    public MatchedOrderResponse matchOrder(MatchedOrderDto matchedOrderDto) throws MessagingException {
         String authorizationHeader = request.getHeader(AUTHORIZATION);
         DecodedJWT decodedJWT = utils.extractTokenDetails(authorizationHeader);
         String email = decodedJWT.getClaim(EMAIL).asString();
         User user = userService.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
-        var allOrders = orderRepository.findOrderBySenderTown(matchedOrderDto.getCarrierTown());
-        List<Order> matchedOrders = new ArrayList<>();
-        for (Order order : allOrders) {
-            var senderLocation = order.getSenderTown();
-            if (senderLocation.equals(matchedOrderDto.getCarrierTown())) matchedOrders.add(order);
-        }
-        if (matchedOrders.size() != 0) {
+        List<SenderPool> allOrders = senderService.findOrderBySenderTown(matchedOrderDto.getCarrierTown());
+        System.out.println("allOrders::: "+ allOrders);
+        List<SenderPool> matchedOrders = new ArrayList<>();
+        if (allOrders.size() != 0) {
+            for (SenderPool order : allOrders) {
+                var senderLocation = order.getSenderTown();
+                if (senderLocation.equals(matchedOrderDto.getCarrierTown())) matchedOrders.add(order);
+            }
             var response = matchedOrders.stream().map(order -> {
                 try {
                     return orderUtils.convertFromOrderToOrderListDto(order, matchedOrderDto.getCurrentLocation());
@@ -67,20 +79,21 @@ public class SpedireAcceptedOrder implements AcceptedOrder{
                     throw new RuntimeException(e);
                 }
             }).toList();
+            javaMailService.sendMail(email, "Match Found", "");
             return MatchedOrderResponse.builder().status(true).message("We found some order going your way").matchedOrders(response).build();
-        } else {
-            CarrierPool carrierPool = new CarrierPool();
-            carrierPool.setName(user.getFullName());
-            carrierPool.setPhoneNumber(user.getPhoneNumber());
-            carrierPool.setDeliveryCount(user.getDeliveryCount());
-            carrierPool.setRating("4");
-            carrierPool.setDestination(matchedOrderDto.getDestination());
-            carrierPool.setCurrentLocation(matchedOrderDto.getCurrentLocation());
-            carrierPool.setCarrierTown(matchedOrderDto.getCarrierTown());
-            carrierPoolRepository.save(carrierPool);
-            return MatchedOrderResponse.builder().status(true).message("Please hold! We are matching your request").build();
         }
-
+        CarrierPool carrierPool = new CarrierPool();
+        carrierPool.setName(user.getFullName());
+        carrierPool.setPhoneNumber(user.getPhoneNumber());
+        carrierPool.setDeliveryCount(user.getDeliveryCount());
+        carrierPool.setRating(user.getReviewId() != null ? String.valueOf(reviewInterface.getRating(user.getReviewId())) : "No Rating");
+        carrierPool.setEmail(user.getEmail());
+        carrierPool.setDestination(matchedOrderDto.getDestination());
+        carrierPool.setCurrentLocation(matchedOrderDto.getCurrentLocation());
+        carrierPool.setCarrierTown(matchedOrderDto.getCarrierTown());
+        carrierPoolRepository.save(carrierPool);
+        javaMailService.sendMail(email, "No Match Found", "");
+        return MatchedOrderResponse.builder().status(true).message("Please hold! We are matching your request").build();
     }
 
     @Override

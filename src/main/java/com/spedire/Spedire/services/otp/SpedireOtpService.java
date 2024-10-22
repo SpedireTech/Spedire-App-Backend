@@ -26,6 +26,7 @@ import java.util.Objects;
 import java.util.Random;
 
 import static com.spedire.Spedire.security.SecurityUtils.JWT_SECRET;
+import static com.spedire.Spedire.services.email.MailTemplates.getWelcomeMailTemplate;
 
 
 @Service
@@ -84,12 +85,10 @@ public class SpedireOtpService implements OtpService{
         for (Otp code: otpList) {
             if (Objects.equals(code.getCode(), otp)) {
                 userService.saveUser(token);
+                getWelcomeMailTemplate(email);
                 return true;
             }
-//            if (Objects.equals(code.getCode(), otp) && code.getPhoneNumber().equals(email)) {
-//                userService.saveUser(token);
-//                return true;
-//            }
+
         }
         return false;
     }

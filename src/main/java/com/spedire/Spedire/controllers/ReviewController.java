@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.spedire.Spedire.dtos.requests.ReviewRequest;
 import org.springframework.web.bind.annotation.*;
 
-import static com.spedire.Spedire.controllers.Utils.SUCCESSFUL;
-
 
 @AllArgsConstructor
 @RequestMapping("/api/v1/review")
@@ -27,7 +25,7 @@ public class ReviewController {
     @PostMapping("")
     public ResponseEntity<ApiResponse<?>> rateUser(@RequestBody ReviewRequest request) {
         try {
-            ReviewResponse reviewResponse = reviewService.rateUser(request);
+            ReviewResponse reviewResponse = reviewService.addReview(request);
             return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().message("User rated successfully").data(reviewResponse).success(true).build());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().message("Error rating user: " + e.getMessage()).success(false).build());

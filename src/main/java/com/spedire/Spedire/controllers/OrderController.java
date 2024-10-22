@@ -8,6 +8,8 @@ import com.spedire.Spedire.dtos.responses.CreateOrderResponse;
 import com.spedire.Spedire.services.carrier.CarrierService;
 import com.spedire.Spedire.services.order.AcceptedORder.AcceptedOrder;
 import com.spedire.Spedire.services.order.OrderService;
+import com.spedire.Spedire.services.sender.SenderService;
+import jakarta.mail.MessagingException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpStatus;
@@ -30,13 +32,15 @@ public class OrderController {
 
     private final CarrierService carrierService;
 
+    private final SenderService senderService;
+
     @PostMapping("/createOrder")
     public CreateOrderResponse<?>  createOrder(@RequestBody CreateOrderRequest order) throws Exception {
-        return orderService.createOrder(order, carrierService);
+        return orderService.createOrder(order, carrierService, senderService);
     }
 
     @PostMapping("/matchOrder")
-    public ResponseEntity<?> matchOrder(@RequestBody MatchedOrderDto order) {
+    public ResponseEntity<?> matchOrder(@RequestBody MatchedOrderDto order) throws MessagingException {
         var response = acceptedOrder.matchOrder(order);
         return ResponseEntity.status(HttpStatus.SC_OK).body(response);
     }
@@ -48,7 +52,6 @@ public class OrderController {
     }
 
     @GetMapping("/acceptedOrders")
-
     public ResponseEntity<?> acceptedOrders() {
         var response = acceptedOrder.senderAcceptedOrders();
         return ResponseEntity.status(HttpStatus.SC_OK).body(ApiResponse.builder().message("Here are list of your accepted orders").data(response).build());

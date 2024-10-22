@@ -40,5 +40,19 @@ public class MailTemplates {
     }
 
 
+    @SneakyThrows
+    public static String getSelectCourierMailTemplate(String link)  {
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(SELECT_COURIER_MAIL_TEMPLATE_LOCATION))) {
+            String template = bufferedReader.lines().collect(Collectors.joining());
+
+            template = template.replace("{link}", "<a href='" + link + "'>Please Login Here</a>");
+
+            return template;
+        } catch (IOException exception) {
+            throw new SpedireException("Failed to send mail");
+        }
+    }
+
+
 
 }

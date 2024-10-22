@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 
 @Setter
 @Getter
-@Document
+@Document(collection = "order_payment")
 @Builder
 @RequiredArgsConstructor
 @AllArgsConstructor

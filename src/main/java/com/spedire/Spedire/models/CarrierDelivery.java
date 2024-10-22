@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Setter
 @Getter
-@Document
+@Document(collection = "carrier_delivery")
 @Builder
 @RequiredArgsConstructor
 @AllArgsConstructor

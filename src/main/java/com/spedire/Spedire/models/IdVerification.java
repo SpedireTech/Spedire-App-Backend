@@ -7,7 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Setter
 @Getter
-@Document
+@Document(collection = "id_verification")
 @Builder
 @RequiredArgsConstructor
 @AllArgsConstructor

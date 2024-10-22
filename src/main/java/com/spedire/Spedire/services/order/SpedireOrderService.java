@@ -5,26 +5,22 @@ import com.spedire.Spedire.dtos.requests.CreateOrderRequest;
 import com.spedire.Spedire.dtos.responses.CreateOrderResponse;
 import com.spedire.Spedire.enums.OrderType;
 import com.spedire.Spedire.exceptions.*;
-import com.spedire.Spedire.models.CarrierPool;
 import com.spedire.Spedire.models.Order;
 import com.spedire.Spedire.models.OrderPayment;
 import com.spedire.Spedire.models.User;
-import com.spedire.Spedire.repositories.CarrierPoolRepository;
 import com.spedire.Spedire.repositories.OrderRepository;
 import com.spedire.Spedire.services.carrier.CarrierService;
-import com.spedire.Spedire.services.location.google.LocationService;
-import com.spedire.Spedire.services.location.mapBox.MapBoxService;
+import com.spedire.Spedire.services.email.JavaMailService;
 import com.spedire.Spedire.services.savedAddress.Address;
+import com.spedire.Spedire.services.sender.SenderService;
 import com.spedire.Spedire.services.user.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.json.JSONObject;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.math.BigDecimal;
-import java.net.URISyntaxException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -46,13 +42,15 @@ public class SpedireOrderService implements OrderService {
     private final OrderRepository orderRepository;
     private final Address savedAddress;
     private final HttpServletRequest request;
+    private final JavaMailService javaMailService;
     private final UserService userService;
     private final OrderUtils utils;
     private static final String PHONE_NUMBER_REGEX = "^(080|091|070|081|090)\\d{8}$";
     private static final Pattern pattern = Pattern.compile(PHONE_NUMBER_REGEX);
 
     @Override
-    public CreateOrderResponse<?>  createOrder(CreateOrderRequest createOrderRequest, CarrierService carrierService) throws Exception {
+    @Transactional
+    public CreateOrderResponse<?>  createOrder(CreateOrderRequest createOrderRequest, CarrierService carrierService, SenderService senderService) throws Exception {
         String authorizationHeader = request.getHeader(AUTHORIZATION);
         DecodedJWT decodedJWT = utils.extractTokenDetails(authorizationHeader);
         String email = decodedJWT.getClaim(EMAIL).asString();
@@ -60,11 +58,21 @@ public class SpedireOrderService implements OrderService {
         validateRequest(createOrderRequest);
         Order order = buildOrder(createOrderRequest, user);
         Order savedOrder = orderRepository.save(order);
+        javaMailService.sendMail(user.getEmail(), "Send a Package", "Hey there! Your order request is received and awaiting match");
         log.info("New Order received with id: {}", savedOrder.getId());
         saveAddress(createOrderRequest);
-        List<Object> matchResult = carrierService.matchOrderRequest(createOrderRequest.getSenderLocation(), createOrderRequest.getSenderTown());
-        if (matchResult.size() != 0) return CreateOrderResponse.builder().status(true).message("We found you some pretty nice match").data(matchResult).build();
-        return CreateOrderResponse.builder().status(true).message("Order has been successfully created").build();
+        List<Object> matchResult = carrierService.matchOrderRequest(createOrderRequest.getSenderLocation(), createOrderRequest.getSenderTown(), savedOrder.getId());
+        Map<String, Object> orderInfo = new LinkedHashMap<>();
+        orderInfo.put("referenceId", savedOrder.getId()); orderInfo.put("orderName", savedOrder.getItemName());
+        if (matchResult.size() != 0) {
+            Map<String, Object> map = new LinkedHashMap<>();
+            map.put("orderInfo", orderInfo);
+            map.put("couriers", matchResult);
+            senderService.saveSenderRequestInAPool(createOrderRequest, user.getFullName(), user.getId());
+            return CreateOrderResponse.builder().status(true).message("We found you some pretty nice match").data(map).build();
+        }
+        senderService.saveSenderRequestInAPool(createOrderRequest, user.getFullName(), user.getId());
+        return CreateOrderResponse.builder().status(true).message("Order has been successfully created").data(orderInfo).build();
     }
 
 

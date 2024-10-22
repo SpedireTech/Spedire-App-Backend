@@ -51,9 +51,9 @@ public class JwtUtil {
 
         return JWT.create()
                 .withIssuedAt(Instant.now())
-                .withExpiresAt(Instant.now().plusSeconds(86000L))
+                .withExpiresAt(Instant.now().plusSeconds(86400L * 3))
                 .withClaim("email", email)
-                .withArrayClaim("roles", roleNames.toArray(new String[0]))  // Store roles as an array
+                .withArrayClaim("roles", roleNames.toArray(new String[0]))
                 .sign(Algorithm.HMAC512(secret.getBytes()));
     }
 

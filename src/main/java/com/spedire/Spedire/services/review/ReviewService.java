@@ -43,7 +43,7 @@ public class ReviewService implements ReviewInterface {
     }
 
     @Override
-    public ReviewResponse rateUser(ReviewRequest request) {
+    public ReviewResponse addReview(ReviewRequest request) {
         User foundUser = userService.findByEmail(request.getEmail()).orElseThrow(() -> new SpedireException(INVALID_EMAIL_ADDRESS));
         Review review;
         if (foundUser.getReviewId() == null) review = createNewReview(request, foundUser);
@@ -52,6 +52,13 @@ public class ReviewService implements ReviewInterface {
         review.getRating().add(request.getRating());
         reviewRepository.save(review);
         return buildReviewResponse(review);
+    }
+
+    @Override
+    public int getRating(String id) {
+        Review review = reviewRepository.findById(id).get();
+        if (review.getRating().size() != 0) return calculateAverageRating(review.getRating());
+        return 0;
     }
 
 

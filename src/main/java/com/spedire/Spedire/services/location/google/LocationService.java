@@ -13,6 +13,8 @@ public interface LocationService {
 
     JSONObject getLocationCoordinates() throws URISyntaxException;
 
+    public JSONObject getCoordinatesWithAddress(String address) throws Exception;
+
     List<String> getNearbyPlaces() throws URISyntaxException;
 
 

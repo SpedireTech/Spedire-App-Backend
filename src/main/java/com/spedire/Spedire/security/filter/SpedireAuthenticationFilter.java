@@ -63,9 +63,7 @@ public class SpedireAuthenticationFilter extends UsernamePasswordAuthenticationF
         Optional<User> foundUser = userService.findByEmail(email);
         String accessToken = jwtUtil.generateAccessToken(email, foundUser.get().getRoles());
         Map<String, Object> responseData = new HashMap<>();
-//        ApiResponse<?> successResponse = ApiResponse.builder().success(true).message("Login successful").data(accessToken).build();
         responseData.put("access_token", accessToken);
-//        responseData.put("", successResponse);
         response.setContentType(APPLICATION_JSON_VALUE);
         response.getOutputStream().write(objectMapper.writeValueAsBytes(
                 responseData));

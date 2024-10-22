@@ -8,20 +8,17 @@ import com.spedire.Spedire.enums.Role;
 import com.spedire.Spedire.exceptions.SpedireException;
 import com.spedire.Spedire.models.*;
 import com.spedire.Spedire.repositories.CarrierPoolRepository;
+import com.spedire.Spedire.repositories.MatchedOrderRepository;
 import com.spedire.Spedire.repositories.UserRepository;
 import com.spedire.Spedire.services.location.mapBox.MapBoxService;
 import com.spedire.Spedire.services.payment.Payment;
 import com.spedire.Spedire.services.user.UserService;
-import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -39,16 +36,18 @@ public class SpedireCarrierService implements CarrierService {
     private final Payment paymentService;
     private final MapBoxService mapBoxService;
     private final CarrierPoolRepository carrierPoolRepository;
+    private final MatchedOrderRepository matchedCarrierRepository;
 
 
 
     public SpedireCarrierService(UserService userService, UserRepository userRepository, Payment paymentService,
-                                 MapBoxService mapBoxService, CarrierPoolRepository carrierPoolRepository) {
+                                 MapBoxService mapBoxService, CarrierPoolRepository carrierPoolRepository, MatchedOrderRepository matchedCarrierRepository) {
         this.userService = userService;
         this.userRepository = userRepository;
         this.paymentService = paymentService;
         this.mapBoxService = mapBoxService;
         this.carrierPoolRepository = carrierPoolRepository;
+        this.matchedCarrierRepository = matchedCarrierRepository;
     }
 
     @Override
@@ -69,7 +68,7 @@ public class SpedireCarrierService implements CarrierService {
        } else {
            return UpgradeResponse.builder().message("Upgrade already completed").build();
        }
-        return UpgradeResponse.builder().message("Upgrade Successful").build();
+        return UpgradeResponse.builder().message("Upgrade Submitted for Review").build();
     }
 
 
@@ -125,16 +124,19 @@ public class SpedireCarrierService implements CarrierService {
     }
 
     @Override
-    public List<Object> matchOrderRequest(String senderLocation, String senderTown) throws Exception {
+    public List<Object> matchOrderRequest(String senderLocation, String senderTown, String orderId) throws Exception {
         List<Object> objectList = new ArrayList<>();
         if (!carrierPoolRepository.findCarrierPoolByCarrierTown(senderTown).isEmpty()) {
             for (CarrierPool carriers: carrierPoolRepository.findCarrierPoolByCarrierTown(senderTown)) {
                 Map<String, String> map = new LinkedHashMap<>();
                 String minutesAway = mapBoxService.getMinutesAway(senderLocation, carriers.getCurrentLocation());
-                map.put("name", carriers.getName()); map.put("minutesAway", minutesAway); map.put("number", carriers.getPhoneNumber());
+                map.put("name", carriers.getName()); map.put("email", carriers.getEmail()); map.put("minutesAway", minutesAway);
+                map.put("town", carriers.getCarrierTown() + " Lagos"); map.put("number", carriers.getPhoneNumber());
                 map.put("rating", carriers.getRating()); map.put("deliveryCount", carriers.getDeliveryCount());
                 objectList.add(map);
             }
+            MatchedOrder matchedOrder = MatchedOrder.builder().orderId(orderId).matchedCarriers(objectList).build();
+            matchedCarrierRepository.save(matchedOrder);
         }
         return objectList;
     }

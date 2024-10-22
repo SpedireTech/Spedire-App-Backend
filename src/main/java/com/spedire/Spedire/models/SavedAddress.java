@@ -8,7 +8,7 @@ import java.util.List;
 
 @Setter
 @Getter
-@Document
+@Document(collection = "saved_address")
 @Builder
 @RequiredArgsConstructor
 @AllArgsConstructor

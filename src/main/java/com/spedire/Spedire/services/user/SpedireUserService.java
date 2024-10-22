@@ -152,7 +152,7 @@ public class SpedireUserService implements UserService{
 
 
     @Override
-    public ChangePasswordResponse resetPassword(ChangePasswordRequest passwordResetRequest)  {
+    public ChangePasswordResponse resetPassword(ChangePasswordRequest passwordResetRequest) throws MessagingException {
         String token = passwordResetRequest.getToken();
         String newPassword = passwordResetRequest.getNewPassword();
         validatePasswordMatch(passwordResetRequest);
@@ -163,6 +163,7 @@ public class SpedireUserService implements UserService{
                 new SpedireException(String.format(NOT_FOUND, email)));
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
+        javaMailService.sendMail(email, "Password Reset Successful", "Password Reset Successful");
         return ChangePasswordResponse.builder().status(true).message(YOUR_PASSWORD_HAS_BEEN_REST).build();
     }
 
@@ -180,7 +181,7 @@ public class SpedireUserService implements UserService{
                 .otpVerificationStatus(true).roles(new HashSet<>(Set.of(Role.SENDER))).createdAt(LocalDateTime.now()).build();
         User savedUser = userRepository.save(user);
         redisInterface.deleteUserCache(email);
-       // javaMailService.sendMail(savedUser.getEmail(), WELCOME_TO_SPEDIRE, getWelcomeMailTemplate(savedUser.getFullName()));
+        javaMailService.sendMail(savedUser.getEmail(), WELCOME_TO_SPEDIRE, getWelcomeMailTemplate(savedUser.getFullName()));
         redisInterface.deleteUserCache(email);
     }
 

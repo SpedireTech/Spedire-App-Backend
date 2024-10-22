@@ -219,7 +219,7 @@ public class UserServiceUtils {
         String token = JWT.create().withIssuedAt(Instant.now()).withExpiresAt(Instant.now().plusSeconds(86000L))
                 .withClaim("email", emailAddress)
                 .sign(Algorithm.HMAC512(secret.getBytes()));
-        return "http://localhost:3000/reset-password?token=" + token;
+        return "https://spedire.netlify.app/reset-password?token=" + token;
     }
 
 

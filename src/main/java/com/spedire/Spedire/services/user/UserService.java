@@ -21,7 +21,7 @@ public interface UserService {
 
     ForgotPasswordResponse forgotPassword(ForgotPasswordRequest forgotPasswordRequest) throws SpedireException;
 
-    ChangePasswordResponse resetPassword(ChangePasswordRequest passwordResetRequest) throws SpedireException;
+    ChangePasswordResponse resetPassword(ChangePasswordRequest passwordResetRequest) throws SpedireException, MessagingException;
 
     void saveUser(String token) throws MessagingException;
 
