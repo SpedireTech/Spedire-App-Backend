@@ -6,8 +6,6 @@ import com.spedire.Spedire.models.Order;
 import com.spedire.Spedire.services.carrier.CarrierService;
 import com.spedire.Spedire.services.sender.SenderService;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,4 +23,9 @@ public interface OrderService {
 
     void deleteOrder(Order order);
 
+    List<Order> pendingOrderHistory(String token);
+
+    List<Order> completedOrderHistory(String token);
+
+    List<Order> acceptedOrderHistory(String token);
 }

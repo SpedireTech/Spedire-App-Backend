@@ -56,5 +56,29 @@ public class OrderController {
         var response = acceptedOrder.senderAcceptedOrders();
         return ResponseEntity.status(HttpStatus.SC_OK).body(ApiResponse.builder().message("Here are list of your accepted orders").data(response).build());
     }
+    @GetMapping("/pendingOrderHistory")
+
+    public ResponseEntity<?> pendingOrderHistory(String token) {
+        var response = orderService.pendingOrderHistory(token);
+        return ResponseEntity.status(HttpStatus.SC_OK).body(ApiResponse.builder().message("Pending Order History").data(response).build());
+    }
+
+
+    @GetMapping("/acceptedOrderHistory")
+
+    public ResponseEntity<?> acceptedOrderHistory(String token) {
+        var response = orderService.acceptedOrderHistory(token);
+        return ResponseEntity.status(HttpStatus.SC_OK).body(ApiResponse.builder().message("Accepted Order History").data(response).build());
+    }
+
+    @GetMapping("/completedOrderHistory")
+
+    public ResponseEntity<?> completedOrderHistory(String token) {
+        var response = orderService.completedOrderHistory(token);
+        return ResponseEntity.status(HttpStatus.SC_OK).body(ApiResponse.builder().message("Accepted Order History").data(response).build());
+    }
+
+
+
 
 }

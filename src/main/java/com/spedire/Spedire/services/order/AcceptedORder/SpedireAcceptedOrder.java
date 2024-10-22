@@ -54,16 +54,14 @@ public class SpedireAcceptedOrder implements AcceptedOrder{
     private final OrderUtils orderUtils;
 
 
-
-
-
-
     @Override
     public MatchedOrderResponse matchOrder(MatchedOrderDto matchedOrderDto) throws MessagingException {
         String authorizationHeader = request.getHeader(AUTHORIZATION);
         DecodedJWT decodedJWT = utils.extractTokenDetails(authorizationHeader);
         String email = decodedJWT.getClaim(EMAIL).asString();
         User user = userService.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+
+
         List<SenderPool> allOrders = senderService.findOrderBySenderTown(matchedOrderDto.getCarrierTown());
         System.out.println("allOrders::: "+ allOrders);
         List<SenderPool> matchedOrders = new ArrayList<>();
@@ -72,6 +70,8 @@ public class SpedireAcceptedOrder implements AcceptedOrder{
                 var senderLocation = order.getSenderTown();
                 if (senderLocation.equals(matchedOrderDto.getCarrierTown())) matchedOrders.add(order);
             }
+
+        if (!matchedOrders.isEmpty()) {
             var response = matchedOrders.stream().map(order -> {
                 try {
                     return orderUtils.convertFromOrderToOrderListDto(order, matchedOrderDto.getCurrentLocation());
@@ -94,6 +94,8 @@ public class SpedireAcceptedOrder implements AcceptedOrder{
         carrierPoolRepository.save(carrierPool);
         javaMailService.sendMail(email, "No Match Found", "");
         return MatchedOrderResponse.builder().status(true).message("Please hold! We are matching your request").build();
+    }
+        return null;
     }
 
     @Override

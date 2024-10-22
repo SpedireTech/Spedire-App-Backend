@@ -27,9 +27,9 @@ public class OtpController {
 
     @GetMapping("getOtp")
     public ResponseEntity<ApiResponse<?>> getOtp(@RequestBody SavePhoneNumberRequest request)  {
-        OtpResponse response;
+        String response;
         try {
-            response = otpService.generateOtp(request.getPhoneNumber());
+            response = otpService.generateOtpWithTermii(request.getPhoneNumber());
             return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().message(OTP_AVAILABLE).data(response).success(true).build());
         } catch (SpedireException exception) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().message(exception.getMessage()).success(false).build());
@@ -45,10 +45,10 @@ public class OtpController {
 
         boolean response;
         try {
-            response = otpService.verifyOtp(request.getVerificationCode(), token, userService);
+            response = otpService.verifyOtpWithTermii(request.getVerificationCode(), request.getPin_id());
             if (response) {return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().message(REGISTRATION_COMPLETED).success(response).build());
             } else {return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().message(INVALID_OTP_OR_PHONE_NUMBER).success(response).build());}
-           } catch (SpedireException | MessagingException exception) {return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().message(exception.getMessage()).success(false).build());
+           } catch (SpedireException exception) {return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().message(exception.getMessage()).success(false).build());
         }
     }
 

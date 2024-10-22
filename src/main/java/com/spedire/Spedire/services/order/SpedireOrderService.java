@@ -9,6 +9,8 @@ import com.spedire.Spedire.models.Order;
 import com.spedire.Spedire.models.OrderPayment;
 import com.spedire.Spedire.models.User;
 import com.spedire.Spedire.repositories.OrderRepository;
+import com.spedire.Spedire.repositories.*;
+import com.spedire.Spedire.security.JwtUtil;
 import com.spedire.Spedire.services.carrier.CarrierService;
 import com.spedire.Spedire.services.email.JavaMailService;
 import com.spedire.Spedire.services.savedAddress.Address;
@@ -30,8 +32,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static com.spedire.Spedire.services.user.UserServiceUtils.EMAIL;
+import static com.spedire.Spedire.services.user.UserServiceUtils.INVALID_EMAIL_ADDRESS;
 import static org.apache.http.HttpHeaders.AUTHORIZATION;
 
 @AllArgsConstructor
@@ -39,11 +43,15 @@ import static org.apache.http.HttpHeaders.AUTHORIZATION;
 @Slf4j
 public class SpedireOrderService implements OrderService {
 
+    private final UserRepository userRepository;
     private final OrderRepository orderRepository;
+    private final AcceptedOrderRepository acceptedOrderRepository;
+    private final CompletedOrderRepository completedOrderRepository;
     private final Address savedAddress;
     private final HttpServletRequest request;
     private final JavaMailService javaMailService;
     private final UserService userService;
+    private final JwtUtil jwtUtil;
     private final OrderUtils utils;
     private static final String PHONE_NUMBER_REGEX = "^(080|091|070|081|090)\\d{8}$";
     private static final Pattern pattern = Pattern.compile(PHONE_NUMBER_REGEX);
@@ -122,6 +130,44 @@ public class SpedireOrderService implements OrderService {
     @Override
     public void deleteOrder(Order order) {
         orderRepository.delete(order);
+    }
+
+    @Override
+    public List<Order> pendingOrderHistory(String token) {
+        String splitToken = token.split(" ")[1];
+        DecodedJWT decodedJWT = jwtUtil.verifyToken(splitToken);
+        String email = decodedJWT.getClaim(EMAIL).asString();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new SpedireException(INVALID_EMAIL_ADDRESS));
+        String userId = user.getId();
+
+        return orderRepository.findAll().stream().filter(order -> order.getCarriedId().equals(userId) || order.getSenderId().equals(userId)).toList();
+    }
+
+    @Override
+    public List<Order> completedOrderHistory(String token) {
+
+        String splitToken = token.split(" ")[1];
+        DecodedJWT decodedJWT = jwtUtil.verifyToken(splitToken);
+        String email = decodedJWT.getClaim(EMAIL).asString();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new SpedireException(INVALID_EMAIL_ADDRESS));
+        String userId = user.getId();
+        return completedOrderRepository.findAll().stream().filter(order -> order.getCarriedId().equals(userId) || order.getSenderId().equals(userId)).toList();
+
+    }
+
+    @Override
+    public List<Order> acceptedOrderHistory(String token) {
+        String splitToken = token.split(" ")[1];
+        DecodedJWT decodedJWT = jwtUtil.verifyToken(splitToken);
+        String email = decodedJWT.getClaim(EMAIL).asString();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new SpedireException(INVALID_EMAIL_ADDRESS));
+        String userId = user.getId();
+
+        return acceptedOrderRepository.findAll().stream().filter(order -> order.getCarriedId().equals(userId) || order.getSenderId().equals(userId)).toList();
+
     }
 
     private void saveAddress(CreateOrderRequest createOrderRequest) {
