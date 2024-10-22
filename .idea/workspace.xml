@@ -5,13 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="14a91c5d-574e-49dd-a81f-f21cf400d22a" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/repositories/CompletedOrderRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/controllers/OrderController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/controllers/OrderController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/repositories/OrderRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/repositories/OrderRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/order/OrderService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/order/OrderService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/order/SpedireOrderService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/order/SpedireOrderService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/user/SpedireUserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/spedire/Spedire/services/user/SpedireUserService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
