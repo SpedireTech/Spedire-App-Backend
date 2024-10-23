@@ -51,7 +51,7 @@ public class SpedireCarrierService implements CarrierService {
     }
 
     @Override
-    public UpgradeResponse upgradeToCarrier(UpgradeRequest request) {
+    public UpgradeResponse submitUpgradeRequest(UpgradeRequest request) {
         String carrierEmail = SecurityContextHolder.getContext().getAuthentication().getName();
         validateUserExist(carrierEmail, userRepository);
         validateNotNull(request);

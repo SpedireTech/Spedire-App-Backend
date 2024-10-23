@@ -7,6 +7,6 @@ import lombok.Getter;
 @AllArgsConstructor
 public class VerifyPhoneNumberRequest {
 
-    private boolean route;
-    private String phoneNumber;
+    private String pinId;
+    private String pin;
 }

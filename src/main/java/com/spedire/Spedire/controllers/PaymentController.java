@@ -2,13 +2,9 @@ package com.spedire.Spedire.controllers;
 
 
 import com.spedire.Spedire.dtos.requests.PaymentRequest;
-import com.spedire.Spedire.dtos.requests.RegistrationRequest;
 import com.spedire.Spedire.dtos.responses.ApiResponse;
 import com.spedire.Spedire.dtos.responses.PaymentVerificationResponse;
-import com.spedire.Spedire.dtos.responses.RegistrationResponse;
-import com.spedire.Spedire.exceptions.SpedireException;
 import com.spedire.Spedire.services.payment.Payment;
-import com.spedire.Spedire.services.payment.PaymentStatusHandler;
 import com.spedire.Spedire.services.websocket.WebSocketService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;

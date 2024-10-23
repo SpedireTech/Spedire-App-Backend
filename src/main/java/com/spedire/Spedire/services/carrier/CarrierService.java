@@ -4,13 +4,11 @@ import com.spedire.Spedire.dtos.requests.ServiceChargeRequest;
 import com.spedire.Spedire.dtos.requests.UpgradeRequest;
 import com.spedire.Spedire.dtos.responses.*;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.List;
 
 public interface CarrierService {
 
-    UpgradeResponse upgradeToCarrier(UpgradeRequest request);
+    UpgradeResponse submitUpgradeRequest(UpgradeRequest request);
     DowngradeCarrierResponse downgradeCarrierToSender();
 
     CheckCarrierUpgradeResponse checkCarrierUpgradeStatus();

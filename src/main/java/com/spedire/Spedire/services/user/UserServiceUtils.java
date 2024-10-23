@@ -5,13 +5,16 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.spedire.Spedire.dtos.requests.ChangePasswordRequest;
 import com.spedire.Spedire.dtos.requests.CompleteRegistrationRequest;
+import com.spedire.Spedire.dtos.requests.RegistrationRequest;
 import com.spedire.Spedire.dtos.responses.UserDashboardResponse;
 import com.spedire.Spedire.dtos.responses.VerifyPhoneNumberResponse;
 import com.spedire.Spedire.exceptions.SpedireException;
 import com.spedire.Spedire.models.User;
 import com.spedire.Spedire.repositories.UserRepository;
 import com.spedire.Spedire.security.JwtUtil;
+import com.spedire.Spedire.services.cache.RedisInterface;
 import com.spedire.Spedire.services.email.JavaMailService;
+import jakarta.mail.MessagingException;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -41,6 +44,8 @@ public class UserServiceUtils {
     private UserRepository userRepository;
 
     private JavaMailService javaMailService;
+    private final RedisInterface redisInterface;
+
 
     private static final String EMAIL_REGEX_PATTERN =
             "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
@@ -71,6 +76,24 @@ public class UserServiceUtils {
         if (!matcher.matches()){
             throw new SpedireException("Invalid phone number");
         }
+    }
+
+
+    void cacheUserData(RegistrationRequest registrationRequest, String encodedPassword) {
+        User user = new User();
+        user.setEmail(registrationRequest.getEmail());
+        user.setFullName(registrationRequest.getFullName());
+        user.setPassword(encodedPassword);
+        user.setPhoneNumber(registrationRequest.getPhoneNumber());
+        redisInterface.cacheUserData(user);
+    }
+
+    public void validateRequest(RegistrationRequest registrationRequest) {
+        verifyPhoneNumberIsValid(registrationRequest.getPhoneNumber());
+        validateEmailAddress(registrationRequest.getEmail());
+        validateEmailDoesntExist(registrationRequest.getEmail(), userRepository);
+        validatePhoneNumberDoesntExist(registrationRequest.getPhoneNumber(), userRepository);
+        validatePassword(registrationRequest.getPassword());
     }
 
 
@@ -138,26 +161,11 @@ public class UserServiceUtils {
 
     }
 
-    public VerifyPhoneNumberResponse getVerifyPhoneNumberResponse(String token, String otp) {
-        return VerifyPhoneNumberResponse.builder().otp(otp).token(token).build();
-//        if (message.equals("OTP Sent")) {
-//            User storedUser = userRepository.save(filledUser);
-//            String token = fetchToken(storedUser.getPhoneNumber());
-//            return VerifyPhoneNumberResponse.builder().message(message).token(token).build();
-//        } else {
-//            return VerifyPhoneNumberResponse.builder().message(message).build();
-//        }
-    }
 
-    public User buildRegistrationRequest(CompleteRegistrationRequest registrationRequest)  {
-        User user = new User();
+    public User buildRegistrationRequest(User user) throws MessagingException {
         user.getRoles().add(SENDER);
-//        user.setFirstName(registrationRequest.getFirstName());
-//        user.setLastName(registrationRequest.getLastName());
-        user.setEmail(registrationRequest.getEmail());
-        user.setPassword(passwordEncoder.encode(registrationRequest.getPassword()));
-        user.setProfileImage(registrationRequest.getImage());
         user.setCreatedAt(LocalDateTime.now());
+        javaMailService.sendMail(user.getEmail(), "", "");
         return user;
     }
 

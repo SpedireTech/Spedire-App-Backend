@@ -34,7 +34,6 @@ public class RedisService implements RedisInterface{
             userData.put("phoneNumber", user.getPhoneNumber());
         }
 
-        System.out.println("User data in redis == " + userData);
         if (!userData.isEmpty()) {
             redisTemplate.opsForHash().putAll(emailKey, userData);
         }

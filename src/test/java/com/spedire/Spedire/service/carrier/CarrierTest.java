@@ -17,7 +17,7 @@ public class CarrierTest {
         UpgradeRequest request = UpgradeRequest.builder().nin("88887657799").accountNumber("1462416987")
                 .accountName("Olawale Cooker").bankName("GTB").picture("My pics").bvn("5643")
                 .idVerification("Voters Card").build();
-        var res = carrierService.upgradeToCarrier(request);
+        var res = carrierService.submitUpgradeRequest(request);
         System.out.println("Reslt -- " + res.toString());
     }
 

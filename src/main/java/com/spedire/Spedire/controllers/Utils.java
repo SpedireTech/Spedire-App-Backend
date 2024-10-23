@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-import java.awt.print.Pageable;
 
 public class Utils {
 
@@ -22,7 +21,7 @@ public class Utils {
     public static final String INVALID_OTP_OR_PHONE_NUMBER = "Invalid Otp or Phone number";
     public static final String VERIFICATION_SUCCESSFUL = "Verification Successful";
     public static final String VERIFICATION_FAILED = "Verification Failed";
-    public static final String SUCCESSFUL = "Successful";
+    public static final String OTP_SENT_SUCCESSFULLY = "OTP sent successfully";
     public static final String PROCEED_TO_ENTER_GENERATED_OTP = "Proceed to enter generated OTP";
     public static final String USER_DASHBOARD_INFO = "Dashboard Information";
     public static final String INCOMPLETE_REGISTRATION = "Incomplete registration, Verify your phone number to continue";

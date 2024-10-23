@@ -2,6 +2,7 @@ package com.spedire.Spedire.configurations;
 
 import com.spedire.Spedire.repositories.UserRepository;
 import com.spedire.Spedire.security.JwtUtil;
+import com.spedire.Spedire.services.cache.RedisInterface;
 import com.spedire.Spedire.services.email.JavaMailService;
 import com.spedire.Spedire.services.user.UserServiceUtils;
 import org.modelmapper.ModelMapper;
@@ -37,8 +38,8 @@ public class BeanConfig {
 
     @Bean
     public UserServiceUtils userServiceUtils(PasswordEncoder passwordEncoder, JwtUtil jwtUtil,
-                                             UserRepository userRepository, JavaMailService javaMailService) {
-        return new UserServiceUtils(secret, jwtUtil, passwordEncoder, userRepository, javaMailService);
+                                             UserRepository userRepository, JavaMailService javaMailService, RedisInterface redisInterface) {
+        return new UserServiceUtils(secret, jwtUtil, passwordEncoder, userRepository, javaMailService, redisInterface);
     }
 }
 

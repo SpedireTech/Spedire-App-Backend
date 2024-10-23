@@ -8,9 +8,9 @@ import lombok.*;
 @Builder
 @RequiredArgsConstructor
 @AllArgsConstructor
-public class VerifyPhoneNumberResponse {
+public class VerifyPhoneNumberResponse<T> {
 
-    private String otp;
-    private String token;
+    private String message;
+    private T data;
 
 }

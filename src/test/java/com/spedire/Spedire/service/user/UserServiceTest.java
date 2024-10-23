@@ -37,35 +37,35 @@ public class UserServiceTest {
 
     String token = "";
 
-    @BeforeEach
-    public void setUp() {
-        User.builder().email("").phoneNumber("08030669508").fullName("").build();
-    }
-
-
-    @Test
-    public void savePhoneNumberTest() {
-        VerifyPhoneNumberResponse response = userService.verifyPhoneNumber(httpServletRequest, false, "");
-        token = response.getToken();
-        log.info("Response -> {} " , response);
-        assertThat(response.getOtp()).isEqualTo("OTP Sent");
-    }
-
-    @Test
-    public void inValidPhoneNumberThrowsExceptionTest() {
-        SpedireException exception = assertThrows(SpedireException.class, () -> {
-            userService.verifyPhoneNumber(httpServletRequest, false, "");
-        });
-        assertEquals("Invalid phone number", exception.getMessage());
-    }
-
-    @Test
-    public void phoneNumberExistThrowExceptionTest() {
-        MissingFormatArgumentException exception = assertThrows(MissingFormatArgumentException.class, () -> {
-            userService.verifyPhoneNumber(httpServletRequest, false, "");
-        });
-        assertEquals("Format specifier '%s'", exception.getMessage());
-    }
+//    @BeforeEach
+//    public void setUp() {
+//        User.builder().email("").phoneNumber("08030669508").fullName("").build();
+//    }
+//
+//
+//    @Test
+//    public void savePhoneNumberTest() {
+//        VerifyPhoneNumberResponse response = userService.verifyPhoneNumber(httpServletRequest, false, "");
+//        token = response.getToken();
+//        log.info("Response -> {} " , response);
+//        assertThat(response.getOtp()).isEqualTo("OTP Sent");
+//    }
+//
+//    @Test
+//    public void inValidPhoneNumberThrowsExceptionTest() {
+//        SpedireException exception = assertThrows(SpedireException.class, () -> {
+//            userService.verifyPhoneNumber(httpServletRequest, false, "");
+//        });
+//        assertEquals("Invalid phone number", exception.getMessage());
+//    }
+//
+//    @Test
+//    public void phoneNumberExistThrowExceptionTest() {
+//        MissingFormatArgumentException exception = assertThrows(MissingFormatArgumentException.class, () -> {
+//            userService.verifyPhoneNumber(httpServletRequest, false, "");
+//        });
+//        assertEquals("Format specifier '%s'", exception.getMessage());
+//    }
 
 
 

@@ -31,10 +31,10 @@ public class UserController {
         RegistrationResponse response;
         try {
             response = userService.createUser(registrationRequest);
-            if ( response.getOtp() == null) {
+            if (response.getPinId() == null | response.getToken() == null) {
                 return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(ApiResponse.builder().message(INCOMPLETE_REGISTRATION).data(response).success(false).build());
             } else {
-                return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().message(SUCCESSFUL).data(response).success(true).build());
+                return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().message(OTP_SENT_SUCCESSFULLY).data(response).success(true).build());
             }
         } catch (SpedireException | RedisConnectionFailureException exception) {
             if (exception.getMessage().equals("Unable to connect to Redis")) {
@@ -46,11 +46,15 @@ public class UserController {
 
     @PostMapping("verifyPhoneNumber")
     public ResponseEntity<ApiResponse<?>> verifyPhoneNumber(HttpServletRequest httpServletRequest, @RequestBody VerifyPhoneNumberRequest request)  {
-        VerifyPhoneNumberResponse response;
+        VerifyPhoneNumberResponse<?> response;
         try {
-            response = userService.verifyPhoneNumber(httpServletRequest, request.isRoute(), request.getPhoneNumber());
-            return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().message(PROCEED_TO_ENTER_GENERATED_OTP).data(response).success(true).build());
-           } catch (SpedireException | RedisConnectionFailureException exception) {
+            response = userService.verifyPhoneNumber(httpServletRequest, request);
+            if (response.getMessage().equals("Registration Successful")) {
+                return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().message(response.getMessage()).data(response.getData()).success(true).build());
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.builder().message(response.getMessage()).success(false).build());
+            }
+           } catch (SpedireException | RedisConnectionFailureException | MessagingException exception) {
             if (exception.getMessage().equals("Unable to connect to Redis")) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ApiResponse.builder().message(exception.getMessage()).success(false).build());
             }
@@ -95,9 +99,9 @@ public class UserController {
 
 
 
-
-    @PostMapping("/api/v1/user/forgotPassword")
+    @PostMapping("forgotPassword")
     public ResponseEntity<?> forgotPassword (@RequestBody ForgotPasswordRequest request)  {
+
         ForgotPasswordResponse response;
         try {
             response = userService.forgotPassword(request);

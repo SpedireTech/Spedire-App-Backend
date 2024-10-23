@@ -10,5 +10,5 @@ import lombok.*;
 public class RegistrationResponse {
 
     private String token;
-    private String otp;
+    private String pinId;
 }

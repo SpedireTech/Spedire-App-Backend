@@ -5,6 +5,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.spedire.Spedire.dtos.requests.ChangePasswordRequest;
 import com.spedire.Spedire.dtos.requests.ForgotPasswordRequest;
 import com.spedire.Spedire.dtos.requests.RegistrationRequest;
+import com.spedire.Spedire.dtos.requests.VerifyPhoneNumberRequest;
 import com.spedire.Spedire.dtos.responses.*;
 import com.spedire.Spedire.enums.Role;
 import com.spedire.Spedire.exceptions.SpedireException;
@@ -24,11 +25,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
+import static com.spedire.Spedire.enums.Role.SENDER;
 import static com.spedire.Spedire.security.SecurityUtils.JWT_SECRET;
 import static com.spedire.Spedire.services.email.MailTemplates.*;
 import static com.spedire.Spedire.services.user.UserServiceUtils.*;
@@ -51,11 +50,9 @@ public class SpedireUserService implements UserService{
         this.redisInterface = redisInterface;
     }
 
-    @Value(JWT_SECRET)
-    private String secret;
     private final UserRepository userRepository;
     private final OtpService otpService;
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final JavaMailService javaMailService;
     private final UserServiceUtils utils;
@@ -64,59 +61,46 @@ public class SpedireUserService implements UserService{
 
     @Override
     public RegistrationResponse createUser(RegistrationRequest registrationRequest) {
-        validateRequest(registrationRequest);
-        boolean exists = redisInterface.isUserExist(registrationRequest.getEmail());
-        User cachedUser = redisInterface.getUserData(registrationRequest.getEmail());
-        String token = utils.generateToken(registrationRequest.getEmail());
+        utils.validateRequest(registrationRequest);
+        String email = registrationRequest.getEmail();
+        String phoneNumber = registrationRequest.getPhoneNumber();
         String encodedPassword = passwordEncoder.encode(registrationRequest.getPassword());
-        if (!exists && cachedUser == null) {
-            cacheUserData(registrationRequest, encodedPassword);
-            cachedUser = redisInterface.getUserData(registrationRequest.getEmail());
+
+        if (redisInterface.getUserData(email) == null) {
+            utils.cacheUserData(registrationRequest, encodedPassword);
         }
-        assert cachedUser != null;
-        VerifyPhoneNumberResponse response = verifyPhoneNumber(null, false, cachedUser.getPhoneNumber());
-        return RegistrationResponse.builder().token(token).otp(response.getOtp()).build();
-    }
 
-
-    private void cacheUserData(RegistrationRequest registrationRequest, String encodedPassword) {
-        User user = new User();
-        user.setEmail(registrationRequest.getEmail());
-        user.setFullName(registrationRequest.getFullName());
-        user.setPassword(encodedPassword);
-        user.setPhoneNumber(registrationRequest.getPhoneNumber());
-        redisInterface.cacheUserData(user);
-    }
-
-    private void validateRequest(RegistrationRequest registrationRequest) {
-        verifyPhoneNumberIsValid(registrationRequest.getPhoneNumber());
-        validateEmailAddress(registrationRequest.getEmail());
-        validateEmailDoesntExist(registrationRequest.getEmail(), userRepository);
-        validatePhoneNumberDoesntExist(registrationRequest.getPhoneNumber(), userRepository);
-        validatePassword(registrationRequest.getPassword());
+        String token = utils.generateToken(email);
+        String pinId = otpService.generateOtpWithTermii(phoneNumber);
+        return RegistrationResponse.builder().token(token).pinId(pinId).build();
     }
 
 
     @Override
     @Transactional
-    public VerifyPhoneNumberResponse verifyPhoneNumber(HttpServletRequest request, boolean route, String phoneNumber) throws RedisConnectionFailureException {
-        verifyPhoneNumberIsValid(phoneNumber);
-        validatePhoneNumberDoesntExist(phoneNumber, userRepository);
-        if (route) {
-            String authorizationHeader = request.getHeader(AUTHORIZATION);
-            DecodedJWT decodedJWT = utils.extractTokenDetails(authorizationHeader);
-            String email = decodedJWT.getClaim(EMAIL).asString();
-            User user = redisInterface.getUserData(email);
-            user.setPhoneNumber(phoneNumber);
-            redisInterface.cacheUserData(user);
-            String token = utils.generateFreshTokenWhereOAuthIsTrue(email);
-            OtpResponse otp = otpService.generateOtp(phoneNumber);
-            return utils.getVerifyPhoneNumberResponse(token, otp.getOtpNumber());
-        } else {
-            OtpResponse otp = otpService.generateOtp(phoneNumber);
-            return utils.getVerifyPhoneNumberResponse("", otp.getOtpNumber());
+    public VerifyPhoneNumberResponse<?> verifyPhoneNumber(HttpServletRequest httpServletRequest, VerifyPhoneNumberRequest request) throws RedisConnectionFailureException, MessagingException {
+        String authorizationHeader = httpServletRequest.getHeader(AUTHORIZATION);
+        DecodedJWT decodedJWT = utils.extractTokenDetails(authorizationHeader);
+        String email = decodedJWT.getClaim(EMAIL).asString();
+        User user = redisInterface.getUserData(email);
+        boolean response = otpService.verifyOtpWithTermii(request.getPin(), request.getPinId());
+        if (response) {
+            Optional<User> foundUserOptional = userRepository.findByEmail(email);
+            if (foundUserOptional.isPresent()) {
+                User foundUser = foundUserOptional.get();
+                if (foundUser.isOtpVerificationStatus()) {
+                    return VerifyPhoneNumberResponse.builder().message("Phone number already verified").build();
+                }
+            }
+            User savedUser = saveUser(user);
+            Map<String, Object> data = new LinkedHashMap<>();
+            data.put("id", savedUser.getId()); data.put("name", savedUser.getFullName()); data.put("phone", savedUser.getPhoneNumber()); data.put("email", savedUser.getEmail());
+            return VerifyPhoneNumberResponse.builder().message("Registration Successful").data(data).build();
         }
+        return VerifyPhoneNumberResponse.builder().message("OTP Expired").build();
     }
+
+
 
     @Override
     public UserDashboardResponse fetchDashboardInfoForUser(String token) {
@@ -155,6 +139,7 @@ public class SpedireUserService implements UserService{
         String token = passwordResetRequest.getToken();
         String newPassword = passwordResetRequest.getNewPassword();
         validatePasswordMatch(passwordResetRequest);
+        validatePassword(passwordResetRequest.getNewPassword());
         DecodedJWT decodedJWT = jwtUtil.verifyToken(token);
         Claim claim = decodedJWT.getClaim(EMAIL);
         String email = claim.asString();
@@ -168,26 +153,14 @@ public class SpedireUserService implements UserService{
 
 
     @Override
-    public void saveUser(String token) throws MessagingException {
-        System.out.println("hello");
-        String splitToken = token.split(" ")[1];
-        DecodedJWT decodedJWT = jwtUtil.verifyToken(splitToken);
-        String email = decodedJWT.getClaim(EMAIL).asString();
-        User cachedUser = redisInterface.getUserData(email);
-        System.out.println(cachedUser.toString());
-        User user = User.builder().fullName(cachedUser.getFullName()).password(cachedUser.getPassword())
-                .phoneNumber(cachedUser.getPhoneNumber()).email(cachedUser.getEmail()).profileImage(cachedUser.getProfileImage())
+    public User saveUser(User user) throws MessagingException {
+        user = User.builder().fullName(user.getFullName()).password(user.getPassword())
+                .phoneNumber(user.getPhoneNumber()).email(user.getEmail()).profileImage(user.getProfileImage())
                 .otpVerificationStatus(true).roles(new HashSet<>(Set.of(Role.SENDER))).createdAt(LocalDateTime.now()).build();
         User savedUser = userRepository.save(user);
-        redisInterface.deleteUserCache(email);
         javaMailService.sendMail(savedUser.getEmail(), WELCOME_TO_SPEDIRE, getWelcomeMailTemplate(savedUser.getFullName()));
-        redisInterface.deleteUserCache(email);
-    }
-
-    @Override
-    public void save(User user) {
-        userRepository.save(user);
-
+        redisInterface.deleteUserCache(user.getEmail());
+        return savedUser;
     }
 
     @Override
@@ -209,6 +182,11 @@ public class SpedireUserService implements UserService{
     @Override
     public User findById(String senderId) {
         return userRepository.findById(senderId).orElseThrow(() -> new SpedireException("User not found"));
+    }
+
+    @Override
+    public void save(User user) {
+        userRepository.save(user);
     }
 
 

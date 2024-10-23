@@ -24,10 +24,10 @@ public class CarrierController {
 
     private final CarrierService carrierService;
 
-    @PostMapping("/upgrade")
-    public ResponseEntity<ApiResponse<?>> upgradeToCarrier(@RequestBody UpgradeRequest request) {
+    @PostMapping("/submit-upgrade")
+    public ResponseEntity<ApiResponse<?>> submitUpgradeRequest(@RequestBody UpgradeRequest request) {
         try {
-            UpgradeResponse response = carrierService.upgradeToCarrier(request);
+            UpgradeResponse response = carrierService.submitUpgradeRequest(request);
             if (response.getMessage().equals(UPGRADE_SUCCESSFUL)) {
                 return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder().message(response.getMessage()).success(true).build());
             } else if (response.getMessage().equals("Upgrade already completed")) {

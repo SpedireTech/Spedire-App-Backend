@@ -3,6 +3,7 @@ package com.spedire.Spedire.services.user;
 import com.spedire.Spedire.dtos.requests.ChangePasswordRequest;
 import com.spedire.Spedire.dtos.requests.ForgotPasswordRequest;
 import com.spedire.Spedire.dtos.requests.RegistrationRequest;
+import com.spedire.Spedire.dtos.requests.VerifyPhoneNumberRequest;
 import com.spedire.Spedire.dtos.responses.*;
 import com.spedire.Spedire.exceptions.SpedireException;
 import com.spedire.Spedire.models.User;
@@ -15,7 +16,7 @@ public interface UserService {
 
     RegistrationResponse createUser(RegistrationRequest request);
 
-    VerifyPhoneNumberResponse verifyPhoneNumber(HttpServletRequest request, boolean route, String phoneNumber);
+    VerifyPhoneNumberResponse<?> verifyPhoneNumber(HttpServletRequest httpServletRequest, VerifyPhoneNumberRequest request) throws MessagingException;
 
     UserDashboardResponse fetchDashboardInfoForUser(String token);
 
@@ -23,9 +24,7 @@ public interface UserService {
 
     ChangePasswordResponse resetPassword(ChangePasswordRequest passwordResetRequest) throws SpedireException, MessagingException;
 
-    void saveUser(String token) throws MessagingException;
-
-    void save(User user) ;
+    User  saveUser(User user) throws MessagingException;
 
     void deliveryStatus(boolean status, String token);
 
@@ -33,5 +32,7 @@ public interface UserService {
 
     User findById(String senderId);
 
+
+    void save(User user);
 
 }

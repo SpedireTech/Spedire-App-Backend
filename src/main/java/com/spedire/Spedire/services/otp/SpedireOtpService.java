@@ -82,21 +82,21 @@ public class SpedireOtpService implements OtpService{
         return OtpResponse.builder().otpNumber(otp.toString()).build();
     }
 
-@Override
+    @Override
     public String generateOtpWithTermii(String phoneNumber){
         RestTemplate restTemplate = new RestTemplate();
         String url = "https://v3.api.termii.com/api/sms/otp/send";
         String json = "{"
                 + "\"api_key\": \"TLgLzfHohQohNPJuLcosERfDGvAAcjRQNtcjNEONwhTLPOMfOeZjyYbmpspovn\","
                 + "\"message_type\": \"NUMERIC\","
-                + "\"to\":" +phoneNumber
+                + "\"to\":\"+234" + phoneNumber.substring(1) + "\","
                 + "\"from\": \"N-Alert\","
                 + "\"channel\": \"dnd\","
                 + "\"pin_attempts\": 10,"
-                + "\"pin_time_to_live\": 5,"
+                + "\"pin_time_to_live\": 30,"
                 + "\"pin_length\": 6,"
                 + "\"pin_placeholder\": \"< 1234 >\","
-                + "\"message_text\": \" Your Spedire Code is < 1234 >, Thank you for choosing us\","
+                + "\"message_text\": \"Your Spedire Code is < 1234 >, Thank you for choosing us\","
                 + "\"pin_type\": \"NUMERIC\""
                 + "}";
 
@@ -104,6 +104,7 @@ public class SpedireOtpService implements OtpService{
         headers.set("Content-Type", "application/json");
         HttpEntity<String> request = new HttpEntity<>(json, headers);
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, request, String.class);
+
     Map<String, Object> responseMap = new HashMap<>();
     try {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -112,18 +113,15 @@ public class SpedireOtpService implements OtpService{
     } catch (Exception e) {
         e.printStackTrace();
     }
-
     return (String) responseMap.get("pin_id");
-
     }
 
     @Override
-    public boolean verifyOtp(String otp, String token, UserService userService) throws MessagingException {
+    public boolean verifyOtp(String otp, String token, UserService userService) {
         String email = decodeToken(token);
         var otpList = findAllOtp();
         for (Otp code: otpList) {
             if (Objects.equals(code.getCode(), otp)) {
-                userService.saveUser(token);
                 getWelcomeMailTemplate(email);
                 return true;
             }
@@ -134,23 +132,18 @@ public class SpedireOtpService implements OtpService{
 
     @Override
     public boolean verifyOtpWithTermii(String pin, String pinID) {
-
         RestTemplate restTemplate = new RestTemplate();
         String url = "https://v3.api.termii.com/api/sms/otp/verify";
         String json = "{"
                 + "\"api_key\": \"TLgLzfHohQohNPJuLcosERfDGvAAcjRQNtcjNEONwhTLPOMfOeZjyYbmpspovn\","
-                + "\"pin_id\": \"NUMERIC\"," +pinID
-                + "\"pin\":" +pin
+                + "\"pin_id\": \"" + pinID + "\","
+                + "\"pin\": \"" + pin + "\""
                 + "}";
-
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", "application/json");
         HttpEntity<String> request = new HttpEntity<>(json, headers);
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, request, String.class);
-
         return response.getStatusCode().is2xxSuccessful();
-
-
     }
 
     private List<Otp> findAllOtp() {
