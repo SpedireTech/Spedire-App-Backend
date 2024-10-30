@@ -1,7 +1,8 @@
 package com.spedire.Spedire.controllers;
 
 import com.spedire.Spedire.dtos.responses.ApiResponse;
-import com.spedire.Spedire.services.location.google.LocationApis;
+import com.spedire.Spedire.services.location.google.GoogleApis;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -20,9 +21,10 @@ import static com.spedire.Spedire.controllers.Utils.NO_LANDMARK;
 @Slf4j
 @RequestMapping("/api/v1/location")
 @RestController
+@Tag(name = "Location", description = "Endpoints related to Location")
 public class LocationApiController {
 
-    private final LocationApis locationApis;
+    private final GoogleApis locationApis;
 
 
     @PostMapping("/nearbyPlaces")

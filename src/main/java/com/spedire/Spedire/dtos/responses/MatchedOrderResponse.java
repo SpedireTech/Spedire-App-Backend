@@ -5,7 +5,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @AllArgsConstructor
 @Builder
@@ -15,7 +17,8 @@ public class MatchedOrderResponse {
 
     private String message;
     private boolean status;
-    private List<CarrierListDtoResponse> matchedOrders;
+    private Map<String, Object> data;
+//    private List<CarrierListDtoResponse> matchedOrders;
 
 
 }

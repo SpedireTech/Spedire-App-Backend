@@ -24,8 +24,11 @@ public class OrderUtils {
 
     public CarrierListDtoResponse convertFromOrderToOrderListDto(SenderPool order, String carrierLocation) throws Exception {
         User user = userService.findById(order.getSenderId());
+        System.out.println("User -- " + user);
+        System.out.println("Order -- " + order);
+        System.out.println("CarrierLocation -- " + carrierLocation);
         String minutesAway = mapBoxService.getMinutesAway(order.getSenderLocation(), carrierLocation);
-        return   CarrierListDtoResponse.builder().orderId(order.getId()).image(order.getPicture())
+        return CarrierListDtoResponse.builder().orderId(order.getOrderId()).image(order.getPicture())
                 .senderName(user.getFullName()).minutesAway(minutesAway).senderPhoneNumber(user.getPhoneNumber())
                 .pickUpNote(order.getPickUpNote()).dropOffNote(order.getDropOffNote()).senderLocation(order.getSenderLocation())
                 .receiverLocation(order.getReceiverLocation()).build();

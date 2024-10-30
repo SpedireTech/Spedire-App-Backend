@@ -4,6 +4,7 @@ import com.spedire.Spedire.dtos.requests.*;
 import com.spedire.Spedire.dtos.responses.*;
 import com.spedire.Spedire.exceptions.SpedireException;
 import com.spedire.Spedire.services.user.UserService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
@@ -19,6 +20,7 @@ import static org.apache.http.HttpHeaders.AUTHORIZATION;
 
 @AllArgsConstructor
 @RequestMapping("/api/v1/user/")
+@Tag(name = "User", description = "Endpoints related to User")
 @RestController
 @Slf4j
 public class UserController {

@@ -3,6 +3,7 @@ package com.spedire.Spedire.controllers;
 import com.spedire.Spedire.dtos.responses.ApiResponse;
 import com.spedire.Spedire.dtos.responses.ReviewResponse;
 import com.spedire.Spedire.services.review.ReviewService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/review")
 @RestController
 @Slf4j
+@Tag(name = "Review", description = "Endpoints related to Review")
 public class ReviewController {
 
     private final ReviewService reviewService;

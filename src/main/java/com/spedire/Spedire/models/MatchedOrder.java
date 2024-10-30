@@ -8,7 +8,7 @@ import java.util.List;
 
 @Setter
 @Getter
-@Document(collection = "matched_order_list")
+@Document(collection = "matched_orders")
 @Builder
 @ToString
 @AllArgsConstructor

@@ -1,6 +1,6 @@
 package com.spedire.Spedire.models;
 
-import com.spedire.Spedire.enums.OrderType;
+import com.spedire.Spedire.enums.OrderStatus;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -21,31 +21,37 @@ public class Order {
 
     @Id
     private String id;
+
     private String itemDescription;
     private String itemName;
     private BigDecimal itemValue;
     private Date dueDate;
     private LocalTime dueTime;
     private String picture;
+    private String pickUpNote;
+    private String dropOffNote;
+
     private String senderId;
-    private String carriedId;
     private String senderName;
     private String senderLocation;
     private String senderTown;
-    private String receiverLocation;
-    private OrderType orderType;
-    private String carrierTown;
-    private String receiverTown;
     private String senderPhoneNumber;
+
+    private String receiverLocation;
+    private String receiverTown;
     private String receiverPhoneNumber;
     private String receiverName;
+
+    private String carriedId;
+    private String carrierTown;
     private String carrierImage;
     private String carrierFullName;
     private String carrierLocation;
     private String carrierPhoneNumber;
+
     private boolean payState;
-    private String pickUpNote;
-    private String dropOffNote;
+
+    private OrderStatus orderStatus;
     private OrderPayment orderPayment;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -155,12 +161,12 @@ public class Order {
         this.receiverLocation = receiverLocation;
     }
 
-    public OrderType getOrderType() {
-        return orderType;
+    public OrderStatus getOrderStatus() {
+        return orderStatus;
     }
 
-    public void setOrderType(OrderType orderType) {
-        this.orderType = orderType;
+    public void setOrderStatus(OrderStatus orderStatus) {
+        this.orderStatus = orderStatus;
     }
 
     public String getCarrierTown() {

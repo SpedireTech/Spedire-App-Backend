@@ -32,7 +32,7 @@ public class User {
     @Indexed(unique = true)
     private String phoneNumber;
     private String profileImage;
-    private String deliveryCount;
+    private int deliveryCount;
 
     @Indexed(unique = true)
     private String email;

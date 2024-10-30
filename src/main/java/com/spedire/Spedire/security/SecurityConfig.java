@@ -20,6 +20,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import static com.spedire.Spedire.security.SecurityUtils.JWT_SECRET;
+
 @Configuration
 @AllArgsConstructor
 public class SecurityConfig {
@@ -47,7 +48,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request -> request.requestMatchers("/api/v1/user/sign-up", "/api/v1/user/testing",
                                 "/api/v1/user/verifyPhoneNumber", "/api/v1/user/forgotPassword", "/api/v1/user/resetPassword","/api/v1/sms/verify-otp", "/api/v1/otp/verifyOtp","/login","/api/v1/order/createOrder", "/api/v1/payment/**",
                                 "/api/v1/carrier/submit-upgrade", "/api/v1/carrier/status", "/websocket/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs.yaml").permitAll()
-                        .requestMatchers("/api/v1/order/matchOrder", "/api/v1/address/sender", "/api/v1/address/receiver", "/api/v1/review", "api/v1/sender/find-match", "api/v1/sender/select-carrier").authenticated()
+                        .requestMatchers("/api/v1/order/matchOrder", "/api/v1/address/sender", "/api/v1/address/receiver", "/api/v1/review", "/api/v1/order/find-match", "/api/v1/sender/select-carrier").authenticated()
                         .requestMatchers("/api/v1/user/dashboard",
                                 "/api/v1/user/deliveryStatus/{status}", "/api/v1/location/nearbyPlaces", "/api/v1/carrier/downgrade", "/api/v1/carrier/service-charge", "/api/v1/order/pendingOrderHistory", "/api/v1/order/completedOrderHistory", "/api/v1/order/acceptedOrderHistory").hasAnyAuthority(new SimpleGrantedAuthority(Role.SENDER.name()).getAuthority(), new SimpleGrantedAuthority(Role.CARRIER.name()).getAuthority()).anyRequest().authenticated())
                  .exceptionHandling(exceptionHandling -> exceptionHandling

@@ -1,10 +1,13 @@
 package com.spedire.Spedire.services.location.mapBox;
 
+import com.spedire.Spedire.services.location.google.GoogleService;
+import lombok.AllArgsConstructor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -18,13 +21,16 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 
 @Service
+@AllArgsConstructor
 public class MapBoxServiceImpl implements MapBoxService {
 
     private static final String MAPBOX_API_URL = "https://api.mapbox.com/directions-matrix/v1/mapbox";
 
-    @Value("${mapbox.apikey}")
-    private String MAPBOX_APIKEY;
+//    @Value("${mapbox.apikey}")
+    private final String MAPBOX_APIKEY = "pk.eyJ1Ijoic3BlZGlyZXRlY2gxMjM0IiwiYSI6ImNtMHM5aTNiNjBlMGIyaXMzeDE0ZnNtdGEifQ.FxPpe7RhTpG0_DrzeeG9aA";
     private final OkHttpClient client = new OkHttpClient();
+
+    private final GoogleService googleService;
 
 
     @Override
@@ -48,8 +54,8 @@ public class MapBoxServiceImpl implements MapBoxService {
 
 
     public String getMinutesAway(String senderLocation, String carrierLocation) throws Exception {
-        JSONObject originCoordinates = getCoordinatesFromAddressV5(senderLocation);
-        JSONObject destinationCoordinates = getCoordinatesFromAddressV5(carrierLocation);
+        JSONObject originCoordinates = googleService.getCoordinatesWithAddress(senderLocation);
+        JSONObject destinationCoordinates = googleService.getCoordinatesWithAddress(carrierLocation);
 
         double originLongitude = originCoordinates.getDouble("longitude");
         double originLatitude = originCoordinates.getDouble("latitude");

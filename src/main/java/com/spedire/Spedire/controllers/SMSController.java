@@ -6,6 +6,7 @@ import com.spedire.Spedire.dtos.responses.ApiResponse;
 import com.spedire.Spedire.dtos.responses.CompleteRegistrationResponse;
 import com.spedire.Spedire.exceptions.SpedireException;
 import com.spedire.Spedire.services.sms.SMSService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import static org.apache.http.HttpHeaders.AUTHORIZATION;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/sms/")
+@Tag(name = "SMS", description = "Endpoints related to SMS")
 public class SMSController {
 
     private final SMSService smsService;

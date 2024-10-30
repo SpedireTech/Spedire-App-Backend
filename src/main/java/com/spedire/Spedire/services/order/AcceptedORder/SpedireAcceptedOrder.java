@@ -1,19 +1,17 @@
 package com.spedire.Spedire.services.order.AcceptedORder;
 
-import com.auth0.jwt.interfaces.DecodedJWT;
 import com.spedire.Spedire.dtos.requests.AcceptedOrderDto;
 import com.spedire.Spedire.dtos.requests.MatchedOrderDto;
 import com.spedire.Spedire.dtos.responses.AcceptedOrderResponse;
 import com.spedire.Spedire.dtos.responses.AcceptedOrderResponseForSender;
+import com.spedire.Spedire.dtos.responses.CarrierListDtoResponse;
 import com.spedire.Spedire.dtos.responses.MatchedOrderResponse;
-import com.spedire.Spedire.models.Order;
-import com.spedire.Spedire.models.SenderPool;
-import com.spedire.Spedire.models.User;
+import com.spedire.Spedire.enums.OrderStatus;
+import com.spedire.Spedire.exceptions.SpedireException;
+import com.spedire.Spedire.models.*;
 import com.spedire.Spedire.repositories.AcceptedOrderRepository;
-import com.spedire.Spedire.repositories.CarrierDeliveryRepository;
 import com.spedire.Spedire.repositories.OrderRepository;
 import com.spedire.Spedire.repositories.UserRepository;
-import com.spedire.Spedire.models.CarrierPool;
 import com.spedire.Spedire.repositories.*;
 import com.spedire.Spedire.services.email.JavaMailService;
 import com.spedire.Spedire.services.order.OrderUtils;
@@ -26,15 +24,13 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.math.BigDecimal;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
-import static com.spedire.Spedire.services.user.UserServiceUtils.EMAIL;
-import static org.apache.http.HttpHeaders.AUTHORIZATION;
+import static com.spedire.Spedire.services.email.MailTemplates.matchFoundTemplate;
+import static com.spedire.Spedire.services.email.MailTemplates.noMatchFoundTemplate;
 
 @Service
 @AllArgsConstructor
@@ -43,60 +39,64 @@ public class SpedireAcceptedOrder implements AcceptedOrder{
     private final OrderRepository orderRepository;
     private AcceptedOrderUtils utils;
     private final CarrierPoolRepository carrierPoolRepository;
+    private final DeliveryRepository deliveryRepository;
+    private final MatchedDeliveryRepository matchedDeliveryRepository;
     private final AcceptedOrderRepository acceptedOrderRepository;
     private final JavaMailService javaMailService;
     private final HttpServletRequest request;
     private final UserRepository userRepository;
     private final ReviewInterface reviewInterface;
     private final UserService userService;
-    private final SenderPoolRepository senderPoolRepository;
     private final SenderService senderService;
     private final OrderUtils orderUtils;
 
 
+
     @Override
     public MatchedOrderResponse matchOrder(MatchedOrderDto matchedOrderDto) throws MessagingException {
-        String authorizationHeader = request.getHeader(AUTHORIZATION);
-        DecodedJWT decodedJWT = utils.extractTokenDetails(authorizationHeader);
-        String email = decodedJWT.getClaim(EMAIL).asString();
-        User user = userService.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
-
-
+        String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString().replace("\"", "");
+        User user = userService.findByEmail(email).orElseThrow(() -> new SpedireException("User not found with email: " + email));
         List<SenderPool> allOrders = senderService.findOrderBySenderTown(matchedOrderDto.getCarrierTown());
-        System.out.println("allOrders::: "+ allOrders);
-        List<SenderPool> matchedOrders = new ArrayList<>();
-        if (allOrders.size() != 0) {
-            for (SenderPool order : allOrders) {
-                var senderLocation = order.getSenderTown();
-                if (senderLocation.equals(matchedOrderDto.getCarrierTown())) matchedOrders.add(order);
-            }
+        List<SenderPool> matchedOrders = allOrders.stream()
+                .filter(order -> order.getSenderTown().equals(matchedOrderDto.getCarrierTown())).collect(Collectors.toList());
+        Delivery delivery = Delivery.builder().carrierTown(matchedOrderDto.getCarrierTown()).currentLocation(matchedOrderDto.getCurrentLocation())
+                .createdAt(LocalDateTime.now()).userId(user.getId()).destination(matchedOrderDto.getDestination()).build();
+        Delivery savedDelivery = deliveryRepository.save(delivery);
+        Map<String, Object> deliveryInfo = new LinkedHashMap<>();
+        deliveryInfo.put("referenceId", savedDelivery.getId());
+        deliveryInfo.put("carrierTown", savedDelivery.getCarrierTown());
+        deliveryInfo.put("carrierDestination", savedDelivery.getDestination());
 
         if (!matchedOrders.isEmpty()) {
-            var response = matchedOrders.stream().map(order -> {
-                try {
-                    return orderUtils.convertFromOrderToOrderListDto(order, matchedOrderDto.getCurrentLocation());
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }).toList();
-            javaMailService.sendMail(email, "Match Found", "");
-            return MatchedOrderResponse.builder().status(true).message("We found some order going your way").matchedOrders(response).build();
+            List<CarrierListDtoResponse> response = matchedOrders.stream()
+                    .map(order -> {
+                        try {
+                            return orderUtils.convertFromOrderToOrderListDto(order, matchedOrderDto.getCurrentLocation());
+                        } catch (Exception exception) {
+                            throw new RuntimeException("Failed to convert order to DTO", exception);
+                        }
+                    }).toList();
+            System.out.println("Response -- " + response);
+            MatchedDelivery matchedDelivery = MatchedDelivery.builder().deliveryId(savedDelivery.getId()).matchedOrders(response).build();
+            matchedDeliveryRepository.save(matchedDelivery);
+            String mailContent = matchFoundTemplate(matchedOrders.size(), "https://spedire.netlify.app/login", savedDelivery.getId());
+            javaMailService.sendMail(email, "Match Found", mailContent);
+            Map<String, Object> data = new LinkedHashMap<>();
+            data.put("deliveryInfo", deliveryInfo);
+            data.put("matchedOrders", response);
+            return MatchedOrderResponse.builder().status(true).message("We found some orders going your way").data(data).build();
         }
-        CarrierPool carrierPool = new CarrierPool();
-        carrierPool.setName(user.getFullName());
-        carrierPool.setPhoneNumber(user.getPhoneNumber());
-        carrierPool.setDeliveryCount(user.getDeliveryCount());
-        carrierPool.setRating(user.getReviewId() != null ? String.valueOf(reviewInterface.getRating(user.getReviewId())) : "No Rating");
-        carrierPool.setEmail(user.getEmail());
-        carrierPool.setDestination(matchedOrderDto.getDestination());
-        carrierPool.setCurrentLocation(matchedOrderDto.getCurrentLocation());
-        carrierPool.setCarrierTown(matchedOrderDto.getCarrierTown());
+
+        CarrierPool carrierPool = CarrierPool.builder().orderId(savedDelivery.getId()).name(user.getFullName()).phoneNumber(user.getPhoneNumber())
+                .deliveryCount(String.valueOf(user.getDeliveryCount())).rating(user.getReviewId() != null ? String.valueOf(reviewInterface.getRating(user.getReviewId())) : "No Rating")
+                .email(user.getEmail()).destination(matchedOrderDto.getDestination()).currentLocation(matchedOrderDto.getCurrentLocation())
+                .carrierTown(matchedOrderDto.getCarrierTown()).build();
         carrierPoolRepository.save(carrierPool);
-        javaMailService.sendMail(email, "No Match Found", "");
-        return MatchedOrderResponse.builder().status(true).message("Please hold! We are matching your request").build();
+        javaMailService.sendMail(email, "Matching in Progress", noMatchFoundTemplate(savedDelivery.getId()));
+        return MatchedOrderResponse.builder().status(true).message("Please hold! We are matching your request").data(deliveryInfo).build();
     }
-        return null;
-    }
+    
+
 
     @Override
     public AcceptedOrderResponse acceptOrder(AcceptedOrderDto acceptedOrderDto) {

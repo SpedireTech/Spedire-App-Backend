@@ -10,7 +10,7 @@ import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LocationUtils {
+public class GoogleUtils {
 
     public static String X_Goog_FieldMask = "places.displayName";
     public static String Content_Type = "application/json";

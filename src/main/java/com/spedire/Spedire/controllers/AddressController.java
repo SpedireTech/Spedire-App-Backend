@@ -3,6 +3,7 @@ package com.spedire.Spedire.controllers;
 import com.spedire.Spedire.dtos.responses.ApiResponse;
 import com.spedire.Spedire.dtos.responses.SavedAddressResponse;
 import com.spedire.Spedire.services.savedAddress.Address;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import static com.spedire.Spedire.controllers.Utils.INCOMPLETE_REGISTRATION;
 @RequestMapping("/api/v1/address")
 @RestController
 @Slf4j
+@Tag(name = "Address", description = "Endpoints related to Address")
 public class AddressController {
 
     private final Address savedAddress;

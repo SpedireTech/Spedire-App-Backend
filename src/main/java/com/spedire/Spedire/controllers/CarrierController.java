@@ -5,6 +5,7 @@ import com.spedire.Spedire.dtos.requests.UpgradeRequest;
 import com.spedire.Spedire.dtos.responses.*;
 import com.spedire.Spedire.exceptions.SpedireException;
 import com.spedire.Spedire.services.carrier.CarrierService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,7 @@ import static com.spedire.Spedire.controllers.Utils.*;
 @RequestMapping("/api/v1/carrier")
 @RestController
 @Slf4j
+@Tag(name = "Carrier", description = "Endpoints related to Carrier")
 public class CarrierController {
 
     private final CarrierService carrierService;

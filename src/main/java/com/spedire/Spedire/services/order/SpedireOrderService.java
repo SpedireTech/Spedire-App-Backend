@@ -2,23 +2,27 @@ package com.spedire.Spedire.services.order;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.spedire.Spedire.dtos.requests.CreateOrderRequest;
+import com.spedire.Spedire.dtos.requests.MatchedOrderDto;
+import com.spedire.Spedire.dtos.requests.SelectCarrierRequest;
 import com.spedire.Spedire.dtos.responses.CreateOrderResponse;
-import com.spedire.Spedire.enums.OrderType;
+import com.spedire.Spedire.dtos.responses.FindMatchResponse;
+import com.spedire.Spedire.enums.OrderStatus;
 import com.spedire.Spedire.exceptions.*;
-import com.spedire.Spedire.models.Order;
-import com.spedire.Spedire.models.OrderPayment;
-import com.spedire.Spedire.models.User;
+import com.spedire.Spedire.models.*;
 import com.spedire.Spedire.repositories.OrderRepository;
 import com.spedire.Spedire.repositories.*;
 import com.spedire.Spedire.security.JwtUtil;
 import com.spedire.Spedire.services.carrier.CarrierService;
 import com.spedire.Spedire.services.email.JavaMailService;
+import com.spedire.Spedire.services.order.AcceptedORder.AcceptedOrder;
 import com.spedire.Spedire.services.savedAddress.Address;
 import com.spedire.Spedire.services.sender.SenderService;
 import com.spedire.Spedire.services.user.UserService;
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,12 +32,14 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static com.spedire.Spedire.services.email.MailTemplates.*;
 import static com.spedire.Spedire.services.user.UserServiceUtils.EMAIL;
 import static com.spedire.Spedire.services.user.UserServiceUtils.INVALID_EMAIL_ADDRESS;
 import static org.apache.http.HttpHeaders.AUTHORIZATION;
@@ -47,7 +53,10 @@ public class SpedireOrderService implements OrderService {
     private final OrderRepository orderRepository;
     private final AcceptedOrderRepository acceptedOrderRepository;
     private final CompletedOrderRepository completedOrderRepository;
+    private final MatchedDeliveryRepository matchedDeliveryRepository;
+    private final CarrierPoolRepository carrierPoolRepository;
     private final Address savedAddress;
+    private final SenderService senderService;
     private final HttpServletRequest request;
     private final JavaMailService javaMailService;
     private final UserService userService;
@@ -55,6 +64,7 @@ public class SpedireOrderService implements OrderService {
     private final OrderUtils utils;
     private static final String PHONE_NUMBER_REGEX = "^(080|091|070|081|090)\\d{8}$";
     private static final Pattern pattern = Pattern.compile(PHONE_NUMBER_REGEX);
+
 
     @Override
     @Transactional
@@ -66,7 +76,6 @@ public class SpedireOrderService implements OrderService {
         validateRequest(createOrderRequest);
         Order order = buildOrder(createOrderRequest, user);
         Order savedOrder = orderRepository.save(order);
-        javaMailService.sendMail(user.getEmail(), "Send a Package", "Hey there! Your order request is received and awaiting match");
         log.info("New Order received with id: {}", savedOrder.getId());
         saveAddress(createOrderRequest);
         List<Object> matchResult = carrierService.matchOrderRequest(createOrderRequest.getSenderLocation(), createOrderRequest.getSenderTown(), savedOrder.getId());
@@ -76,13 +85,76 @@ public class SpedireOrderService implements OrderService {
             Map<String, Object> map = new LinkedHashMap<>();
             map.put("orderInfo", orderInfo);
             map.put("couriers", matchResult);
-            senderService.saveSenderRequestInAPool(createOrderRequest, user.getFullName(), user.getId());
+            javaMailService.sendMail(user.getEmail(), "Match Found", matchFoundTemplate(matchResult.size(), "https://spedire.netlify.app/login", savedOrder.getId()));
             return CreateOrderResponse.builder().status(true).message("We found you some pretty nice match").data(map).build();
         }
-        senderService.saveSenderRequestInAPool(createOrderRequest, user.getFullName(), user.getId());
+        javaMailService.sendMail(email, "Matching in Progress", noMatchFoundTemplate(savedOrder.getId()));
+        senderService.saveSenderRequestInAPool(createOrderRequest, user, savedOrder.getId());
         return CreateOrderResponse.builder().status(true).message("Order has been successfully created").data(orderInfo).build();
     }
 
+
+    @Override
+    public FindMatchResponse<?> findMatch(String orderId, CarrierService carrierService) throws Exception {
+        String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString().replace("\"", "");
+        userService.findByEmail(email).orElseThrow(() -> new SpedireException("User not found"));
+        Optional<Order> foundSendRequest = orderRepository.findById(orderId);
+        Map<String, Object> orderInfo = new LinkedHashMap<>();
+        if (foundSendRequest.isPresent()) {
+            List<Object> matchResult = carrierService.matchOrderRequest(foundSendRequest.get().getSenderLocation(), foundSendRequest.get().getSenderTown(), orderId);
+            orderInfo.put("referenceId", orderId); orderInfo.put("orderName", foundSendRequest.get().getItemName());
+            if (matchResult.size() != 0) {
+                Map<String, Object> map = new LinkedHashMap<>();
+                map.put("orderInfo", orderInfo);
+                map.put("couriers", matchResult);
+                javaMailService.sendMail(email, "Match Found", matchFoundTemplate(matchResult.size(), "https://spedire.netlify.app/login", orderId));
+                return FindMatchResponse.builder().status(true).message("We found you some pretty nice match").data(map).build();
+            }
+        } else {
+            Optional<MatchedDelivery> matchedDeliveryOpt = matchedDeliveryRepository.findByDeliveryId(orderId);
+            if (matchedDeliveryOpt.isPresent()) {
+                javaMailService.sendMail(email, "Match Found", matchFoundTemplate(matchedDeliveryOpt.get().getMatchedOrders().size(), "https://spedire.netlify.app/login", orderId));
+                return FindMatchResponse.builder().status(true).message("We found you some pretty nice match").data(matchedDeliveryOpt.get().getMatchedOrders()).build();
+            } else {
+                Optional<CarrierPool> carrierPool = carrierPoolRepository.findByOrderId(orderId);
+                if (carrierPool.isPresent()) {
+                    CarrierPool carrier = carrierPool.get();
+                    List<SenderPool> allOrders = senderService.findOrderBySenderTown(carrier.getCarrierTown());
+                    if (allOrders.isEmpty()) {
+                        return FindMatchResponse.builder().message("No Match Yet").status(false).data(null).build();
+                    }
+                    List<SenderPool> matchedOrders = allOrders.stream()
+                            .filter(order -> order.getSenderTown().equals(carrier.getCarrierTown())).toList();
+
+                    return FindMatchResponse.builder().message("We found you some pretty nice match").status(true).data(matchedOrders).build();
+                }
+            }
+        }
+        return FindMatchResponse.builder().status(false).message("No Match Yet").data(orderInfo).build();
+    }
+
+
+    @Override
+    @Transactional
+    public Object selectCarrier(SelectCarrierRequest request) throws MessagingException {
+//        MatchedOrder matchedOrder = matchedOrderRepository.findByOrderId(request.getOrderId()).orElseThrow(() -> new SpedireException("Order not found"));
+//        for (var order: matchedOrder.getMatchedCarriers()) {
+//            if (order.getEmail().(request.getEmail())) {
+//
+//            }
+//        javaMailService.sendMail(request.getEmail(), "You have been selected", getSelectCourierMailTemplate("https://spedire.netlify.app/login"));
+//        Order order = orderService.findOrderById(matchedOrder.getOrderId()).orElseThrow(() -> new SpedireException("Order not found"));
+//        order.setOrderStatus(OrderStatus.FOUND_MATCH);
+//        orderService.saveOrder(order);
+//        matchedOrderRepository.deleteById(matchedOrder.getId());
+//        Map<String, Object> map = new LinkedHashMap<>();
+//        map.put("senderName", order.getSenderName()); map.put("referenceId", order.getId());
+//        map.put("orderName", order.getItemName());
+//        return map;
+
+        return null;
+
+    }
 
 
     @Override
@@ -184,7 +256,6 @@ public class SpedireOrderService implements OrderService {
     }
 
 
-
     private void validateRequest(CreateOrderRequest createOrderRequest) {
         if (createOrderRequest.getItemValue() == null) throw new NullValueException("Item value is null");
         if (createOrderRequest.getItemName() == null) throw new NullValueException("Item name is null");
@@ -199,18 +270,24 @@ public class SpedireOrderService implements OrderService {
 
     private Order buildOrder(CreateOrderRequest createOrderRequest, User user) {
         Order order = new Order();
+        LocalDateTime dueDateTime;
+
         try {
-            order.setDueDate(dateConverter(createOrderRequest.getDueDate()));
+            Date dueDate = dateConverter(createOrderRequest.getDueDate());
+            LocalTime dueTime = timeConverter(createOrderRequest.getDueTime());
+            dueDateTime = LocalDateTime.ofInstant(dueDate.toInstant(), ZoneId.systemDefault()).with(dueTime);
+            order.setDueDate(dueDate);
+            order.setDueTime(dueTime);
         } catch (ParseException exception) {
             throw new InvalidDateException("Invalid date format. Please provide the date in 'MM/dd/yyyy' format.");
         }
-
-        try {
-            order.setDueTime(timeConverter(createOrderRequest.getDueTime()));
-        } catch (ParseException exception) {
-            throw new InvalidTimeException("Invalid time format. Please provide time in 'hh:mm a' format.");
+        LocalDateTime now = LocalDateTime.now();
+        if (dueDateTime.isBefore(now)) {
+            throw new InvalidDateException("Due date and time must be in the future.");
         }
-
+        if (dueDateTime.toLocalDate().isEqual(now.toLocalDate()) && dueDateTime.toLocalTime().isBefore(now.toLocalTime())) {
+            throw new InvalidDateException("Due time must be in the future if the due date is today.");
+        }
         order.setPicture(createOrderRequest.getPicture());
         order.setItemValue(new BigDecimal(createOrderRequest.getItemValue()));
         order.setReceiverName(createOrderRequest.getReceiverName());
@@ -218,13 +295,14 @@ public class SpedireOrderService implements OrderService {
         order.setReceiverPhoneNumber(createOrderRequest.getReceiverPhoneNumber());
         order.setSenderLocation(createOrderRequest.getSenderLocation());
         order.setSenderId(user.getId());
+        order.setSenderPhoneNumber(user.getPhoneNumber());
         order.setSenderName(user.getFullName());
         order.setItemName(createOrderRequest.getItemName());
         order.setPickUpNote(createOrderRequest.getPickUpNote());
         order.setSenderTown(createOrderRequest.getSenderTown());
         order.setDropOffNote(createOrderRequest.getDropOffNote());
         order.setCreatedAt(LocalDateTime.now());
-        order.setOrderType(OrderType.AWAITING_MATCH);
+        order.setOrderStatus(OrderStatus.AWAITING_MATCH);
         return order;
     }
 

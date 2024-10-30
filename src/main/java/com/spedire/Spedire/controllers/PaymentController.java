@@ -6,6 +6,7 @@ import com.spedire.Spedire.dtos.responses.ApiResponse;
 import com.spedire.Spedire.dtos.responses.PaymentVerificationResponse;
 import com.spedire.Spedire.services.payment.Payment;
 import com.spedire.Spedire.services.websocket.WebSocketService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.xml.bind.DatatypeConverter;
@@ -35,6 +36,7 @@ import static com.spedire.Spedire.controllers.Utils.verifySignature;
 @RestController
 @Slf4j
 @RequestMapping("/api/v1/payment")
+@Tag(name = "Payment", description = "Endpoints related to Payment")
 public class PaymentController {
 
     static final Logger logger = LoggerFactory.getLogger(PaymentController.class);

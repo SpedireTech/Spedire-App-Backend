@@ -17,6 +17,7 @@ public class SenderPool {
 
     @Id
     private String id;
+    private String orderId;
 
     private String pickUpNote;
     private String itemName;

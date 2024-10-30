@@ -5,7 +5,6 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
@@ -15,15 +14,16 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-import static com.spedire.Spedire.services.location.google.LocationUtils.*;
+import static com.spedire.Spedire.services.location.google.GoogleUtils.*;
 
 
 @Service
 @Slf4j
-public class LocationApis implements LocationService {
+public class GoogleApis implements GoogleService {
 
     @Value("AIzaSyAFJ857mY26RWOoPQzpcMc1pJRjVEC5QoI")
     private String GOOGLE_APIKEY;
+
 
     @Override
     public JSONObject getLocationCoordinates() throws URISyntaxException {
@@ -65,7 +65,6 @@ public class LocationApis implements LocationService {
     @Override
     public List<String> getNearbyPlaces() throws URISyntaxException {
         JSONObject object = getLocationCoordinates();
-        log.info(object + " this is object");
 
         double longitude = Double.parseDouble(String.valueOf(object.getDouble("lng")));
         double latitude = Double.parseDouble(String.valueOf(object.getDouble("lat")));

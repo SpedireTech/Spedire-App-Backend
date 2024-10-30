@@ -8,6 +8,7 @@ import com.spedire.Spedire.dtos.responses.VerifyPhoneNumberResponse;
 import com.spedire.Spedire.exceptions.SpedireException;
 import com.spedire.Spedire.services.otp.OtpService;
 import com.spedire.Spedire.services.user.UserService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,7 @@ import static org.apache.http.HttpHeaders.AUTHORIZATION;
 @RestController
 @AllArgsConstructor
 @RequestMapping("api/v1/otp")
+@Tag(name = "Otp", description = "Endpoints related to Otp")
 public class OtpController {
 
     private final OtpService otpService;

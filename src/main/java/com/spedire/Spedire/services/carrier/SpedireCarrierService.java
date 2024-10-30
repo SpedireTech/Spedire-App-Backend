@@ -123,23 +123,53 @@ public class SpedireCarrierService implements CarrierService {
         return mapResponse(request.getAmount(), request.getOrderId(), authorizationUrl, reference);
     }
 
+
     @Override
     public List<Object> matchOrderRequest(String senderLocation, String senderTown, String orderId) throws Exception {
         List<Object> objectList = new ArrayList<>();
-        if (!carrierPoolRepository.findCarrierPoolByCarrierTown(senderTown).isEmpty()) {
-            for (CarrierPool carriers: carrierPoolRepository.findCarrierPoolByCarrierTown(senderTown)) {
-                Map<String, String> map = new LinkedHashMap<>();
-                String minutesAway = mapBoxService.getMinutesAway(senderLocation, carriers.getCurrentLocation());
-                map.put("name", carriers.getName()); map.put("email", carriers.getEmail()); map.put("minutesAway", minutesAway);
-                map.put("town", carriers.getCarrierTown() + " Lagos"); map.put("number", carriers.getPhoneNumber());
-                map.put("rating", carriers.getRating()); map.put("deliveryCount", carriers.getDeliveryCount());
-                objectList.add(map);
+        List<CarrierPool> carriersInTown = carrierPoolRepository.findCarrierPoolByCarrierTown(senderTown);
+
+        if (!carriersInTown.isEmpty()) {
+            for (CarrierPool carrier : carriersInTown) {
+                objectList.add(buildCarrierInfoMap(senderLocation, carrier));
             }
             MatchedOrder matchedOrder = MatchedOrder.builder().orderId(orderId).matchedCarriers(objectList).build();
             matchedCarrierRepository.save(matchedOrder);
         }
         return objectList;
     }
+
+    private Map<String, String> buildCarrierInfoMap(String senderLocation, CarrierPool carrier) throws Exception {
+        Map<String, String> map = new LinkedHashMap<>();
+        String minutesAway = mapBoxService.getMinutesAway(senderLocation, carrier.getCurrentLocation());
+        map.put("name", carrier.getName());
+        map.put("email", carrier.getEmail());
+        map.put("minutesAway", minutesAway);
+        map.put("town", carrier.getCarrierTown() + " Lagos");
+        map.put("number", carrier.getPhoneNumber());
+        map.put("rating", carrier.getRating());
+        map.put("deliveryCount", carrier.getDeliveryCount());
+        return map;
+    }
+
+
+//    @Override
+//    public List<Object> matchOrderRequest(String senderLocation, String senderTown, String orderId) throws Exception {
+//        List<Object> objectList = new ArrayList<>();
+//        if (!carrierPoolRepository.findCarrierPoolByCarrierTown(senderTown).isEmpty()) {
+//            for (CarrierPool carriers: carrierPoolRepository.findCarrierPoolByCarrierTown(senderTown)) {
+//                Map<String, String> map = new LinkedHashMap<>();
+//                String minutesAway = mapBoxService.getMinutesAway(senderLocation, carriers.getCurrentLocation());
+//                map.put("name", carriers.getName()); map.put("email", carriers.getEmail()); map.put("minutesAway", minutesAway);
+//                map.put("town", carriers.getCarrierTown() + " Lagos"); map.put("number", carriers.getPhoneNumber());
+//                map.put("rating", carriers.getRating()); map.put("deliveryCount", carriers.getDeliveryCount());
+//                objectList.add(map);
+//            }
+//            MatchedOrder matchedOrder = MatchedOrder.builder().orderId(orderId).matchedCarriers(objectList).build();
+//            matchedCarrierRepository.save(matchedOrder);
+//        }
+//        return objectList;
+//    }
 
 
     @Override

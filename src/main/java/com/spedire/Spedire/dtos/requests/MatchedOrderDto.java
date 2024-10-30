@@ -1,12 +1,12 @@
 package com.spedire.Spedire.dtos.requests;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Setter
 @Getter
 @AllArgsConstructor
+@Builder
+@NoArgsConstructor
 public class MatchedOrderDto {
 
     private String currentLocation;
