@@ -2,7 +2,6 @@ package com.spedire.Spedire.services.order;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.spedire.Spedire.dtos.requests.CreateOrderRequest;
-import com.spedire.Spedire.dtos.requests.MatchedOrderDto;
 import com.spedire.Spedire.dtos.requests.SelectCarrierRequest;
 import com.spedire.Spedire.dtos.responses.CreateOrderResponse;
 import com.spedire.Spedire.dtos.responses.FindMatchResponse;
@@ -14,12 +13,11 @@ import com.spedire.Spedire.repositories.*;
 import com.spedire.Spedire.security.JwtUtil;
 import com.spedire.Spedire.services.carrier.CarrierService;
 import com.spedire.Spedire.services.email.JavaMailService;
-import com.spedire.Spedire.services.order.AcceptedORder.AcceptedOrder;
+import com.spedire.Spedire.services.location.mapBox.MapBoxService;
 import com.spedire.Spedire.services.savedAddress.Address;
 import com.spedire.Spedire.services.sender.SenderService;
 import com.spedire.Spedire.services.user.UserService;
 import jakarta.mail.MessagingException;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -37,27 +35,26 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import static com.spedire.Spedire.services.email.MailTemplates.*;
 import static com.spedire.Spedire.services.user.UserServiceUtils.EMAIL;
 import static com.spedire.Spedire.services.user.UserServiceUtils.INVALID_EMAIL_ADDRESS;
-import static org.apache.http.HttpHeaders.AUTHORIZATION;
 
 @AllArgsConstructor
 @Service
 @Slf4j
 public class SpedireOrderService implements OrderService {
 
+
     private final UserRepository userRepository;
     private final OrderRepository orderRepository;
     private final AcceptedOrderRepository acceptedOrderRepository;
     private final CompletedOrderRepository completedOrderRepository;
-    private final MatchedDeliveryRepository matchedDeliveryRepository;
+    private final DeliveryRepository deliveryRepository;
     private final CarrierPoolRepository carrierPoolRepository;
     private final Address savedAddress;
     private final SenderService senderService;
-    private final HttpServletRequest request;
+    private final MapBoxService mapBoxService;
     private final JavaMailService javaMailService;
     private final UserService userService;
     private final JwtUtil jwtUtil;
@@ -69,16 +66,15 @@ public class SpedireOrderService implements OrderService {
     @Override
     @Transactional
     public CreateOrderResponse<?>  createOrder(CreateOrderRequest createOrderRequest, CarrierService carrierService, SenderService senderService) throws Exception {
-        String authorizationHeader = request.getHeader(AUTHORIZATION);
-        DecodedJWT decodedJWT = utils.extractTokenDetails(authorizationHeader);
-        String email = decodedJWT.getClaim(EMAIL).asString();
+        String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString().replace("\"", "");
         User user = userService.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
         validateRequest(createOrderRequest);
-        Order order = buildOrder(createOrderRequest, user);
-        Order savedOrder = orderRepository.save(order);
+        Order savedOrder = buildOrder(createOrderRequest, user);
         log.info("New Order received with id: {}", savedOrder.getId());
         saveAddress(createOrderRequest);
-        List<Object> matchResult = carrierService.matchOrderRequest(createOrderRequest.getSenderLocation(), createOrderRequest.getSenderTown(), savedOrder.getId());
+
+        //Match the order, with sender location, town, orderId
+        List<Object> matchResult = matchOrderRequestForSender(createOrderRequest.getSenderLocation(), createOrderRequest.getSenderTown());
         Map<String, Object> orderInfo = new LinkedHashMap<>();
         orderInfo.put("referenceId", savedOrder.getId()); orderInfo.put("orderName", savedOrder.getItemName());
         if (matchResult.size() != 0) {
@@ -89,7 +85,7 @@ public class SpedireOrderService implements OrderService {
             return CreateOrderResponse.builder().status(true).message("We found you some pretty nice match").data(map).build();
         }
         javaMailService.sendMail(email, "Matching in Progress", noMatchFoundTemplate(savedOrder.getId()));
-        senderService.saveSenderRequestInAPool(createOrderRequest, user, savedOrder.getId());
+        senderService.saveSenderRequestInAPool(savedOrder);
         return CreateOrderResponse.builder().status(true).message("Order has been successfully created").data(orderInfo).build();
     }
 
@@ -98,62 +94,140 @@ public class SpedireOrderService implements OrderService {
     public FindMatchResponse<?> findMatch(String orderId, CarrierService carrierService) throws Exception {
         String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString().replace("\"", "");
         userService.findByEmail(email).orElseThrow(() -> new SpedireException("User not found"));
-        Optional<Order> foundSendRequest = orderRepository.findById(orderId);
-        Map<String, Object> orderInfo = new LinkedHashMap<>();
-        if (foundSendRequest.isPresent()) {
-            List<Object> matchResult = carrierService.matchOrderRequest(foundSendRequest.get().getSenderLocation(), foundSendRequest.get().getSenderTown(), orderId);
-            orderInfo.put("referenceId", orderId); orderInfo.put("orderName", foundSendRequest.get().getItemName());
+        //For Sender
+        Optional<Order> order = orderRepository.findById(orderId);
+        if (order.isPresent()) {
+            List<Object> matchResult = matchOrderRequestForSender(order.get().getSenderLocation(), order.get().getSenderTown());
+            Map<String, Object> orderInfo = new LinkedHashMap<>();
+            orderInfo.put("referenceId", order.get().getId()); orderInfo.put("orderName", order.get().getItemName());
             if (matchResult.size() != 0) {
                 Map<String, Object> map = new LinkedHashMap<>();
                 map.put("orderInfo", orderInfo);
                 map.put("couriers", matchResult);
-                javaMailService.sendMail(email, "Match Found", matchFoundTemplate(matchResult.size(), "https://spedire.netlify.app/login", orderId));
                 return FindMatchResponse.builder().status(true).message("We found you some pretty nice match").data(map).build();
             }
-        } else {
-            Optional<MatchedDelivery> matchedDeliveryOpt = matchedDeliveryRepository.findByDeliveryId(orderId);
-            if (matchedDeliveryOpt.isPresent()) {
-                javaMailService.sendMail(email, "Match Found", matchFoundTemplate(matchedDeliveryOpt.get().getMatchedOrders().size(), "https://spedire.netlify.app/login", orderId));
-                return FindMatchResponse.builder().status(true).message("We found you some pretty nice match").data(matchedDeliveryOpt.get().getMatchedOrders()).build();
-            } else {
-                Optional<CarrierPool> carrierPool = carrierPoolRepository.findByOrderId(orderId);
-                if (carrierPool.isPresent()) {
-                    CarrierPool carrier = carrierPool.get();
-                    List<SenderPool> allOrders = senderService.findOrderBySenderTown(carrier.getCarrierTown());
-                    if (allOrders.isEmpty()) {
-                        return FindMatchResponse.builder().message("No Match Yet").status(false).data(null).build();
-                    }
-                    List<SenderPool> matchedOrders = allOrders.stream()
-                            .filter(order -> order.getSenderTown().equals(carrier.getCarrierTown())).toList();
-
-                    return FindMatchResponse.builder().message("We found you some pretty nice match").status(true).data(matchedOrders).build();
-                }
+            else {
+                return FindMatchResponse.builder().status(false).message("No Match Yet").data(new ArrayList<>()).build();
             }
         }
-        return FindMatchResponse.builder().status(false).message("No Match Yet").data(orderInfo).build();
+        //Carrier
+        else {
+            Optional<CarrierPool> carriers = carrierPoolRepository.findByOrderId(orderId);
+            if (carriers.isPresent()) {
+                List<Object> matchResult = matchOrderRequestForCarriers(carriers.get().getCurrentLocation(), carriers.get().getCarrierTown());
+                if (matchResult.size() != 0) {
+                    Map<String, Object> map = new LinkedHashMap<>();
+                    map.put("couriers", matchResult);
+                    return FindMatchResponse.builder().status(true).message("We found you some pretty nice match").data(map).build();
+                }
+                else {
+                    return FindMatchResponse.builder().status(false).message("No Match Yet").data(new ArrayList<>()).build();
+                }
+            }
+
+        }
+        return FindMatchResponse.builder().status(false).message("Invalid Reference Id").data(new ArrayList<>()).build();
+    }
+
+    private List<Object> matchOrderRequestForCarriers(String currentLocation, String carrierTown) throws Exception {
+        List<Object> objectList = new ArrayList<>();
+        List<SenderPool> allOrders = senderService.findOrderBySenderTown(carrierTown);
+        if (!allOrders.isEmpty()) {
+            for (SenderPool sender : allOrders) {
+                objectList.add(buildSenderInfoMap(currentLocation, sender, null));
+            }
+        } else {
+            List<Order> order = orderRepository.findOrderBySenderTown(carrierTown);
+            for (Order singleOrder : order) {
+                objectList.add(buildSenderInfoMap(currentLocation, null, singleOrder));
+            }
+
+        }
+        return objectList;
     }
 
 
     @Override
     @Transactional
     public Object selectCarrier(SelectCarrierRequest request) throws MessagingException {
-//        MatchedOrder matchedOrder = matchedOrderRepository.findByOrderId(request.getOrderId()).orElseThrow(() -> new SpedireException("Order not found"));
-//        for (var order: matchedOrder.getMatchedCarriers()) {
-//            if (order.getEmail().(request.getEmail())) {
-//
-//            }
-//        javaMailService.sendMail(request.getEmail(), "You have been selected", getSelectCourierMailTemplate("https://spedire.netlify.app/login"));
-//        Order order = orderService.findOrderById(matchedOrder.getOrderId()).orElseThrow(() -> new SpedireException("Order not found"));
-//        order.setOrderStatus(OrderStatus.FOUND_MATCH);
-//        orderService.saveOrder(order);
-//        matchedOrderRepository.deleteById(matchedOrder.getId());
-//        Map<String, Object> map = new LinkedHashMap<>();
-//        map.put("senderName", order.getSenderName()); map.put("referenceId", order.getId());
-//        map.put("orderName", order.getItemName());
-//        return map;
-
         return null;
+    }
 
+    @Override
+    public List<Object> matchOrderRequestForSender(String senderLocation, String senderTown) throws Exception {
+        List<Object> objectList = new ArrayList<>();
+        List<CarrierPool> carriersInTown = carrierPoolRepository.findCarrierPoolByCarrierTown(senderTown);
+        if (!carriersInTown.isEmpty()) {
+            for (CarrierPool carrier : carriersInTown) {
+                objectList.add(buildCarrierInfoMap(senderLocation, carrier, null));
+            }
+        } else {
+            List<Delivery> deliverers = deliveryRepository.findDeliveryByCarrierTown(senderTown);
+            if (!deliverers.isEmpty()) {
+                for (Delivery delivery : deliverers) {
+                    objectList.add(buildCarrierInfoMap(senderLocation, null, delivery));
+                }
+            }
+        }
+        return objectList;
+    }
+
+
+
+    private Map<String, String> buildSenderInfoMap(String carrierLocation, SenderPool sender, Order order) throws Exception {
+        Map<String, String> map = new LinkedHashMap<>();
+        String minutesAway;
+        User user;
+        if (sender != null && !sender.getOrder().getSenderId().isEmpty()) {
+            minutesAway = mapBoxService.getMinutesAway(carrierLocation, sender.getOrder().getSenderLocation());
+            user = userRepository.findById(sender.getOrder().getSenderId()).get();
+            map.put("name", user.getFullName());
+            map.put("email", user.getEmail());
+            map.put("minutesAway", minutesAway);
+            map.put("town", sender.getOrder().getSenderTown() + " Lagos");
+            map.put("number", user.getPhoneNumber());
+            map.put("rating", user.getRating());
+            map.put("deliveryCount", String.valueOf(user.getDeliveryCount()));
+        }
+        else if (order != null && !order.getSenderId().isEmpty()){
+            user = userRepository.findById(order.getSenderId()).get();
+            minutesAway = mapBoxService.getMinutesAway(carrierLocation, order.getSenderLocation());
+            map.put("name", user.getFullName());
+            map.put("email", user.getEmail());
+            map.put("minutesAway", minutesAway);
+            map.put("town", order.getSenderTown() + " Lagos");
+            map.put("number", user.getPhoneNumber());
+            map.put("rating", user.getRating());
+            map.put("deliveryCount", String.valueOf(user.getDeliveryCount()));
+        }
+        return map;
+    }
+
+    private Map<String, String> buildCarrierInfoMap(String senderLocation, CarrierPool carrier, Delivery delivery) throws Exception {
+        Map<String, String> map = new LinkedHashMap<>();
+        String minutesAway;
+        if (delivery != null && !delivery.getUserId().isEmpty()) {
+            minutesAway = mapBoxService.getMinutesAway(senderLocation, delivery.getCurrentLocation());
+            User user = userRepository.findById(delivery.getUserId()).get();
+            map.put("name", user.getFullName());
+            map.put("email", user.getEmail());
+            map.put("minutesAway", minutesAway);
+            map.put("town", delivery.getCarrierTown() + " Lagos");
+            map.put("number", user.getPhoneNumber());
+            map.put("rating", user.getRating());
+            map.put("deliveryCount", String.valueOf(user.getDeliveryCount()));
+        }
+        else if (carrier != null) {
+            minutesAway = mapBoxService.getMinutesAway(senderLocation, carrier.getCurrentLocation());
+            map.put("name", carrier.getName());
+            map.put("email", carrier.getEmail());
+            map.put("minutesAway", minutesAway);
+            map.put("town", carrier.getCarrierTown() + " Lagos");
+            map.put("number", carrier.getPhoneNumber());
+            map.put("rating", carrier.getRating());
+            map.put("deliveryCount", carrier.getDeliveryCount());
+        }
+        return map;
     }
 
 
@@ -303,7 +377,7 @@ public class SpedireOrderService implements OrderService {
         order.setDropOffNote(createOrderRequest.getDropOffNote());
         order.setCreatedAt(LocalDateTime.now());
         order.setOrderStatus(OrderStatus.AWAITING_MATCH);
-        return order;
+        return orderRepository.save(order);
     }
 
 

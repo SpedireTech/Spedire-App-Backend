@@ -22,13 +22,11 @@ public class OrderUtils {
     private final UserService userService;
     private final JwtUtil jwtUtil;
 
-    public CarrierListDtoResponse convertFromOrderToOrderListDto(SenderPool order, String carrierLocation) throws Exception {
+    public CarrierListDtoResponse convertFromOrderToOrderListDto(SenderPool senderPool, String carrierLocation) throws Exception {
+        Order order = senderPool.getOrder();
         User user = userService.findById(order.getSenderId());
-        System.out.println("User -- " + user);
-        System.out.println("Order -- " + order);
-        System.out.println("CarrierLocation -- " + carrierLocation);
         String minutesAway = mapBoxService.getMinutesAway(order.getSenderLocation(), carrierLocation);
-        return CarrierListDtoResponse.builder().orderId(order.getOrderId()).image(order.getPicture())
+        return CarrierListDtoResponse.builder().orderId(order.getId()).image(order.getPicture())
                 .senderName(user.getFullName()).minutesAway(minutesAway).senderPhoneNumber(user.getPhoneNumber())
                 .pickUpNote(order.getPickUpNote()).dropOffNote(order.getDropOffNote()).senderLocation(order.getSenderLocation())
                 .receiverLocation(order.getReceiverLocation()).build();

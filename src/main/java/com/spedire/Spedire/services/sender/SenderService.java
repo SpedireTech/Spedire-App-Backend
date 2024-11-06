@@ -1,19 +1,18 @@
 package com.spedire.Spedire.services.sender;
 
-import com.spedire.Spedire.dtos.requests.CreateOrderRequest;
-import com.spedire.Spedire.dtos.requests.SelectCarrierRequest;
+import com.spedire.Spedire.models.Order;
 import com.spedire.Spedire.models.SenderPool;
-import com.spedire.Spedire.models.User;
-import com.spedire.Spedire.services.carrier.CarrierService;
-import jakarta.mail.MessagingException;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface SenderService {
 
 
 
-    void saveSenderRequestInAPool(CreateOrderRequest createOrderRequest, User user, String orderId);
+    void saveSenderRequestInAPool(Order order);
 
-    List<SenderPool> findOrderBySenderTown(String carrierTown);
+    List<SenderPool>  findOrderBySenderTown(String carrierTown);
+
+    Optional<SenderPool> findById(String orderId);
 }

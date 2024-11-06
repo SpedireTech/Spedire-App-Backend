@@ -17,29 +17,6 @@ public class SenderPool {
 
     @Id
     private String id;
-    private String orderId;
-
-    private String pickUpNote;
-    private String itemName;
-
-    private String senderLocation;
-    private String senderTown;
-    private String senderName;
-    private String senderId;
-    private String receiverName;
-    private String receiverPhoneNumber;
-    private String receiverLocation;
-
-    private String itemValue;
-    private String dueDate;
-    private String dueTime;
-    private String picture;
-    private String dropOffNote;
-    private String SenderTown;
-
-    private boolean saveSenderAddress;
-    private boolean saveReceiverAddress;
-
-    private LocalDateTime createdAt;
+    private Order order;
 
 }

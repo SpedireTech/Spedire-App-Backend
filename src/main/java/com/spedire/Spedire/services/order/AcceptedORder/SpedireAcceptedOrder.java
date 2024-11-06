@@ -40,7 +40,6 @@ public class SpedireAcceptedOrder implements AcceptedOrder{
     private AcceptedOrderUtils utils;
     private final CarrierPoolRepository carrierPoolRepository;
     private final DeliveryRepository deliveryRepository;
-    private final MatchedDeliveryRepository matchedDeliveryRepository;
     private final AcceptedOrderRepository acceptedOrderRepository;
     private final JavaMailService javaMailService;
     private final HttpServletRequest request;
@@ -58,7 +57,7 @@ public class SpedireAcceptedOrder implements AcceptedOrder{
         User user = userService.findByEmail(email).orElseThrow(() -> new SpedireException("User not found with email: " + email));
         List<SenderPool> allOrders = senderService.findOrderBySenderTown(matchedOrderDto.getCarrierTown());
         List<SenderPool> matchedOrders = allOrders.stream()
-                .filter(order -> order.getSenderTown().equals(matchedOrderDto.getCarrierTown())).collect(Collectors.toList());
+                .filter(order -> order.getOrder().getSenderTown().equals(matchedOrderDto.getCarrierTown())).toList();
         Delivery delivery = Delivery.builder().carrierTown(matchedOrderDto.getCarrierTown()).currentLocation(matchedOrderDto.getCurrentLocation())
                 .createdAt(LocalDateTime.now()).userId(user.getId()).destination(matchedOrderDto.getDestination()).build();
         Delivery savedDelivery = deliveryRepository.save(delivery);
@@ -76,9 +75,7 @@ public class SpedireAcceptedOrder implements AcceptedOrder{
                             throw new RuntimeException("Failed to convert order to DTO", exception);
                         }
                     }).toList();
-            System.out.println("Response -- " + response);
-            MatchedDelivery matchedDelivery = MatchedDelivery.builder().deliveryId(savedDelivery.getId()).matchedOrders(response).build();
-            matchedDeliveryRepository.save(matchedDelivery);
+
             String mailContent = matchFoundTemplate(matchedOrders.size(), "https://spedire.netlify.app/login", savedDelivery.getId());
             javaMailService.sendMail(email, "Match Found", mailContent);
             Map<String, Object> data = new LinkedHashMap<>();

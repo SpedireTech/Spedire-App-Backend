@@ -8,7 +8,6 @@ import com.spedire.Spedire.enums.Role;
 import com.spedire.Spedire.exceptions.SpedireException;
 import com.spedire.Spedire.models.*;
 import com.spedire.Spedire.repositories.CarrierPoolRepository;
-import com.spedire.Spedire.repositories.MatchedOrderRepository;
 import com.spedire.Spedire.repositories.UserRepository;
 import com.spedire.Spedire.services.location.mapBox.MapBoxService;
 import com.spedire.Spedire.services.payment.Payment;
@@ -36,18 +35,16 @@ public class SpedireCarrierService implements CarrierService {
     private final Payment paymentService;
     private final MapBoxService mapBoxService;
     private final CarrierPoolRepository carrierPoolRepository;
-    private final MatchedOrderRepository matchedCarrierRepository;
 
 
 
     public SpedireCarrierService(UserService userService, UserRepository userRepository, Payment paymentService,
-                                 MapBoxService mapBoxService, CarrierPoolRepository carrierPoolRepository, MatchedOrderRepository matchedCarrierRepository) {
+                                 MapBoxService mapBoxService, CarrierPoolRepository carrierPoolRepository) {
         this.userService = userService;
         this.userRepository = userRepository;
         this.paymentService = paymentService;
         this.mapBoxService = mapBoxService;
         this.carrierPoolRepository = carrierPoolRepository;
-        this.matchedCarrierRepository = matchedCarrierRepository;
     }
 
     @Override
@@ -123,53 +120,6 @@ public class SpedireCarrierService implements CarrierService {
         return mapResponse(request.getAmount(), request.getOrderId(), authorizationUrl, reference);
     }
 
-
-    @Override
-    public List<Object> matchOrderRequest(String senderLocation, String senderTown, String orderId) throws Exception {
-        List<Object> objectList = new ArrayList<>();
-        List<CarrierPool> carriersInTown = carrierPoolRepository.findCarrierPoolByCarrierTown(senderTown);
-
-        if (!carriersInTown.isEmpty()) {
-            for (CarrierPool carrier : carriersInTown) {
-                objectList.add(buildCarrierInfoMap(senderLocation, carrier));
-            }
-            MatchedOrder matchedOrder = MatchedOrder.builder().orderId(orderId).matchedCarriers(objectList).build();
-            matchedCarrierRepository.save(matchedOrder);
-        }
-        return objectList;
-    }
-
-    private Map<String, String> buildCarrierInfoMap(String senderLocation, CarrierPool carrier) throws Exception {
-        Map<String, String> map = new LinkedHashMap<>();
-        String minutesAway = mapBoxService.getMinutesAway(senderLocation, carrier.getCurrentLocation());
-        map.put("name", carrier.getName());
-        map.put("email", carrier.getEmail());
-        map.put("minutesAway", minutesAway);
-        map.put("town", carrier.getCarrierTown() + " Lagos");
-        map.put("number", carrier.getPhoneNumber());
-        map.put("rating", carrier.getRating());
-        map.put("deliveryCount", carrier.getDeliveryCount());
-        return map;
-    }
-
-
-//    @Override
-//    public List<Object> matchOrderRequest(String senderLocation, String senderTown, String orderId) throws Exception {
-//        List<Object> objectList = new ArrayList<>();
-//        if (!carrierPoolRepository.findCarrierPoolByCarrierTown(senderTown).isEmpty()) {
-//            for (CarrierPool carriers: carrierPoolRepository.findCarrierPoolByCarrierTown(senderTown)) {
-//                Map<String, String> map = new LinkedHashMap<>();
-//                String minutesAway = mapBoxService.getMinutesAway(senderLocation, carriers.getCurrentLocation());
-//                map.put("name", carriers.getName()); map.put("email", carriers.getEmail()); map.put("minutesAway", minutesAway);
-//                map.put("town", carriers.getCarrierTown() + " Lagos"); map.put("number", carriers.getPhoneNumber());
-//                map.put("rating", carriers.getRating()); map.put("deliveryCount", carriers.getDeliveryCount());
-//                objectList.add(map);
-//            }
-//            MatchedOrder matchedOrder = MatchedOrder.builder().orderId(orderId).matchedCarriers(objectList).build();
-//            matchedCarrierRepository.save(matchedOrder);
-//        }
-//        return objectList;
-//    }
 
 
     @Override

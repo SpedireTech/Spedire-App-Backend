@@ -20,6 +20,9 @@ public interface OrderService {
 
     FindMatchResponse<?> findMatch(String orderId, CarrierService carrierService) throws Exception;
 
+    List<Object> matchOrderRequestForSender(String senderLocation, String senderTown) throws Exception;
+
+
     Object selectCarrier(SelectCarrierRequest request) throws MessagingException;
 
     void saveOrder(Order foundOrder);
